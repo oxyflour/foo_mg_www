@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<link type="text/css" href="theme.css" rel="stylesheet" />
+<script src="jquery-2.0.2.min.js"></script>
+<script src="jq.index.js"></script>
+<script src="jq.index2.js"></script>
+<style>
+.hidden { display: none; }
+.clear { width: 100%; clear: both; }
+.float-left { float: left; }
+.float-right {float: right; }
+.text-center { text-align: center; }
+.margin-center { margin: 0 auto; }
+.no-wrap { white-space: nowrap; }
+.no-overflow { overflow: hidden; }
+
+.show-play #bw_play, .show-conf #bw_conf, .show-extra #bw_extra, .show-info #bw_info, .show-tool #bw_tool { display: block; }
+.img-view .img { display: block; }
+.img, .img-view .head, .img-view .main, .img-view .side, .img-view .foot { display: none; }
+
+.show-head.show-play #tab_play, .show-head.show-conf #tab_conf, .show-head.show-extra #tab_extra,
+.show-head.show-info #tab_info, .show-head.show-tool #tab_tool { background-color: #ddd; }
+#bw_toolbar button { padding: 0; width: 60px; }
+#bw_title { position: absolute; padding: 0; left: 0; right: 130px; overflow: hidden; background-color: #fff; text-align: left;
+	-webkit-transition: right .3s ease; -ms-transition: right .3s ease; transition: right .3s ease; }
+.show-head #bw_title { right: 260px; }
+
+.list .sep a { display: block; height: 90px; padding: 1em 0; padding-left: 0.5em; color: #fff; }
+.small-sep .sep a { height: auto; padding: 0.6em 0; background: rgba(180, 180, 180, 0.8); }
+
+#bw_extra li, #pl_list li { padding: 5px; margin: 3px; }
+#bw_path .active, #bw_play .active { font-weight: bold; }
+#bw_play .playing { border-left: 13px solid #ddd; margin-left: -10px; }
+#bw_play.on-edit .active-on-edit { font-weight: bold; }
+#bw_play.on-edit li { border-left: 13px solid #ddd; margin-left: -10px; }
+#bw_play.on-edit li.selected { border-left-color: #aaa; }
+#bw_play.on-select .hide-on-select { display: none; }
+#bw_play.on-select .show-on-select { display: initial; font-weight: bold; }
+
+#pl_albumart { cursor: pointer; padding-top: 12px; display: block; margin:0 auto; width: 94%; max-width: 380px; }
+#pl_ctrl button { font-weight: bold; background-color: transparent; border: 0; color: #fff;}
+#pl_info { background-color: #eee; }
+#pl_info2 button { width: 20%; font-size: 120%; padding: 0.8em 0; }
+
+.player { color: #666; position: relative; width: 100%; text-align: center; }
+.player .title { font-size: 105%; font-weight: bold; }
+.player .time { font-size: 80%; }
+.player .info { margin-top: 8px; font-size: 70%; }
+.player .status { margin-top: 5px; font-size: 50%; }
+.proc { background-color:#ddd; border-left: 0 solid #666; height: 3px; }
+
+.bw-list { display: none; /*	z-index: 0; opacity: 0;
+	-webkit-transition: all .3s ease; -moz-transition: all .3s ease;
+	-ms-transition: all .3s ease; transition: all .3s ease; */ }
+.bw-list.bw-show { display: block; /* z-index: 1; opacity: 1; margin-left: 0;
+	-webkit-transform: none; -ms-transform: none; */ }
+/*
+.bw-list.no-anim { -webkit-transition: none; -moz-transition: none;
+	-ms-transition: none; transition: none; }
+.bw-list.bw-showup { -webkit-transform-origin: left center; -ms-transform-origin: left center;
+	-webkit-transform: rotateY(-30deg); -ms-transform: rotateY(-30deg); }
+.bw-list.bw-showdown { -webkit-transform-origin: right center; -ms-transform-origin: right center;
+	-webkit-transform: rotateY(30deg); -ms-transform: rotateY(30deg); }
+*/
+</style>
+</head>
+<body radio-class="show-play show-conf show-extra show-info show-tool,list-view img-view">
+<div class="foot">
+	<div class="title">
+		<button class="float-right" onclick="$bw.elem.find('li.selected').removeClass('selected');
+			$('body').removeClass('show-foot show-select')">x</button>
+		<button class="float-right" onmousedown="event.stopPropagation()"
+			onclick="$('body').clearClass('show-play').addClass('show-head show-play');
+				load_playlist();pl_list.parent().addClass('on-edit')">+</button>
+		<button class="float-left"
+			onclick="$bw.elem.find('li.selected').slideUp(function(){$(this).remove()})">-</button>
+		<button class="float-left"
+			onclick="$bw.elem.find('li.selected').shiftUp()">&and;</button>
+		<button class="float-left"
+			onclick="$bw.elem.find('li.selected').shiftDown()">&or;</button>
+	</div>
+</div>
+<div class="main">
+<ul id="bw_list" class="list"></ul>
+</div>
+<div class="side" class="text-center">
+	<img id="pl_albumart" src="nocover.jpg" onclick="show_list(pl_audio.data('l'))" />
+	<audio id="pl_audio" class="hidden">your browser too old?</audio>
+	<div id="pl_info2" class="clear text-center">
+		<button onclick="play('-')">&lt;&lt;</button>
+		<button onclick="toggle_head_display('show-conf')">&lt;-&gt;</button>
+		<button onclick="play_pause()">&gt;||</button>
+		<button onclick="play('+')">&gt;&gt;</button>
+		<div style="margin:0 auto;width:94%;max-width:500px;">
+			<div id="pl_process2" class="proc" style="height:5px;"></div>
+		</div>
+		<div class="player" onclick="show_list(pl_audio.data('l'))" style="padding-top:20px;cursor:pointer;">
+			<span class="title">not playing</span>&nbsp;<span class="time"></span>
+			<div class="info">click [Add] to add tracks</div>
+		</div>
+	</div>
+</div>
+<div class="head">
+	<div class="menu">
+		<div id="bw_tool" class="hidden">
+			<h3>Search</h3>
+			<form action="javascript:void(null)" onsubmit="search_word(this)">
+				<input name="searchi" style="min-width:70%" /><input type="submit" value="Search" /><br />
+				<input type="checkbox" name="fields" value="folder" />Folder
+				<input type="checkbox" name="fields" value="album" />Album
+				<input type="checkbox" name="fields" value="artist" />Artist
+				<input type="checkbox" name="fields" value="title" />Title
+			</form>
+			<h3>Navigation</h3>
+			<button onclick="location.reload()">Reload Page</button>
+			<button onclick="$bw.open({reload:1})">Reload List</button>
+			<button onclick="show_list(pl_audio.data('l'))">View Current Playlist </button>
+		</div>
+		<div id="bw_conf" class="hidden">
+			<h3>Settings</h3>
+			<div style="margin:10px 5px;"> play mode: 
+				<select class="conf_autoload" key='conf.play_loop'
+						onchange="localStorage.setItem($(this).attr('key'), this.value)">
+					<option value="yes">loop</option>
+					<option value="">noloop</option>
+				</select>
+				<select class="conf_autoload" key='conf.play_next'
+						onchange="localStorage.setItem($(this).attr('key'), this.value)">
+					<option value="yes">list</option>
+					<option value="">track</option>
+				</select>
+			</div>
+			<div style="margin:10px 5px;"> trancoding: 
+				<select class="conf_autoload" key='conf.transcoding'
+						onchange="localStorage.setItem($(this).attr('key'), this.value)">
+					<option value="">auto</option>
+					<option value="wav">wav</option>
+					<option value="mp3">mp3</option>
+					<option value="force,wav">force wav</option>
+					<option value="force,mp3">force mp3</option>
+				</select>
+			</div>
+			<div style="margin:10px 5px;"> sort this folder with: 
+				<select id="bw_sort" onchange="save_sort(this.value)">
+					<option value="">default</option>
+					<option value="folder">folder</option>
+					<option value="date">date</option>
+				</select>
+			</div>
+			<div style="margin:10px 5px;"> show image in: 
+				<select class="conf_autoload" key='conf.open_img_self'
+						onchange="localStorage.setItem($(this).attr('key'), this.value)">
+					<option value="">new window</option>
+					<option value="yes">self</option>
+				</select>
+			</div>
+		</div>
+		<div id="bw_extra" class="hidden">
+			<div id="bw_path" class="no-wrap no-overflow"></div>
+			<ul id="bw_res" style="margin: 0 10px;border-top:1px solid #ccc;"></ul>
+		</div>
+		<div id="bw_info" class="hidden">
+			<div class="no-wrap no-overflow" onclick="$('body').clearClass('show-extra').addClass('show-extra')">
+				&lt;&lt;&nbsp;<button class="name"></button></div>
+			<pre class="content" style="margin: 0 10px;border-top:1px solid #ccc;"></pre>
+		</div>
+		<div id="bw_play" class="hidden">
+			<!--div class="show-narrowview-only">
+				<div id="pl_info3" style="line-height:44px;font-weight:bold;white-space:nowrap;overflow-x:hidden;">
+					<a class="title" onclick="show_list(pl_audio.data('l'))" style="border:none;">not playing</a>&nbsp;
+					<a class="time" onclick="play_pause()"></a>
+				</div>
+				<div id="pl_process3" class="proc"></div>
+			</div-->
+			<div class="no-wrap no-overflow">
+				<button onclick="new_playlist()">New</button>
+				<button class="hide-on-select active-on-edit" onclick="$('#bw_play').toggleClass('on-edit')">Select</button>
+				<select class="hidden show-on-select" onchange="if (this.value) eval(this.value); this.selectedIndex = 0">
+					<option value="">
+						Action...</option>
+					<option value="add_to_playlist($bw.elem.find('li.track.selected:visible'))">
+						Add Selected Tracks</option>
+					<option value="add_to_playlist($bw.elem.find('li.track:visible'))">
+						Add All Tracks</option>
+					<option value="add_to_playlist($bw.elem.find('li.track.selected:visible'), true)">
+						Replace With Selected Tracks</option>
+					<option value="add_to_playlist($bw.elem.find('li.track:visible'), true)">
+						Replace With All Tracks</option>
+					<option value="rename_playlist()">
+						Rename This Playlist</option>
+					<option value="remove_playlist()">
+						Remove This Playlist</option>
+					<option value="cancel_playlist_select()">
+						Cancel</option>
+				</select>
+			</div>
+			<ul id="pl_list" style="margin: 0 10px;border-top:1px solid #ccc;"></ul>
+		</div>
+	</div>
+	<div class="title">
+		<button id="bw_title" onclick="browse('..')"></button>
+		<div id="bw_toolbar" class="float-right">
+			<button id="tab_conf" onclick="toggle_head_display('show-conf')">...</button>
+			<button id="tab_tool" onclick="toggle_head_display('show-tool')">#</button>
+			<button id="tab_extra" onclick="toggle_head_display('show-extra')">+</button>
+			<button id="tab_play" onclick="toggle_head_display('show-play');
+				if ($('body').hasClass('show-head')) load_playlist();">*</button>
+		</div>
+	</div>
+</div>
+<div id="pl_ctrl" class="pg-modal-pop hidden text-center" modal-width="*1">
+	<button class="float-left" onclick="play('-')" style="width:18%;font-size:150%">&lt;&lt;</button>
+	<button class="float-right" onclick="play('+')" style="width:18%;font-size:150%">&gt;&gt;</button>
+	<button style="font-size:300%;margin-top:-15px" onclick="play_pause()">&gt;||</Button>
+</div>
+<div id="pl_info" class="pg-modal-pop hidden" modal-alignY="bottom" modal-width="*1">
+	<div class="player" style="padding:5px;padding-top:10px;">
+		<button class="float-left" onclick="show_list($bw.data('d'))">+</button>
+		<button class="float-right" onclick="">...</button>
+		<div onclick="show_list(pl_audio.data('l'))">
+			<span class="title">not playing</span>&nbsp;<span class="time"></span>
+			<div class="info">click [Add] to add tracks</div>
+		</div>
+	</div>
+	<div id="pl_process" class="proc"></div>
+</div>
+<img class="img" style="position:absolute;" onclick="$('#pl_ctrl,#pl_info').show().modal('open')" />
+<script>
+function save_sort(val) {
+	var d = $bw.data('data');
+	if (d && d.url) {
+		$ul.storage('conf.sort.'+d.url, val || null);
+		$bw.open({reload:1});
+	}
+}
+function toggle_head_display(cls) {
+	var b = $('body');
+	(b.hasClass(cls) && b.hasClass(cls)) ?
+		b.toggleClass('show-head') :
+		b.clearClass(cls).addClass('show-head '+cls);
+}
+function show_list(d) {
+	(d && navigate('list', d.url));
+	$('body').removeClass('show-head');
+};
+function search_word(e) {
+	var word = $(e).find('input[name=searchi]').val();
+	var fields = $ul.ieach($(e).find('input[name=fields]'), function(i, v, l, p) {
+		if (v.checked) p.o = p.o ? p.o+','+$(v).val() : $(v).val()
+	}, {}).o
+	search(word, fields);
+}
+function new_playlist() {
+	var name = $bw.data('data') && $bw.data('data').name || '';
+	if (!pl_list.children().first().find('form').length)
+		pl_list.prepend('<li><form action="javascript:void(null)" onsubmit="submit_new_playlist(this)">'+
+			'<input name="name" style="min-width:70%" value="'+name+'" /><input type="submit" value="OK" /></form></li>')
+}
+function submit_new_playlist(e) {
+	var name = $(e).find('input[name=name]').val();
+	if (name) {
+		var d = { isempty: true, name: name, url: 'search.lua?tojson=1&name='+encodeURIComponent(name) }
+		$(e).parent().replaceWith(item_formatter.playlist(d));
+		localStorage.setItem('playlist.'+d.name, d.url);
+	}
+	else $(e).parent().remove();
+}
+function rename_playlist() {
+	pl_list.children('.selected').each(function(i, e) {
+		var d = $(e).data('d');
+		$('<li><form action="javascript:void(null)" onsubmit="submit_rename_playlist(this)">'+
+			'<input name="name" style="min-width:70%" value="'+d.name+'" /><input type="submit" value="OK" /></form></li>')
+			.data('d', d).replaceAll(e);
+	});
+}
+function submit_rename_playlist(e) {
+	var name = $(e).find('input[name=name]').val(), d = $(e).parent().data('d');
+	if (name && d) {
+		localStorage.removeItem('playlist.'+d.name);
+		d.name = name;
+		$(e).parent().replaceWith(item_formatter.playlist(d));
+		localStorage.setItem('playlist.'+d.name, d.url);
+	}
+	else {
+		localStorage.removeItem('playlist.'+d.name);
+		$(e).remove();
+	}
+}
+function remove_playlist() {
+	pl_list.children('.selected').each(function(i, e) {
+		localStorage.removeItem('playlist.'+$(e).data('d').name);
+		$(e).remove();
+	});
+}
+function cancel_playlist_select() {
+	pl_list.children().removeClass('selected');
+	pl_list.parent().removeClass('on-edit on-select');
+}
+function load_playlist() {
+	var list = pl_list.empty();
+	$ul.storage(function(k, v) {
+		if (k.substr(0, 9) == 'playlist.')
+			var i = item_formatter.playlist({
+				name: k.substr(9),
+				url: v
+			}).appendTo(list);
+			if ($bw.data('data') && $bw.data('data').url == v)
+				i.addClass('active');
+			if (pl_audio.data('l') && pl_audio.data('l').url == v)
+				i.addClass('playing');
+	});
+	cancel_playlist_select();
+}
+function add_to_playlist(ls, save) {
+	pl_list.children('.selected').each(function(i, e) {
+		var d = $(e).data('d');
+		if (d.isempty || save) {
+			playlist_manager.save(d.name, ls, load_playlist);
+			d.isempty = false;
+		}
+		else
+			playlist_manager.add(d.name, ls, load_playlist);
+	});
+}
+function play_pause() {
+	pl_audio[0].paused ?
+		pl_audio[0].play() :
+		pl_audio[0].pause()
+}
+$('select.conf_autoload').each(function (i, e) {
+	var p = $(e), s = p.children('[value="'+localStorage.getItem(p.attr('key'))+'"]');
+	if (s.length)
+		s.attr('selected', true);
+	else {
+		s = p.children().first().attr('selected', true);
+		localStorage.setItem(p.attr('key'), s.val());
+	}
+})
+</script>
+</body>
+</html>
