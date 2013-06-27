@@ -34,11 +34,6 @@
 #bw_extra li, #pl_list li { padding: 5px; margin: 3px; }
 #bw_path .active, #bw_play .active { font-weight: bold; }
 #bw_play .playing { border-left: 13px solid #ddd; margin-left: -10px; }
-#bw_play.on-edit .active-on-edit { font-weight: bold; }
-#bw_play.on-edit li { border-left: 13px solid #ddd; margin-left: -10px; }
-#bw_play.on-edit li.selected { border-left-color: #aaa; }
-#bw_play.on-select .hide-on-select { display: none; }
-#bw_play.on-select .show-on-select { display: initial; font-weight: bold; }
 
 #pl_albumart { cursor: pointer; padding-top: 12px; display: block; margin:0 auto; width: 94%; max-width: 380px; }
 #pl_ctrl button { font-weight: bold; background-color: transparent; border: 0; color: #fff;}
@@ -73,8 +68,7 @@
 		<button class="float-right" onclick="$bw.elem.find('li.selected').removeClass('selected');
 			$('body').removeClass('show-foot show-select')">x</button>
 		<button class="float-right" onmousedown="event.stopPropagation()"
-			onclick="$('body').clearClass('show-play').addClass('show-head show-play');
-				load_playlist();pl_list.parent().addClass('on-edit')">+</button>
+			onclick="$('body').clearClass('show-play').addClass('show-head show-play');load_playlist()">+</button>
 		<button class="float-left"
 			onclick="$bw.elem.find('li.selected').slideUp(function(){$(this).remove()})">-</button>
 		<button class="float-left"
@@ -176,25 +170,14 @@
 				<div id="pl_process3" class="proc"></div>
 			</div-->
 			<div class="no-wrap no-overflow">
-				<button onclick="new_playlist()">New</button>
-				<button class="hide-on-select active-on-edit" onclick="$('#bw_play').toggleClass('on-edit')">Select</button>
-				<select class="hidden show-on-select" onchange="if (this.value) eval(this.value); this.selectedIndex = 0">
-					<option value="">
-						Action...</option>
-					<option value="add_to_playlist($bw.elem.find('li.track.selected:visible'))">
-						Add Selected Tracks</option>
-					<option value="add_to_playlist($bw.elem.find('li.track:visible'))">
-						Add All Tracks</option>
-					<option value="add_to_playlist($bw.elem.find('li.track.selected:visible'), true)">
-						Replace With Selected Tracks</option>
-					<option value="add_to_playlist($bw.elem.find('li.track:visible'), true)">
-						Replace With All Tracks</option>
-					<option value="rename_playlist()">
-						Rename This Playlist</option>
-					<option value="remove_playlist()">
-						Remove This Playlist</option>
-					<option value="cancel_playlist_select()">
-						Cancel</option>
+				<button onclick="rename_playlist($('<li></li>').prependTo(pl_list))">New</button>
+				<button onclick="edit_playlist()">Edit</button>
+				<select id="playlist_action">
+					<option value="">Go to...</option>
+					<option value="+s">Add Selected to</option>
+					<option value="+a">Add All to</option>
+					<option value="=s">Save Selected As</option>
+					<option value="=a">Save All As</option>
 				</select>
 			</div>
 			<ul id="pl_list" style="margin: 0 10px;border-top:1px solid #ccc;"></ul>
@@ -205,9 +188,9 @@
 		<div id="bw_toolbar" class="float-right">
 			<button id="tab_conf" onclick="toggle_head_display('show-conf')">...</button>
 			<button id="tab_tool" onclick="toggle_head_display('show-tool')">#</button>
-			<button id="tab_extra" onclick="toggle_head_display('show-extra')">+</button>
 			<button id="tab_play" onclick="toggle_head_display('show-play');
-				if ($('body').hasClass('show-head')) load_playlist();">*</button>
+				if ($('body').hasClass('show-head')) load_playlist();">+</button>
+			<button id="tab_extra" onclick="toggle_head_display('show-extra')">*</button>
 		</div>
 	</div>
 </div>
@@ -253,52 +236,6 @@ function search_word(e) {
 	}, {}).o
 	search(word, fields);
 }
-function new_playlist() {
-	var name = $bw.data('data') && $bw.data('data').name || '';
-	if (!pl_list.children().first().find('form').length)
-		pl_list.prepend('<li><form action="javascript:void(null)" onsubmit="submit_new_playlist(this)">'+
-			'<input name="name" style="min-width:70%" value="'+name+'" /><input type="submit" value="OK" /></form></li>')
-}
-function submit_new_playlist(e) {
-	var name = $(e).find('input[name=name]').val();
-	if (name) {
-		var d = { isempty: true, name: name, url: 'search.lua?tojson=1&name='+encodeURIComponent(name) }
-		$(e).parent().replaceWith(item_formatter.playlist(d));
-		localStorage.setItem('playlist.'+d.name, d.url);
-	}
-	else $(e).parent().remove();
-}
-function rename_playlist() {
-	pl_list.children('.selected').each(function(i, e) {
-		var d = $(e).data('d');
-		$('<li><form action="javascript:void(null)" onsubmit="submit_rename_playlist(this)">'+
-			'<input name="name" style="min-width:70%" value="'+d.name+'" /><input type="submit" value="OK" /></form></li>')
-			.data('d', d).replaceAll(e);
-	});
-}
-function submit_rename_playlist(e) {
-	var name = $(e).find('input[name=name]').val(), d = $(e).parent().data('d');
-	if (name && d) {
-		localStorage.removeItem('playlist.'+d.name);
-		d.name = name;
-		$(e).parent().replaceWith(item_formatter.playlist(d));
-		localStorage.setItem('playlist.'+d.name, d.url);
-	}
-	else {
-		localStorage.removeItem('playlist.'+d.name);
-		$(e).remove();
-	}
-}
-function remove_playlist() {
-	pl_list.children('.selected').each(function(i, e) {
-		localStorage.removeItem('playlist.'+$(e).data('d').name);
-		$(e).remove();
-	});
-}
-function cancel_playlist_select() {
-	pl_list.children().removeClass('selected');
-	pl_list.parent().removeClass('on-edit on-select');
-}
 function load_playlist() {
 	var list = pl_list.empty();
 	$ul.storage(function(k, v) {
@@ -312,18 +249,59 @@ function load_playlist() {
 			if (pl_audio.data('l') && pl_audio.data('l').url == v)
 				i.addClass('playing');
 	});
-	cancel_playlist_select();
+	var sel = $('#playlist_action');
+	if ($bw.elem.find('li.selected').length) {
+		if (!sel.val()) sel[0].selectedIndex = 1;
+	}
+	else {
+		sel[0].selectedIndex = 0;
+	}
 }
-function add_to_playlist(ls, save) {
-	pl_list.children('.selected').each(function(i, e) {
+function edit_playlist() {
+	var edit = pl_list.children('.on-edit');
+	if (edit.length) {
+		edit.each(function(i, e) {
+			$(e).removeClass('on-edit').find('div.edit-bar').remove();
+		});
+	}
+	else {
+		pl_list.children().each(function(i, e) {
+			$(e).prepend('<div class="edit-bar float-left">'+
+				'<span style="padding: 0 10px; cursor: pointer; color: #aaa;" '+
+					'onclick="$(this).parents(\'li\').first().addClass(\'to-remove\');remove_playlist()">x</span>'+
+//				'<span style="padding: 0 10px; cursor: pointer; color: #aaa;" '+
+//					'onclick="$(this).parents(\'li\').first().addClass(\'to-rename\');rename_playlist()">r</span>'+
+			'</div>').addClass('on-edit');
+		})
+	}
+}
+function remove_playlist() {
+	pl_list.children('.to-remove').each(function(i, e) {
 		var d = $(e).data('d');
-		if (d.isempty || save) {
-			playlist_manager.save(d.name, ls, load_playlist);
-			d.isempty = false;
-		}
-		else
-			playlist_manager.add(d.name, ls, load_playlist);
+		$(e).remove();
+		localStorage.removeItem('playlist.'+d.name);
 	});
+}
+function rename_playlist(s) {
+	(s && s.length ? s : pl_list.children('.to-rename')).each(function(i, e) {
+		var d = $(e).data('d') || {name:'new', url:'search.lua?tojson=1&name=new'};
+		$('<li><form action="javascript:void(null)" onsubmit="submit_rename_playlist(this.parentNode)">'+
+			'<input name="name" style="min-width:70%" value="'+(d.name || '')+'" /><input type="submit" value="OK" /></form></li>')
+			.data('d', d).replaceAll(e);
+	});
+}
+function submit_rename_playlist(e) {
+	var name = $(e).find('input[name=name]').val(), d = $(e).data('d');
+	if (name && d) {
+		localStorage.removeItem('playlist.'+d.name);
+		d.name = name;
+		$(e).replaceWith(item_formatter.playlist(d));
+		localStorage.setItem('playlist.'+d.name, d.url);
+	}
+	else {
+		if (d.name) localStorage.removeItem('playlist.'+d.name);
+		$(e).remove();
+	}
 }
 function play_pause() {
 	pl_audio[0].paused ?

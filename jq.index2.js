@@ -52,8 +52,14 @@ var $ul = new (function($) {
 			return $t.get(obj, name);
 		});
 	}
-	$.format = function(str) {
+	this.formatelem = function(str) {
 		return $($t.format(str, arguments));
+	}
+	this.formatcat = function(list, str, sep) {
+		return ($t.each(list, function(index, item, list, para) {
+			var s = $t.format(str, [index, item]);
+			if (s) para.s = (!para.s) ? s : para.s+sep+s;
+		}, {})).s;
 	}
 	this.storage = function(key, value) {
 		if (typeof(key) == typeof('')) {
@@ -81,13 +87,13 @@ var item_formatter = {
 		var v = string_utility.get_brakets(d.name),
 			b1 = (v[2].length ? '['+string_utility.table_cat(v[2], '] [')+']' : ''),
 			b2 = string_utility.table_cat(v[1], ' ') || '';
-		return $.format('<li bw-id="{{1//id}}" class="folder">{{2//0}}<span class="inc">&gt;</span>'+
+		return $ul.formatelem('<li bw-id="{{1//id}}" class="folder">{{2//0}}<span class="inc">&gt;</span>'+
 				'<div class="info">{{3}} {{4}}</div>'+
 			'</li>', d, v, b1, b2)
 			.data("d", d).click(item_callbacks.folder);
 	},
 	track: function(d) {
-		var li = $.format('<li pl-id="{{1//id}}" class="track"><span class="num">{{1//num}}</span>{{1//name}}'+
+		var li = $ul.formatelem('<li pl-id="{{1//id}}" class="track"><span class="num">{{1//num}}</span>{{1//name}}'+
 				'<span class="duration">{{1//length}}</span>'+
 				'<div class="info">&lt;{{1//artist}}&gt;</div>'+
 			'</li>', d).data("d", d)
@@ -96,7 +102,7 @@ var item_formatter = {
 		return li;
 	},
 	sep: function(d) {
-		return $.format('<div class="sep" style="background-image:url({{2}}&nofallback=1)">'+
+		return $ul.formatelem('<div class="sep" style="background-image:url({{2}}&nofallback=1)">'+
 				'<a href="{{2}}" target="_blank"><span class="stress">{{1//album}}</span> ({{1//album_artist}})</a>'+
 			'</div>', d, $conf.get_full_url('resource.lua?id='+d.id)).data("d", d)
 			.click(item_callbacks.sep);
@@ -105,17 +111,17 @@ var item_formatter = {
 		var ext = d.res.substr(-4).toLowerCase(),
 			url = $conf.get_full_url('resource.lua?pid='+d.id+'&res='+encodeURIComponent(d.res));
 		if (ext == ".jpg" || ext == ".bmp" || ext == ".png") {
-			return $.format('<li><a target="_blank" href="{{2}}">'+
+			return $ul.formatelem('<li><a target="_blank" href="{{2}}">'+
 					'[{{1//res}}]</a></li>', d, url)
 				.click(item_callbacks.res_img);
 		}
 		else if (ext == ".txt") {
-			return $.format('<li>[{{1//res}}]</li>', d).data("d", d)
+			return $ul.formatelem('<li>[{{1//res}}]</li>', d).data("d", d)
 				.click(item_callbacks.res_text);
 		}
 	},
 	playlist: function(d) {
-		return $.format('<li><a href="#list/{{1//url}}">{{1//:o.name||"Default";}}</a></li>', d).data('d', d)
+		return $ul.formatelem('<li><a href="#list/{{1//url}}">{{1//:o.name||"Default";}}</a></li>', d).data('d', d)
 			.click(item_callbacks.playlist);
 	}
 }

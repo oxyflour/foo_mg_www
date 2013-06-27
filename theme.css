@@ -214,11 +214,11 @@ a {
 }
 
 /*-- selection --*/
-.show-select .duration {
+.show-foot.show-select .duration {
 	/*-- test only --*/
 	background-color: #eee;
 }
-.show-select .selected .duration {
+.show-foot.show-select .selected .duration {
 	/*-- test only --*/
 	background-color: #bbb;
 }

@@ -221,12 +221,22 @@ var item_callbacks = {
 		});
 	},
 	playlist: function(e) {
-		if (pl_list.parent().hasClass('on-edit')) {
+		function done(data) {
+			$('body').removeClass('show-head');
+			navigate('list', data.url);
+		}
+		var a = $('#playlist_action').val();
+		if (a) {
 			e.preventDefault();
-			$(this).toggleClass('selected');
-			$(this).parent().children('li.selected').length > 0 ?
-				pl_list.parent().addClass('on-select') :
-				pl_list.parent().removeClass('on-select');
+			var ls = $bw.elem.find(a[1] == 'a' ? 'li.track:visible' : 'li.track.selected:visible'),
+				save = a[0] == '=';
+			var d = $(this).data('d');
+			if (d.isempty || save) {
+				playlist_manager.save(d.name, ls, done);
+				d.isempty = false;
+			}
+			else
+				playlist_manager.add(d.name, ls, done);
 		}
 	}
 }
