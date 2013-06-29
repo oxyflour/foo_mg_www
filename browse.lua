@@ -141,6 +141,9 @@ for pid, dir in pairs(para.ps) do
 	end
 	-- try get resource list
 	inf.res = scan_res(inf.res, dir, extra and extra.res_path)
+	if dir:lower():match('disc%d+$') or dir:lower():match('cd%d+$') then
+		inf.res = scan_res(inf.res, dir, '..')
+	end
 	inf.extra = extra and extra.extra
 end
 db:close()

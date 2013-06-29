@@ -33,6 +33,7 @@
 
 #bw_extra li, #pl_list li { padding: 5px; margin: 3px; }
 #bw_path .active, #bw_play .active { font-weight: bold; }
+#bw_path button { max-width: 90px; overflow: hidden; text-overflow: ellipsis; padding: 0; }
 #bw_play .playing { border-left: 13px solid #ddd; margin-left: -10px; }
 
 #pl_albumart { cursor: pointer; padding-top: 12px; display: block; margin:0 auto; width: 94%; max-width: 380px; }
@@ -86,7 +87,7 @@
 	<div id="pl_info2" class="clear text-center">
 		<button onclick="play('-')">&lt;&lt;</button>
 		<button onclick="toggle_head_display('show-conf')">&lt;-&gt;</button>
-		<button onclick="play_pause()">&gt;||</button>
+		<button id="pl_button2" onclick="play_pause()">&gt;||</button>
 		<button onclick="play('+')">&gt;&gt;</button>
 		<div style="margin:0 auto;width:94%;max-width:500px;">
 			<div id="pl_process2" class="proc" style="height:5px;"></div>
@@ -111,10 +112,19 @@
 			<h3>Navigation</h3>
 			<button onclick="location.reload()">Reload Page</button>
 			<button onclick="$bw.open({reload:1})">Reload List</button>
-			<button onclick="show_list(pl_audio.data('l'))">View Current Playlist </button>
+			<br />
+			<button onclick="show_list(pl_audio.data('l'))">View Current Playlist</button>
 		</div>
 		<div id="bw_conf" class="hidden">
-			<h3>Settings</h3>
+			<h3>Folder Setting</h3>
+			<div style="margin:10px 5px;"> sort this folder with: 
+				<select id="bw_sort" onchange="save_sort(this.value)">
+					<option value="">default</option>
+					<option value="folder">folder</option>
+					<option value="date">date</option>
+				</select>
+			</div>
+			<h3>Global Setting</h3>
 			<div style="margin:10px 5px;"> play mode: 
 				<select class="conf_autoload" key='conf.play_loop'
 						onchange="localStorage.setItem($(this).attr('key'), this.value)">
@@ -137,13 +147,6 @@
 					<option value="force,mp3">force mp3</option>
 				</select>
 			</div>
-			<div style="margin:10px 5px;"> sort this folder with: 
-				<select id="bw_sort" onchange="save_sort(this.value)">
-					<option value="">default</option>
-					<option value="folder">folder</option>
-					<option value="date">date</option>
-				</select>
-			</div>
 			<div style="margin:10px 5px;"> show image in: 
 				<select class="conf_autoload" key='conf.open_img_self'
 						onchange="localStorage.setItem($(this).attr('key'), this.value)">
@@ -164,7 +167,7 @@
 		<div id="bw_play" class="hidden">
 			<!--div class="show-narrowview-only">
 				<div id="pl_info3" style="line-height:44px;font-weight:bold;white-space:nowrap;overflow-x:hidden;">
-					<a class="title" onclick="show_list(pl_audio.data('l'))" style="border:none;">not playing</a>&nbsp;
+					<a class="title" onclick="show_list(pl_audio.data('l'))" style="border:none;">ready to play</a>&nbsp;
 					<a class="time" onclick="play_pause()"></a>
 				</div>
 				<div id="pl_process3" class="proc"></div>
@@ -197,14 +200,14 @@
 <div id="pl_ctrl" class="pg-modal-pop hidden text-center" modal-width="*1">
 	<button class="float-left" onclick="play('-')" style="width:18%;font-size:150%">&lt;&lt;</button>
 	<button class="float-right" onclick="play('+')" style="width:18%;font-size:150%">&gt;&gt;</button>
-	<button style="font-size:300%;margin-top:-15px" onclick="play_pause()">&gt;||</Button>
+	<button id="pl_button" style="font-size:300%;margin-top:-15px" onclick="play_pause()">&gt;||</Button>
 </div>
 <div id="pl_info" class="pg-modal-pop hidden" modal-alignY="bottom" modal-width="*1">
 	<div class="player" style="padding:5px;padding-top:10px;">
 		<button class="float-left" onclick="show_list($bw.data('d'))">+</button>
 		<button class="float-right" onclick="">...</button>
-		<div onclick="show_list(pl_audio.data('l'))">
-			<span class="title">not playing</span>&nbsp;<span class="time"></span>
+		<div onclick="show_list(pl_audio.data('l') || $bw.data('data'))">
+			<span class="title">ready to play</span>&nbsp;<span class="time"></span>
 			<div class="info">click [Add] to add tracks</div>
 		</div>
 	</div>
@@ -269,8 +272,8 @@ function edit_playlist() {
 			$(e).prepend('<div class="edit-bar float-left">'+
 				'<span style="padding: 0 10px; cursor: pointer; color: #aaa;" '+
 					'onclick="$(this).parents(\'li\').first().addClass(\'to-remove\');remove_playlist()">x</span>'+
-//				'<span style="padding: 0 10px; cursor: pointer; color: #aaa;" '+
-//					'onclick="$(this).parents(\'li\').first().addClass(\'to-rename\');rename_playlist()">r</span>'+
+				'<span style="padding: 0 10px; cursor: pointer; color: #aaa;" '+
+					'onclick="$(this).parents(\'li\').first().addClass(\'to-rename\');rename_playlist()">r</span>'+
 			'</div>').addClass('on-edit');
 		})
 	}

@@ -26,6 +26,9 @@ a {
 	color: #333;
 	text-decoration: none;
 }
+a.visited {
+	color: #aaa;
+}
 
 /*-- head --*/
 .head {
@@ -35,7 +38,7 @@ a {
 	top: 0;
 	background-color: white;
 }
-.head .menu {
+.head>.menu {
 	height: 0;
 	overflow: hidden;
 	-webkit-transition: height .4s ease;
@@ -61,10 +64,10 @@ a {
 	width: 100%;
 	overflow-x: hidden;
 	overflow-y: auto;
-	-webkit-transition: bottom .3s ease;
-	-moz-transition: bottom .3s ease;
-	-ms-transition: bottom .3s ease;
-	transition: bottom .3s ease;
+	-webkit-transition: bottom,opacity .3s ease;
+	-moz-transition: bottom,opacity .3s ease;
+	-ms-transition: bottom,opacity .3s ease;
+	transition: bottom,opacity .3s ease;
 }
 
 /*-- side --*/
@@ -78,10 +81,10 @@ a {
 	max-width: 640px;
 	overflow: auto;
 	background-color: white;
-	-webkit-transition: bottom .3s ease;
-	-moz-transition: bottom .3s ease;
-	-ms-transition: bottom .3s ease;
-	transition: bottom .3s ease;
+	-webkit-transition: bottom,opacity .3s ease;
+	-moz-transition: bottom,opacity .3s ease;
+	-ms-transition: bottom,opacity .3s ease;
+	transition: bottom,opacity .3s ease;
 }
 
 /*-- foot --*/
@@ -199,26 +202,30 @@ a {
 }
 
 /*-- when toggle on the menu --*/
-.show-head .head .menu {
+.show-head>.head .menu {
 	height: 299px;
 	overflow: auto;
 	border-bottom: 1px solid #ccc;
 }
+.show-head>.main, .show-head>.side {
+/*-- there is a bug in android stock browser if I use opacity here --*/
+/*	opacity: 0.99; */
+}
 /*-- show foot --*/
-.show-foot .main, .show-foot .side {
+.show-foot>.main, .show-foot>.side {
 	bottom: 45px;
 }
-.show-foot .foot {
+.show-foot>.foot {
 	height: 45px;
 	bottom: 0;
 }
 
 /*-- selection --*/
-.show-foot.show-select .duration {
+.show-select .duration {
 	/*-- test only --*/
 	background-color: #eee;
 }
-.show-foot.show-select .selected .duration {
+.show-select .selected .duration {
 	/*-- test only --*/
 	background-color: #bbb;
 }

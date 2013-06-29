@@ -267,18 +267,3 @@ var $pl = new (function($) {
 	this.play = function(d) {
 	}
 })(jQuery);
-
-var page_loader = {
-	list: function(url) {
-		$bw.open({url:url});
-	},
-	img: function(url) {
-		$("body>.img").attr("src", url).wait(function(t) {
-			return this.prop("complete") ? 0 : 200;
-		}, function(t) {
-			var i = this[0], w = $(window);
-			i.naturalWidth / i.naturalHeight < w.width() / w.height() && w.width() < 720 ?
-				this.width("100%").height("auto") : this.width("auto").height("100%");
-		});
-	}
-};

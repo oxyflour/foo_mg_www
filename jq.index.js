@@ -189,6 +189,7 @@ var item_callbacks = {
 		}
 	},
 	sep: function(e) {
+		$(this).children('a').addClass('visited');
 		if (localStorage.getItem('conf.open_img_self') == "yes") {
 			e.preventDefault();
 			navigate('img', $(this).children('a').attr('href'));
@@ -202,6 +203,7 @@ var item_callbacks = {
 		e.stopPropagation();
 	},
 	res_img: function(e) {
+		$(this).children('a').addClass('visited');
 		if (localStorage.getItem('conf.open_img_self') == "yes") {
 			e.preventDefault();
 			navigate('img', $(this).children('a').attr('href'));
@@ -251,12 +253,14 @@ var audio_callbacks = {
 		pl_info.find(".info").text(d.album+' ['+d.num+']');
 		if (a.timeout > 0) clearTimeout(a.timeout);
 		a.timeout = setTimeout(audio_callbacks.playing, 100);
+		pl_button.text('| |');
 	},
 	pause: function(e) {
 		var a = pl_audio[0], d = pl_audio.data("d");
 		$("li[pl-id="+d.id+']').removeClass("playing").addClass("play paused")
 			.find('.duration .timer').text('paused/');
 		pl_info.find(".time").text("[paused]");
+		pl_button.text('>|');
 	},
 	ended: function(e) {
 		var a = pl_audio[0], d = pl_audio.data("d");
@@ -385,6 +389,21 @@ var playlist_manager = {
 	}
 }
 
+var page_loader = {
+	list: function(url) {
+		$bw.open({url:url});
+	},
+	img: function(url) {
+		$("body>.img").width(0).height(0).attr("src", url).wait(function(t) {
+			return this.prop("complete") && t ? 0 : 100;
+		}, function(t) {
+			var i = this[0], w = $(window);
+			i.naturalWidth / i.naturalHeight < w.width() / w.height() && w.width() < 720 ?
+				this.width("100%").height("auto") : this.width("auto").height("100%");
+		});
+	}
+};
+
 $(document).bind('bw.loadbegin', function(e, d) {
 });
 $(document).bind('bw.browse', function(e, elem) {
@@ -402,16 +421,14 @@ $(document).bind('bw.browse', function(e, elem) {
 
 	if (d.path && (!$bw.path.attr('bw-path') || $bw.path.attr('bw-path').indexOf(d.path) < 0)) {
 		$bw.path.attr('bw-path', d.path).empty();
-		$('<button bw-path="">root&gt;</a>').click(function(e) { browse(); }).appendTo($bw.path);
+		$('<button bw-path="">root</button><span>&gt;</span>').click(function(e) { browse(); }).appendTo($bw.path);
 		var pid = Math.floor(d.id), st = d.path.split('\\'), path = "";
 		for (var i = 0; i < st.length; i ++) {
 			if (!st[i]) continue;
 			var s = st[i], id = pid;
 			path += path ? '\\'+s : s;
 			id = (pid+path.length/1000).toFixed(3);
-			$('<button bw-path="'+path+'">'+
-				(s.length > 11 ? s.substr(0, 8)+'...' : s)+
-			'&gt;</button>').click(function(e) {
+			$ul.formatelem('<button bw-path="{{1}}" title="{{2}}">{{2}}</button><span>&gt;</span>', path, s).click(function(e) {
 				browse($(this).attr('bw-path'));
 			}).appendTo($bw.path);
 		}
@@ -431,6 +448,7 @@ $(document).ready(function(e) {
 	window.pl_audio = $('#pl_audio');
 	window.pl_info = $('#pl_info, #pl_info2, #pl_info3');
 	window.pl_list = $('#pl_list');
+	window.pl_button = $('#pl_button, #pl_button2');
 	pl_audio.bind("play", audio_callbacks.play)
 		.bind("pause", audio_callbacks.pause)
 		.bind("ended", audio_callbacks.ended);
@@ -444,7 +462,9 @@ $(document).ready(function(e) {
 	$(window).trigger("hashchange");
 });
 $(document).bind("touchstart mousedown", function(e) {
-	if ($("body").hasClass("show-head") && $(e.target).parents(".head").length == 0) {
+	if ($("body").hasClass("show-head") &&
+			$('.head').is(':visible') &&
+			$(e.target).parents(".head").length == 0) {
 		$("body").removeClass("show-head")
 	}
 });
