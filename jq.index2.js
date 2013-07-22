@@ -1,5 +1,5 @@
 var $conf = {
-	host: 'http://10.98.106.71:8099/',
+	host: '',
 	get_full_url: function(url) {
 		return $conf.host+url;
 	},
@@ -85,8 +85,8 @@ var item_formatter = {
 	},
 	folder: function(d) {
 		var v = string_utility.get_brakets(d.name),
-			b1 = (v[2].length ? '['+string_utility.table_cat(v[2], '] [')+']' : ''),
-			b2 = string_utility.table_cat(v[1], ' ') || '';
+			b1 = $ul.formatcat(v[2], '[{{1}}]', ' ') || '',
+			b2 = $ul.concat(v[1], ' ') || '';
 		return $ul.formatelem('<li bw-id="{{1//id}}" class="folder">{{2//0}}<span class="inc">&gt;</span>'+
 				'<div class="info">{{3}} {{4}}</div>'+
 			'</li>', d, v, b1, b2)
@@ -102,14 +102,17 @@ var item_formatter = {
 		return li;
 	},
 	sep: function(d) {
-		return $ul.formatelem('<div class="sep" style="background-image:url({{2}}&nofallback=1)">'+
-				'<a href="{{2}}" target="_blank"><span class="stress">{{1//album}}</span> ({{1//album_artist}})</a>'+
+		if (!d.album)
+			return $();
+		else return $ul.formatelem('<div class="sep" onmousedown="event.stopPropagation()" style="background-image:url({{2}}&nofallback=1)">'+
+				'<a class="link" href="{{2}}" target="_blank">...</a>'+
+				'<div class="bg"><span class="stress">{{1//album}}</span> ({{1//album_artist}})</div>'+
 			'</div>', d, $conf.get_full_url('resource.lua?id='+d.id)).data("d", d)
 			.click(item_callbacks.sep);
 	},
 	res: function(d) {
 		var ext = d.res.substr(-4).toLowerCase(),
-			url = $conf.get_full_url('resource.lua?pid='+d.id+'&res='+encodeURIComponent(d.res));
+			url = $conf.get_full_url('resource.lua?path='+encodeURIComponent(d.path)+'&res='+encodeURIComponent(d.res));
 		if (ext == ".jpg" || ext == ".bmp" || ext == ".png") {
 			return $ul.formatelem('<li><a target="_blank" href="{{2}}">'+
 					'[{{1//res}}]</a></li>', d, url)
@@ -119,9 +122,12 @@ var item_formatter = {
 			return $ul.formatelem('<li>[{{1//res}}]</li>', d).data("d", d)
 				.click(item_callbacks.res_text);
 		}
+		else {
+			return $ul.formatelem('<li>[{{1//res}}]</li>', d).data("d", d);
+		}
 	},
 	playlist: function(d) {
-		return $ul.formatelem('<li><a href="#list/{{1//url}}">{{1//:o.name||"Default";}}</a></li>', d).data('d', d)
+		return $ul.formatelem('<li><a href="#list/{{1//url}}">{{1//name}}</a></li>', d).data('d', d)
 			.click(item_callbacks.playlist);
 	}
 }
@@ -129,7 +135,7 @@ var item_formatter = {
 var $bw = new (function($) {
 	var $t = this;
 	var cls = 'bw-class';
-	var group_by = 'album';
+	var group_by = '{{pid}}-{{album}}';
 	var max_elems = 2;
 	// should be set
 	this.elem = null;
@@ -181,7 +187,7 @@ var $bw = new (function($) {
 		$(document).trigger('bw.loading', data);
 		$ul.each(data.ls, function(i, v, ls, pa) {
 			if (!v) return;
-			var g = $ul.get(v, group_by), c = elem.data('bw-groupcount') || 0;
+			var g = $ul.format(group_by, v), c = elem.data('bw-groupcount') || 0;
 			if (g && g != elem.attr('bw-group')) {
 				(item_formatter['sep'](v)).insertBefore(loader);
 				elem.attr('bw-group', g).data('bw-groupcount', c + 1);
@@ -254,7 +260,7 @@ var $bw = new (function($) {
 	}
 	this.load = function(url, data) {
 		var elem = get_elem(url);
-		reset_elem(elem);
+//		reset_elem(elem);
 		load_data(elem, data);
 	}
 	this.data = function(key) {

@@ -157,19 +157,6 @@ var string_utility = {
 	secToMmss: function(sec) {
 		var m = Math.floor(sec / 60), s = Math.floor(sec) - m*60;
 		return m + ':' + (s > 9 ? s : '0'+s);
-	},
-	table_cat: function(ls, sep) {
-		var s = "";
-		for (var i = 0; i < ls.length; i ++) {
-			s += (s == "") ? ls[i] : (sep + ls[i]);
-		}
-		return s;
-	},
-	table_each: function(ls, func) {
-		for (var i = 0; i < ls.length; i ++) {
-			var r = func(i, ls[i], ls);
-			if (r) return r;
-		}
 	}
 }
 
@@ -189,10 +176,21 @@ var item_callbacks = {
 		}
 	},
 	sep: function(e) {
-		$(this).children('a').addClass('visited');
-		if (localStorage.getItem('conf.open_img_self') == "yes") {
-			e.preventDefault();
-			navigate('img', $(this).children('a').attr('href'));
+		if ($(e.target).is('a')) {
+			if (localStorage.getItem('conf.open_img_self') == "yes") {
+				e.preventDefault();
+				navigate('img', $(this).children('a').attr('href'));
+			}
+		}
+		else {
+			var d = $(this).data('d');
+			if (d.path) {
+				navigate('list', 'browse.lua?tojson=1&path='+encodeURIComponent(d.path));
+			}
+			else {
+				e.stopPropagation();
+				$("body").clearClass("show-extra").addClass("show-head show-extra");
+			}
 		}
 	},
 	duration: function(e) {
@@ -203,7 +201,7 @@ var item_callbacks = {
 		e.stopPropagation();
 	},
 	res_img: function(e) {
-		$(this).children('a').addClass('visited');
+		if ($(e.target).is('a')) $(e.target).addClass('visited');
 		if (localStorage.getItem('conf.open_img_self') == "yes") {
 			e.preventDefault();
 			navigate('img', $(this).children('a').attr('href'));
@@ -211,7 +209,7 @@ var item_callbacks = {
 	},
 	res_text: function(e) {
 		var d = $(this).data("d"),
-			u = $conf.get_full_url('resource.lua?pid='+d.id+'&res='+encodeURIComponent(d.res)),
+			u = $conf.get_full_url('resource.lua?path='+encodeURIComponent(d.path)+'&res='+encodeURIComponent(d.res)),
 			c = $bw.info.find('.content').text('loading...'),
 			t = $bw.info.find('.name').text(d.res);
 		$("body").clearClass("show-info").addClass("show-head show-info");
@@ -253,14 +251,14 @@ var audio_callbacks = {
 		pl_info.find(".info").text(d.album+' ['+d.num+']');
 		if (a.timeout > 0) clearTimeout(a.timeout);
 		a.timeout = setTimeout(audio_callbacks.playing, 100);
-		pl_button.text('| |');
+		pl_button.text('| |').attr('title', 'pause');
 	},
 	pause: function(e) {
 		var a = pl_audio[0], d = pl_audio.data("d");
 		$("li[pl-id="+d.id+']').removeClass("playing").addClass("play paused")
 			.find('.duration .timer').text('paused/');
 		pl_info.find(".time").text("[paused]");
-		pl_button.text('>|');
+		pl_button.text('>|').attr('title', 'play');;
 	},
 	ended: function(e) {
 		var a = pl_audio[0], d = pl_audio.data("d");
@@ -292,6 +290,7 @@ var audio_callbacks = {
 		}
 	}
 }
+
 function search(word, fields) {
 	if (word) navigate("list", "search.lua?tojson=1&word="+encodeURIComponent(word)+
 		(fields ? '&fields='+encodeURIComponent(fields) : '')+'&name='+encodeURIComponent('Searching: '+word));
@@ -308,7 +307,7 @@ function browse(path) {
 function play(d) {
 	if (typeof(d) == typeof('')) {
 		var x = pl_audio.data("d"), l = pl_audio.data("l"), u = [];
-		string_utility.table_each(l && l.ls || {}, function(i, v, ls) {
+		$ul.ieach(l && l.ls || {}, function(i, v, ls) {
 			if (v.typ != "track") return false;
 			if (v.id == x.id) u.current = u.length;
 			u.push(v);
@@ -335,6 +334,14 @@ function navigate(action, url) {
 	if (location.hash.replace(/^#/, '') != h)
 		location.hash = h;
 }
+function wait(show, delay) {
+	$("#loading").wait(function(t) {
+		return t ? 0 : delay;
+	}, function(t) {
+		this.show().modal(show ? 'open' : 'close');
+	});
+}
+
 var playlist_manager = {
 	save: function(name, ln, cb) {
 		var tlist = '', nlist = '', ls = [], d = $bw.elem.data("data");
@@ -394,9 +401,11 @@ var page_loader = {
 		$bw.open({url:url});
 	},
 	img: function(url) {
+		wait(true, 300);
 		$("body>.img").width(0).height(0).attr("src", url).wait(function(t) {
 			return this.prop("complete") && t ? 0 : 100;
 		}, function(t) {
+			wait(false);
 			var i = this[0], w = $(window);
 			i.naturalWidth / i.naturalHeight < w.width() / w.height() && w.width() < 720 ?
 				this.width("100%").height("auto") : this.width("auto").height("100%");
@@ -415,6 +424,7 @@ $(document).bind('bw.browse', function(e, elem) {
 	for (var i = 0; d.res && i < d.res.length; i ++) {
 		(item_formatter.res({
 			res: d.res[i],
+			path: d.path,
 			id: d.id
 		})).appendTo($bw.res);
 	}
@@ -459,7 +469,13 @@ $(document).ready(function(e) {
 	$bw.res = $("#bw_res");
 	$bw.path = $("#bw_path");
 	$bw.sort = $("#bw_sort");
+
 	$(window).trigger("hashchange");
+});
+$(document).ajaxStart(function() {
+	wait(true, 300);
+}).ajaxComplete(function() {
+	wait(false);
 });
 $(document).bind("touchstart mousedown", function(e) {
 	if ($("body").hasClass("show-head") &&
@@ -485,5 +501,4 @@ $(window).bind("hashchange", function(e) {
 			"width=device-width,minimum-scale=1,maximum-scale=1");
 	}
 	page_loader[exec[1]] && page_loader[exec[1]](exec[2]);
-//	page_load_func[exec[1]] && page_load_func[exec[1]]({url: exec[2]});
 })
