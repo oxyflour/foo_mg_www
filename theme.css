@@ -64,10 +64,10 @@ a.visited {
 	width: 100%;
 	overflow-x: hidden;
 	overflow-y: auto;
-	-webkit-transition: bottom,opacity .3s ease;
-	-moz-transition: bottom,opacity .3s ease;
-	-ms-transition: bottom,opacity .3s ease;
-	transition: bottom,opacity .3s ease;
+	-webkit-transition: bottom .3s ease;
+	-moz-transition: bottom .3s ease;
+	-ms-transition: bottom .3s ease;
+	transition: bottom .3s ease;
 }
 
 /*-- side --*/
@@ -81,10 +81,10 @@ a.visited {
 	max-width: 640px;
 	overflow: auto;
 	background-color: white;
-	-webkit-transition: bottom,opacity .3s ease;
-	-moz-transition: bottom,opacity .3s ease;
-	-ms-transition: bottom,opacity .3s ease;
-	transition: bottom,opacity .3s ease;
+	-webkit-transition: bottom .3s ease;
+	-moz-transition: bottom .3s ease;
+	-ms-transition: bottom .3s ease;
+	transition: bottom .3s ease;
 }
 
 /*-- foot --*/
@@ -134,10 +134,10 @@ a.visited {
 	display: block;
 	left: 435px;
 }
-.show-wideview-only {
+.show-landscape-only {
 	display: block;
 }
-.show-narrowview-only {
+.show-portrait-only {
 	display: none;
 }
 }
