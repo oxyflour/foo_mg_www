@@ -17,6 +17,11 @@
 .no-wrap { white-space: nowrap; }
 .no-overflow { overflow: hidden; }
 
+.title select.button { -webkit-appearance: none; border: none; background-color: transparent; width: 60px; height: 44px;
+	line-height: 44px; padding: 0 20px; margin:0; font-weight: bold; font-size: 105%; }
+
+#loading { background-color: #eee; line-height: 45px; color: #888; }
+
 .show-play #bw_play, .show-conf #bw_conf, .show-extra #bw_extra, .show-info #bw_info, .show-tool #bw_tool { display: block; }
 .img-view .img { display: block; }
 .img, .img-view .head, .img-view .main, .img-view .side, .img-view .foot { display: none; }
@@ -27,9 +32,11 @@
 #bw_title { position: absolute; padding: 0; left: 0; right: 130px; overflow: hidden; background-color: #fff; text-align: left;
 	-webkit-transition: right .3s ease; -ms-transition: right .3s ease; transition: right .3s ease; }
 .show-head #bw_title { right: 260px; }
+@media only screen and (min-width: 621px) { #bw_title { right: 260px; } }
 
-.list .sep a { display: block; height: 90px; padding: 1em 0; padding-left: 0.5em; color: #fff; }
-.small-sep .sep a { height: auto; padding: 0.6em 0; background: rgba(180, 180, 180, 0.8); }
+.list .sep .bg { display: block; height: 90px; padding: 1em 0; padding-left: 0.5em; color: #fff; background: rgba(180, 180, 180, 0.4); }
+.list .sep .link { float: right; margin: 0; padding: 0.5em 1em; color: white; font-weight: bold; font-size: 120%; }
+.small-sep .sep .bg { height: auto; padding: 0.6em 0; background: rgba(180, 180, 180, 0.8); }
 
 #bw_extra li, #pl_list li { padding: 5px; margin: 3px; }
 #bw_path .active, #bw_play .active { font-weight: bold; }
@@ -66,10 +73,19 @@
 <body radio-class="show-play show-conf show-extra show-info show-tool,list-view img-view">
 <div class="foot">
 	<div class="title">
+		<select class="float-right button" onmousedown="event.stopPropagation()"
+				onchange="$('body').clearClass('show-play').addClass('show-head show-play');
+					$('#playlist_action').val(this.value); load_playlist(); this.selectedIndex = 0">
+			<option value="">+</option>
+			<option value="+s">Add Selected to</option>
+			<option value="+a">Add All to</option>
+			<option value="=s">Save Selected as</option>
+			<option value="=a">Save All as</option>
+		</select>
 		<button class="float-right" onclick="$bw.elem.find('li.selected').removeClass('selected');
 			$('body').removeClass('show-foot show-select')">x</button>
-		<button class="float-right" onmousedown="event.stopPropagation()"
-			onclick="$('body').clearClass('show-play').addClass('show-head show-play');load_playlist()">+</button>
+		<!--button class="float-right" onmousedown="event.stopPropagation()"
+			onclick="$('body').clearClass('show-play').addClass('show-head show-play');load_playlist()">+</button-->
 		<button class="float-left"
 			onclick="$bw.elem.find('li.selected').slideUp(function(){$(this).remove()})">-</button>
 		<button class="float-left"
@@ -86,7 +102,7 @@
 	<audio id="pl_audio" class="hidden">your browser too old?</audio>
 	<div id="pl_info2" class="clear text-center">
 		<button onclick="play('-')">&lt;&lt;</button>
-		<button onclick="toggle_head_display('show-conf')">&lt;-&gt;</button>
+		<button onmousedown="event.stopPropagation()" onclick="toggle_head_display('show-conf')">&lt;-&gt;</button>
 		<button id="pl_button2" onclick="play_pause()">&gt;||</button>
 		<button onclick="play('+')">&gt;&gt;</button>
 		<div style="margin:0 auto;width:94%;max-width:500px;">
@@ -103,7 +119,7 @@
 		<div id="bw_tool" class="hidden">
 			<h3>Search</h3>
 			<form action="javascript:void(null)" onsubmit="search_word(this)">
-				<input name="searchi" style="min-width:70%" /><input type="submit" value="Search" /><br />
+				<input name="searchi" style="margin:0 5px;min-width:70%" /><input type="submit" value="Search" /><br />
 				<input type="checkbox" name="fields" value="folder" />Folder
 				<input type="checkbox" name="fields" value="album" />Album
 				<input type="checkbox" name="fields" value="artist" />Artist
@@ -113,7 +129,8 @@
 			<button onclick="location.reload()">Reload Page</button>
 			<button onclick="$bw.open({reload:1})">Reload List</button>
 			<br />
-			<button onclick="show_list(pl_audio.data('l'))">View Current Playlist</button>
+			<button onclick="$('body').clearClass('show-conf').addClass('show-conf')">Setting</button>
+			<button onclick="show_list(pl_audio.data('l'))">Playing</button>
 		</div>
 		<div id="bw_conf" class="hidden">
 			<h3>Folder Setting</h3>
@@ -190,12 +207,15 @@
 		<button id="bw_title" onclick="browse('..')"></button>
 		<div id="bw_toolbar" class="float-right">
 			<button id="tab_conf" onclick="toggle_head_display('show-conf')">...</button>
+			<button id="tab_extra" onclick="toggle_head_display('show-extra')">*</button>
 			<button id="tab_tool" onclick="toggle_head_display('show-tool')">#</button>
 			<button id="tab_play" onclick="toggle_head_display('show-play');
 				if ($('body').hasClass('show-head')) load_playlist();">+</button>
-			<button id="tab_extra" onclick="toggle_head_display('show-extra')">*</button>
 		</div>
 	</div>
+</div>
+<div id="loading" class="pg-modal-pop hidden text-center" modal-no-overlay="1">
+	Loading...
 </div>
 <div id="pl_ctrl" class="pg-modal-pop hidden text-center" modal-width="*1">
 	<button class="float-left" onclick="play('-')" style="width:18%;font-size:150%">&lt;&lt;</button>
@@ -307,6 +327,8 @@ function submit_rename_playlist(e) {
 	}
 }
 function play_pause() {
+	if (!pl_audio[0].src)
+		return;
 	pl_audio[0].paused ?
 		pl_audio[0].play() :
 		pl_audio[0].pause()
