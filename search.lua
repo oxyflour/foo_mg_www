@@ -41,12 +41,13 @@ if inf.flist or inf.tlist or inf.word then
 			}, inf.total, begin, count)
 		end
 	end
-	local cond = tlist and "id IN ("..tlist..")" or
+	local cond = tlist and "t.id IN ("..tlist..")" or
 		(inf.word and parse_search({title = "title", artist = "artist", album = "album"}, inf.fields, inf.word))
 	if (cond) then
-		for id, pid, title, num, artist, album, album_artist, length, seconds in
-			db:urows("SELECT id, pid, title, tracknumber, artist, album, album_artist, length, length_seconds"..
-				" FROM "..fb_env.db_track_table..
+		for id, pid, title, num, artist, album, album_artist, length, seconds, path in
+			db:urows("SELECT t.id, pid, title, tracknumber, artist, album, album_artist, length, length_seconds, relative_path"..
+				" FROM "..fb_env.db_track_table.." as t"..
+				" LEFT JOIN "..fb_env.db_path_table.." as p ON p.id=t.pid"..
 				" WHERE "..cond..
 				" ORDER BY pid, album, tracknumber") do
 			inf.tlist = inf.tlist ~= '' and inf.tlist..','..id or id
@@ -60,6 +61,7 @@ if inf.flist or inf.tlist or inf.word then
 				length = length,
 				seconds = seconds,
 				pid = pid,
+				path = path,
 				id = id
 			}, inf.total, begin, count)
 		end
