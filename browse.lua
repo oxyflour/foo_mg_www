@@ -11,7 +11,7 @@ function parse_sort(fields, avail_fields)
 			s = s and s..", "..k or k
 		end
 	end
-	return s
+	return s and 'ORDER BY '..s or ''
 end
 function scan_res(ls, path, sub)
 	local p = sub and fb_util.path_canonical(path..'\\'..sub) or path
@@ -43,7 +43,7 @@ local pid = tonumber(get_var("id") or '')
 
 local begin = tonumber(get_var("begin") or '0')
 local count = tonumber(get_var("count") or '1e9')
-local sort = get_var("sort") or "folder"
+local sort = get_var("sort") or ''
 para = {
 	ps = {},
 	ns = {}
@@ -63,13 +63,13 @@ if pid and pid > 0 then
 	sql = "SELECT id, directory_path, relative_path, SUBSTR(relative_path, 1, l) as d"..
 		" FROM (SELECT id as i, "..l.." as l, SUBSTR(relative_path, 1, "..l..") as r"..
 			" FROM "..fb_env.db_path_table.." WHERE id="..i..")"..
-		" LEFT JOIN "..fb_env.db_path_table.." ON d=r ORDER BY "..parse_sort(sort, sort_fields)
+		" LEFT JOIN "..fb_env.db_path_table.." ON d=r "..parse_sort(sort, sort_fields)
 elseif path and path ~= '' then
 	sql = "SELECT id, directory_path, relative_path, SUBSTR(relative_path, 1, "..path:utf8_len()..") as d"..
-		" FROM "..fb_env.db_path_table.." WHERE d='"..path:gsub('\'', '\'\'').."' ORDER BY "..parse_sort(sort, sort_fields)
+		" FROM "..fb_env.db_path_table.." WHERE d='"..path:gsub('\'', '\'\'').."' "..parse_sort(sort, sort_fields)
 else
 	sql = "SELECT id, NULL, relative_path, '', SUBSTR(relative_path, 1, INSTR(relative_path||'\\', '\\')) as g"..
-		" FROM "..fb_env.db_path_table.." GROUP BY g ORDER BY "..parse_sort(sort, sort_fields)
+		" FROM "..fb_env.db_path_table.." GROUP BY g "..parse_sort(sort, sort_fields)
 end
 
 local db = sqlite3.open(fb_env.db_file_name)
