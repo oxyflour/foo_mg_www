@@ -3,12 +3,15 @@ dofile(fb_env.doc_root.."\\common.lua")
 -- get parameter
 id = tonumber(get_var("id") or '')
 pid = tonumber(get_var("pid") or '')
+path = get_var("path")
 res = get_var("res")
 
 local db = sqlite3.open(fb_env.db_file_name)
 for dir, fname in db:urows("SELECT directory_path, filename_ext FROM "..fb_env.db_track_table.." as t"..
 		" LEFT JOIN "..fb_env.db_path_table.." as p ON (t.pid=p.id)"..
-		" WHERE "..((id and id > 0 and "t.id="..id) or (pid and pid > 0 and "t.pid="..math.floor(pid).." LIMIT 0,1"))) do
+		" WHERE "..((id and id > 0 and "t.id="..id) or
+			(pid and pid > 0 and "t.pid="..math.floor(pid).." LIMIT 0,1") or
+			(path and "relative_path='"..path:gsub('\'', '\'\'').."'"))) do
 	if res then
 		local ext = res:match(".*%.(.*)")
 		-- check file extension
