@@ -115,7 +115,7 @@ var item_formatter = {
 			url = $conf.get_full_url('resource.lua?path='+encodeURIComponent(d.path)+'&res='+encodeURIComponent(d.res));
 		if (ext == ".jpg" || ext == ".bmp" || ext == ".png") {
 			return $ul.formatelem('<li><a target="_blank" href="{{2}}">'+
-					'[{{1//res}}]</a></li>', d, url)
+					'[{{3}}]</a></li>', d, url, d.res.split('\\').pop())
 				.click(item_callbacks.res_img);
 		}
 		else if (ext == ".txt") {
