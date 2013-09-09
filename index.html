@@ -102,7 +102,7 @@
 	<audio id="pl_audio" class="hidden">your browser too old?</audio>
 	<div id="pl_info2" class="clear text-center">
 		<button onclick="play('-')">&lt;&lt;</button>
-		<button onmousedown="event.stopPropagation()" onclick="toggle_head_display('show-conf')">&lt;-&gt;</button>
+		<button onmousedown="event.stopPropagation()" onclick="toggle_head_display('show-conf')">...</button>
 		<button id="pl_button2" onclick="play_pause()">&gt;||</button>
 		<button onclick="play('+')">&gt;&gt;</button>
 		<div style="margin:0 auto;width:94%;max-width:500px;">
@@ -145,8 +145,8 @@
 			<div style="margin:10px 5px;"> play mode: 
 				<select class="conf_autoload" key='conf.play_loop'
 						onchange="localStorage.setItem($(this).attr('key'), this.value)">
-					<option value="yes">loop</option>
-					<option value="">noloop</option>
+					<option value="yes">repeat</option>
+					<option value="">norepeat</option>
 				</select>
 				<select class="conf_autoload" key='conf.play_next'
 						onchange="localStorage.setItem($(this).attr('key'), this.value)">
@@ -214,7 +214,7 @@
 		</div>
 	</div>
 </div>
-<div id="loading" class="pg-modal-pop hidden text-center" modal-no-overlay="1" modal-width="280px">
+<div id="loading" class="pg-modal-pop hidden text-center" style="min-height:4em;line-height:4em;" modal-no-overlay="1" modal-width="280px">
 	Loading...
 </div>
 <div id="pl_ctrl" class="pg-modal-pop hidden text-center" modal-width="*1">
