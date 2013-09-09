@@ -170,7 +170,7 @@ var item_callbacks = {
 			pl_audio[0].paused ? pl_audio[0].play() : pl_audio[0].pause();
 		else {
 			play($(this).addClass("play").data("d"));
-			playlist_manager.save('', $bw.elem.find('li.track:visible'), function(data) {
+			playlist_manager.save('Default', $bw.elem.find('li.track:visible'), function(data) {
 				navigate("list", data.url);
 			});
 		}
@@ -201,7 +201,8 @@ var item_callbacks = {
 		e.stopPropagation();
 	},
 	res_img: function(e) {
-		if ($(e.target).is('a')) $(e.target).addClass('visited');
+		if ($(e.target).is('a'))
+			$(e.target).addClass('visited').parent().siblings().find('a').removeClass('visited');
 		if (localStorage.getItem('conf.open_img_self') == "yes") {
 			e.preventDefault();
 			navigate('img', $(this).children('a').attr('href'));
@@ -252,6 +253,7 @@ var audio_callbacks = {
 		if (a.timeout > 0) clearTimeout(a.timeout);
 		a.timeout = setTimeout(audio_callbacks.playing, 100);
 		pl_button.text('| |').attr('title', 'pause');
+		document.title = d.name + ' <' + d.artist + '>';
 	},
 	pause: function(e) {
 		var a = pl_audio[0], d = pl_audio.data("d");
