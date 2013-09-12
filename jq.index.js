@@ -303,8 +303,7 @@ function browse(path) {
 		path = c.parent ? c.parent.path : $bw.last_path;
 	if (!path || path != c.path) {
 		$bw.last_path = path;
-		navigate('browse', path.replace(/\\/g, '/'));
-//		navigate("list", "browse.lua?tojson=1"+(path ? '&path='+encodeURIComponent(path) : ''));
+		navigate('browse', path ? path.replace(/\\/g, '/') : '');
 	}
 }
 function play(d) {
@@ -334,6 +333,12 @@ function play(d) {
 }
 function navigate(action, url) {
 	var h = action+'/'+url;
+	if (action == 'list') {
+		var exec = /^browse\.lua\?tojson=1&path=([^&]+)$/.exec(url);
+		if (exec) {
+			h = 'browse/'+decodeURIComponent(exec[1]).replace(/\\/g, '/');
+		}
+	}
 	if (location.hash.replace(/^#/, '') != h)
 		location.hash = h;
 }
@@ -491,7 +496,7 @@ $(document).bind("touchstart mousedown", function(e) {
 	}
 });
 $(window).bind("hashchange", function(e) {
-	var hash = location.hash.replace(/^#/, '') || "list/browse.lua?tojson=1",
+	var hash = location.hash.replace(/^#/, '') || "browse/",
 		exec = /^([^\/]+)\/(.*)/.exec(hash);
 	if (!exec) return;
 
