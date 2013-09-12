@@ -185,7 +185,7 @@ var item_callbacks = {
 		else {
 			var d = $(this).data('d');
 			if (d.path) {
-				navigate('list', 'browse.lua?tojson=1&path='+encodeURIComponent(d.path));
+				browse(d.path);
 			}
 			else {
 				e.stopPropagation();
@@ -303,7 +303,8 @@ function browse(path) {
 		path = c.parent ? c.parent.path : $bw.last_path;
 	if (!path || path != c.path) {
 		$bw.last_path = path;
-		navigate("list", "browse.lua?tojson=1"+(path ? '&path='+encodeURIComponent(path) : ''));
+		navigate('browse', path.replace(/\\/g, '/'));
+//		navigate("list", "browse.lua?tojson=1"+(path ? '&path='+encodeURIComponent(path) : ''));
 	}
 }
 function play(d) {
@@ -401,6 +402,9 @@ var playlist_manager = {
 var page_loader = {
 	list: function(url) {
 		$bw.open({url:url});
+	},
+	browse: function(path) {
+		$bw.open({url:'browse.lua?tojson=1' + (path ? '&path='+encodeURIComponent(path.replace(/\//g, '\\')) : '')});
 	},
 	img: function(url) {
 		wait(true, 300);
