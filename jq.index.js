@@ -473,6 +473,17 @@ $(document).ready(function(e) {
 	pl_audio.bind("play", audio_callbacks.play)
 		.bind("pause", audio_callbacks.pause)
 		.bind("ended", audio_callbacks.ended);
+	pl_process.bind('mouseup mouseover', function(e) {
+		var p = $(this).parent();
+		var d = pl_audio.data('d');
+		if (d) {
+			var s = (e.pageX - p.offset().left) / p.width() * d.seconds;
+			if (e.type == 'mouseover')
+				$(this).attr('title', string_utility.secToMmss(s));
+			else if (e.type == 'mouseup')
+				pl_audio[0].currentTime = s;
+		}
+	});
 
 	$bw.elem = $("body>.main");
 	$bw.title = $('#bw_title');
