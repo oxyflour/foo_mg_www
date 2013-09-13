@@ -144,20 +144,17 @@
 			</div>
 			<h3>Global Setting</h3>
 			<div style="margin:10px 5px;"> play mode: 
-				<select class="conf_autoload" key='conf.play_loop'
-						onchange="localStorage.setItem($(this).attr('key'), this.value)">
+				<select class="conf_autoload" key='conf.play_loop'>
 					<option value="yes">repeat</option>
 					<option value="">norepeat</option>
 				</select>
-				<select class="conf_autoload" key='conf.play_next'
-						onchange="localStorage.setItem($(this).attr('key'), this.value)">
+				<select class="conf_autoload" key='conf.play_next'>
 					<option value="yes">list</option>
 					<option value="">track</option>
 				</select>
 			</div>
 			<div style="margin:10px 5px;"> trancoding: 
-				<select class="conf_autoload" key='conf.transcoding'
-						onchange="localStorage.setItem($(this).attr('key'), this.value)">
+				<select class="conf_autoload" key='conf.transcoding'>
 					<option value="">auto</option>
 					<option value="wav">wav</option>
 					<option value="mp3">mp3</option>
@@ -166,8 +163,7 @@
 				</select>
 			</div>
 			<div style="margin:10px 5px;"> show image in: 
-				<select class="conf_autoload" key='conf.open_img_self'
-						onchange="localStorage.setItem($(this).attr('key'), this.value)">
+				<select class="conf_autoload" key='conf.open_img_self'>
 					<option value="">new window</option>
 					<option value="yes">self</option>
 				</select>
@@ -342,7 +338,9 @@ $('select.conf_autoload').each(function (i, e) {
 		s = p.children().first().attr('selected', true);
 		localStorage.setItem(p.attr('key'), s.val());
 	}
-})
+}).bind('change', function(e) {
+	localStorage.setItem($(this).attr('key'), this.value);
+});
 </script>
 </body>
 </html>
