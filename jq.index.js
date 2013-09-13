@@ -303,7 +303,7 @@ function browse(path) {
 		path = c.parent ? c.parent.path : $bw.last_path;
 	if (!path || path != c.path) {
 		$bw.last_path = path;
-		navigate('browse', path ? path.replace(/\\/g, '/') : '');
+		navigate('list', 'browse.lua?tojson=1' + (path ? '&path='+encodeURIComponent(path) : ''));
 	}
 }
 function play(d) {
@@ -333,10 +333,17 @@ function play(d) {
 }
 function navigate(action, url) {
 	var h = action+'/'+url;
-	if (action == 'list') {
+	if (action == 'list' && !window.do_not_use_unicode_url) {
 		var exec = /^browse\.lua\?tojson=1&path=([^&]+)$/.exec(url);
 		if (exec) {
-			h = 'browse/'+decodeURIComponent(exec[1]).replace(/\\/g, '/');
+			var hash = 'browse/'+decodeURIComponent(exec[1]).replace(/\\/g, '/');
+			if (location.hash.replace(/^#/, '') != hash)
+				location.hash = hash;
+			if (location.hash.replace(/^#/, '') != hash) {
+				location.hash = h;
+				window.do_not_use_unicode_url = true;
+			}
+			return;
 		}
 	}
 	if (location.hash.replace(/^#/, '') != h)
@@ -409,7 +416,7 @@ var page_loader = {
 		$bw.open({url:url});
 	},
 	browse: function(path) {
-		$bw.open({url:'browse.lua?tojson=1' + (path ? '&path='+encodeURIComponent(path.replace(/\//g, '\\')) : '')});
+		$bw.open({url:'browse.lua?tojson=1' + (path ? '&path='+encodeURIComponent(decodeURI(path).replace(/\//g, '\\')) : '')});
 	},
 	img: function(url) {
 		wait(true, 300);
@@ -473,16 +480,22 @@ $(document).ready(function(e) {
 	pl_audio.bind("play", audio_callbacks.play)
 		.bind("pause", audio_callbacks.pause)
 		.bind("ended", audio_callbacks.ended);
-	pl_process.bind('mouseup mouseover', function(e) {
+	pl_process.bind('mouseup mousemove', function(e) {
 		var p = $(this).parent();
 		var d = pl_audio.data('d');
 		if (d) {
 			var s = (e.pageX - p.offset().left) / p.width() * d.seconds;
-			if (e.type == 'mouseover')
-				$(this).attr('title', string_utility.secToMmss(s));
-			else if (e.type == 'mouseup')
+			if (e.type == 'mouseup')
 				pl_audio[0].currentTime = s;
+			else {
+				var i = $(this).parent().find('.timeinc');
+				if (!i.length)
+					i = $('<span class="timeinc" style="position:absolute"></span>').insertBefore(this).hide();
+				i.show().text(string_utility.secToMmss(s));
+			}
 		}
+	}).bind('mouseleave', function(e) {
+		$(this).parent().find('.timeinc').hide();
 	});
 
 	$bw.elem = $("body>.main");
