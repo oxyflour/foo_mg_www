@@ -183,6 +183,17 @@ a.visited {
 	text-align: center;
 }
 
+.folder {
+	min-height: 92px;
+}
+.folder .albumart {
+	float: left;
+	height: 96px;
+	width: 96px;
+	margin-right: 10px;
+	background-size: cover;
+	background-position: center;
+}
 .folder .inc {
 	float: right;
 }

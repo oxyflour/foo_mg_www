@@ -85,11 +85,14 @@ var item_formatter = {
 	},
 	folder: function(d) {
 		var v = string_utility.get_brakets(d.name),
+			u = $conf.get_full_url('resource.lua?pid='+parseInt(d.id)+'&w=64'),
 			b1 = $ul.formatcat(v[2], '[{{1}}]', ' ') || '',
 			b2 = $ul.concat(v[1], ' ') || '';
-		return $ul.formatelem('<li bw-id="{{1//id}}" class="folder">{{2//0}}<span class="inc">&gt;</span>'+
+		return $ul.formatelem('<li bw-id="{{1//id}}" class="folder">'+
+				'<div class="albumart" style="background-image:url({{5}})" />'+
+				'{{2//0}}<span class="inc">&gt;</span>'+
 				'<div class="info">{{3}} {{4}}</div>'+
-			'</li>', d, v, b1, b2)
+			'</li>', d, v, b1, b2, u)
 			.data("d", d).click(item_callbacks.folder);
 	},
 	track: function(d) {

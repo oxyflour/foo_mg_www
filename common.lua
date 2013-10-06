@@ -1,6 +1,8 @@
 CONF = {
 	-- default albumart file
 	def_albumart = fb_env.doc_root.."\\nocover.jpg",
+	-- albumart cache folder
+	albumart_cache = fb_env.doc_root.."\\tmp\\cache",
 	-- extra lua script name
 	ext_fname = "mg.lua",
 	-- resource types
@@ -10,8 +12,16 @@ CONF = {
 }
 
 string.url_encode = fb_util.url_encode
+string.is_utf8 = fb_util.is_utf8
 string.utf8_len = fb_util.utf8_len
-string.utf8_to_ansi = fb_util.utf8_to_ansi
+-- 65001: utf-8, 0: system default.
+-- see http://msdn.microsoft.com/en-us/library/windows/desktop/dd317756(v=vs.85).aspx
+string.utf8_to_ansi = function(s)
+	return fb_util.string_encode(s, 65001, 0)
+end
+string.ansi_to_utf8 = function(s)
+	return fb_util.string_encode(s, 0, 65001)
+end
 string.substr = function(s, b, c)
 	return s:sub(b, c and b + c - 1)
 end
