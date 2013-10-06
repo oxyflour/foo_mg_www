@@ -310,7 +310,7 @@ function play(d) {
 	if (typeof(d) == typeof('')) {
 		var x = pl_audio.data("d"), l = pl_audio.data("l"), u = [];
 		$ul.ieach(l && l.ls || {}, function(i, v, ls) {
-			if (v.typ != "track") return false;
+			if (v.typ != "track") return;
 			if (v.id == x.id) u.current = u.length;
 			u.push(v);
 		})
@@ -340,8 +340,9 @@ function navigate(action, url) {
 			if (location.hash.replace(/^#/, '') != hash)
 				location.hash = hash;
 			if (location.hash.replace(/^#/, '') != hash) {
-				location.hash = h;
 				window.do_not_use_unicode_url = true;
+				history.back();
+				location.hash = h;
 			}
 			return;
 		}
