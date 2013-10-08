@@ -85,12 +85,13 @@ var item_formatter = {
 	},
 	folder: function(d) {
 		var v = string_utility.get_brakets(d.name),
-			u = $conf.get_full_url('resource.lua?pid='+parseInt(d.id)+'&w=64'),
+			u = $conf.get_full_url('resource.lua?path='+
+				encodeURIComponent(d.path).replace(/([\(\)'"])/g, '\\$1')+'&w=64'),
 			b1 = $ul.formatcat(v[2], '[{{1}}]', ' ') || '',
 			b2 = $ul.concat(v[1], ' ') || '';
-		return $ul.formatelem('<li bw-id="{{1//id}}" class="folder">'+
+		return $ul.formatelem('<li bw-id="{{1//id}}" title="{{1//name}}" class="folder">'+
 				'<div class="albumart" style="background-image:url({{5}})" />'+
-				'{{2//0}}<span class="inc">&gt;</span>'+
+				'<span class="inc">&gt;</span>{{2//0}}'+
 				'<div class="info">{{3}}&nbsp;{{4}}</div>'+
 			'</li>', d, v, b1, b2, u)
 			.data("d", d).click(item_callbacks.folder);
@@ -109,8 +110,8 @@ var item_formatter = {
 			return $();
 		else return $ul.formatelem('<div class="sep" onmousedown="event.stopPropagation()" style="background-image:url({{2}}&nofallback=1)">'+
 				'<a class="link" href="{{2}}" target="_blank">&raquo;</a>'+
-				'<div class="bg"><span class="stress">{{1//album}}</span> ({{1//album_artist}})</div>'+
-			'</div>', d, $conf.get_full_url('resource.lua?id='+d.id)).data("d", d)
+				'<div class="bg" title="{{3}}"><span class="stress">{{1//album}}</span> ({{1//album_artist}})</div>'+
+			'</div>', d, $conf.get_full_url('resource.lua?id='+d.id), d.path || '').data("d", d)
 			.click(item_callbacks.sep);
 	},
 	res: function(d) {
@@ -138,8 +139,8 @@ var item_formatter = {
 var $bw = new (function($) {
 	var $t = this;
 	var cls = 'bw-class';
-	var group_by = '{{pid}}-{{album}}';
-	var max_elems = 2;
+	var group_by = '{{path}}-{{album}}';
+	var max_elems = 3;
 	// should be set
 	this.elem = null;
 	this.is_loading = false;

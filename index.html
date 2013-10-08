@@ -3,6 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>foo_mg_www</title>
 <link type="text/css" href="theme.css" rel="stylesheet" />
 <script src="jquery-2.0.2.min.js"></script>
 <script src="jq.index.js"></script>
@@ -35,15 +36,15 @@
 @media only screen and (min-width: 621px) { #bw_title { right: 260px; } }
 
 .list .sep .bg { display: block; height: 90px; padding: 1em 0; padding-left: 0.5em; color: #fff; background: rgba(180, 180, 180, 0.4); }
-.list .sep .link { float: right; margin: 0; padding: 0.5em 1em; color: white; font-weight: bold; font-size: 120%; }
+.list .sep .link { float: right; margin: 0; padding: 0.5em 1em; color: white; font-weight: bold; font-size: 115%; }
 .small-sep .sep .bg { height: auto; padding: 0.6em 0; background: rgba(180, 180, 180, 0.8); }
 
 .block-view .list > * { float: left; width: 100%; }
 .block-view .list .track { width: 92%; }
-.block-view .list .folder { width: 42%; max-width: 150px; margin-right: 0;
+.block-view .list .folder { width: 42%; max-width: 150px; margin-left: 16px; margin-right: 0;
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: none; }
 .block-view .list .folder .albumart { width: 150px; height: 150px; float: none; }
-@media only screen and (min-width: 769px) { .block-view .main { right: none; width: 540px; } 
+@media only screen and (min-width: 769px) { .block-view .main { right: auto; width: 540px; } 
 	.block-view .side { display: block; left: 540px; } }
 
 #bw_extra li, #pl_list li { padding: 5px; margin: 3px; }
@@ -133,13 +134,16 @@
 				<input type="checkbox" name="fields" value="album" />Album
 				<input type="checkbox" name="fields" value="artist" />Artist
 				<input type="checkbox" name="fields" value="title" />Title
+				<br />
+				<input type="checkbox" name="path" checked />Search under current folder
 			</form>
-			<h3>Navigation</h3>
-			<button onclick="location.reload()">Reload Page</button>
-			<button onclick="$bw.open({reload:1})">Reload List</button>
+			<h3>Go To</h3>
+			<button onclick="$('body').clearClass('show-extra').addClass('show-extra')">[Resource]</button>
+			<button onclick="$('body').clearClass('show-conf').addClass('show-conf')">[Setting]</button>
+			<button onclick="show_list(pl_audio.data('l'))">[Playing]</button>
 			<br />
-			<button onclick="$('body').clearClass('show-conf').addClass('show-conf')">Setting</button>
-			<button onclick="show_list(pl_audio.data('l'))">Playing</button>
+			<button onclick="$bw.open({reload:1})">[Reload List]</button>
+			<button onclick="location.reload()">[Reload Page]</button>
 		</div>
 		<div id="bw_conf" class="hidden">
 			<h3>Folder Setting</h3>
@@ -222,7 +226,7 @@
 		<div id="bw_toolbar" class="float-right">
 			<button id="tab_conf" onclick="toggle_head_display('show-conf')">...</button>
 			<button id="tab_extra" onclick="toggle_head_display('show-extra')">*</button>
-			<button id="tab_tool" onclick="toggle_head_display('show-tool')">#</button>
+			<button id="tab_tool" onclick="toggle_head_display('show-tool');$('#bw_tool input[name=searchi]').focus()">#</button>
 			<button id="tab_play" onclick="toggle_head_display('show-play');
 				if ($('body').hasClass('show-head')) load_playlist();">+</button>
 		</div>
@@ -275,7 +279,9 @@ function search_word(e) {
 	var fields = $ul.ieach($(e).find('input[name=fields]'), function(i, v, l, p) {
 		if (v.checked) p.o = p.o ? p.o+','+$(v).val() : $(v).val()
 	}, {}).o
-	search(word, fields);
+	var path = $(e).find('input[name=path]')[0].checked &&
+		$bw.data('data') && $bw.data('data').path;
+	search(word, fields, path);
 }
 function load_playlist() {
 	var list = pl_list.empty();

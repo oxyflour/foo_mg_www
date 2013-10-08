@@ -293,9 +293,11 @@ var audio_callbacks = {
 	}
 }
 
-function search(word, fields) {
+function search(word, fields, path) {
 	if (word) navigate("list", "search.lua?tojson=1&word="+encodeURIComponent(word)+
-		(fields ? '&fields='+encodeURIComponent(fields) : '')+'&name='+encodeURIComponent('Searching: '+word));
+		(fields ? '&fields='+encodeURIComponent(fields) : '')+
+		(path ? '&path='+encodeURIComponent(path) : '')+
+		'&name='+encodeURIComponent('Searching: '+word));
 }
 function browse(path) {
 	var c = $bw.data('data') || {path:$bw.last_path};
@@ -333,19 +335,54 @@ function play(d) {
 }
 function navigate(action, url) {
 	var h = action+'/'+url;
-	if (action == 'list' && !window.do_not_use_unicode_url) {
-		var exec = /^browse\.lua\?tojson=1&path=([^&]+)$/.exec(url);
-		if (exec) {
-			var hash = 'browse/'+decodeURIComponent(exec[1]).replace(/\\/g, '/');
-			if (location.hash.replace(/^#/, '') != hash)
-				location.hash = hash;
-			if (location.hash.replace(/^#/, '') != hash) {
-				window.do_not_use_unicode_url = true;
-				history.back();
-				location.hash = h;
-			}
-			return;
+	function try_unicode_hash(hash) {
+		if (location.hash.replace(/^#/, '') != hash)
+			location.hash = hash;
+		if (location.hash.replace(/^#/, '') != hash) {
+			window.do_not_use_unicode_url = true;
+			history.back();
+			location.hash = h;
 		}
+	}
+	function url_parse(u) {
+		var f = u.search('\\?'),
+			p = f >= 0 ? u.substr(0, f) : null,
+			a = f >= 0 ? u.substr(f+1) : null,
+			d = {};
+		if (a) {
+			var st = a.split('&');
+			for (var i = 0; i < st.length; i ++) {
+				var s = st[i],
+					j = s.search('='),
+					k = s.substr(0, j),
+					v = s.substr(j+1);
+				if (k && v) d[k] = v;
+			}
+		}
+		return {
+			page: p,
+			dict: d
+		}
+	}
+	function url_concat(d) {
+		var s = '';
+		for (var k in d) {
+			if (k !== undefined && d[k] !== undefined) {
+				var q = k+'='+d[k]
+				s += s ? '&'+q : q;
+			}
+		}
+		return s;
+	}
+	if (action == 'list' && !window.do_not_use_unicode_url) {
+		var para = url_parse(url), direct = '';
+		if ((para.page == 'browse.lua' || para.page == 'search.lua') && para.dict.tojson) {
+			var path = para.dict.path ? decodeURIComponent(para.dict.path).replace(/\\/g, '/') : '';
+			para.dict.tojson = para.dict.path = undefined;
+			redirect = para.page.replace(/\..*/g, '') + '/' + path + url_concat(para.dict);
+		}
+		if (redirect)
+			return try_unicode_hash(redirect)
 	}
 	if (location.hash.replace(/^#/, '') != h)
 		location.hash = h;
@@ -416,8 +453,17 @@ var page_loader = {
 	list: function(url) {
 		$bw.open({url:url});
 	},
+	browse_or_search: function(path, page) {
+		var exec = /(.*\/)(.*)/.exec(path) || [path, '', path];
+		$bw.open({url:page+'?tojson=1' +
+			(exec[1] ? '&path='+encodeURIComponent(decodeURI(exec[1]).replace(/\//g, '\\')) : '') + 
+			(exec[2] ? '&'+exec[2] : '')});
+	},
 	browse: function(path) {
-		$bw.open({url:'browse.lua?tojson=1' + (path ? '&path='+encodeURIComponent(decodeURI(path).replace(/\//g, '\\')) : '')});
+		page_loader.browse_or_search(path, 'browse.lua');
+	},
+	search: function(path) {
+		page_loader.browse_or_search(path, 'search.lua');
 	},
 	img: function(url) {
 		wait(true, 300);
@@ -451,12 +497,11 @@ $(document).bind('bw.browse', function(e, elem) {
 	if (d.path && (!$bw.path.attr('bw-path') || $bw.path.attr('bw-path').indexOf(d.path) < 0)) {
 		$bw.path.attr('bw-path', d.path).empty();
 		$('<button bw-path="">root</button><span>&gt;</span>').click(function(e) { browse(); }).appendTo($bw.path);
-		var pid = Math.floor(d.id), st = d.path.split('\\'), path = "";
+		var st = d.path.split('\\'), path = "";
 		for (var i = 0; i < st.length; i ++) {
 			if (!st[i]) continue;
-			var s = st[i], id = pid;
-			path += path ? '\\'+s : s;
-			id = (pid+path.length/1000).toFixed(3);
+			var s = st[i];
+			path += s + '\\';
 			$ul.formatelem('<button bw-path="{{1}}" title="{{2}}">{{2}}</button><span>&gt;</span>', path, s).click(function(e) {
 				browse($(this).attr('bw-path'));
 			}).appendTo($bw.path);

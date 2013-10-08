@@ -11,6 +11,7 @@ CONF = {
 	res_sub = {"scans", "bk"}
 }
 
+string.md5 = fb_util.md5
 string.url_encode = fb_util.url_encode
 string.is_utf8 = fb_util.is_utf8
 string.utf8_len = fb_util.utf8_len
