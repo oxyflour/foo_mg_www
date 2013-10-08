@@ -2,28 +2,29 @@ dofile(fb_env.doc_root.."\\common.lua")
 function opt_find(opts, item, sep)
 	return (sep..opts..sep):find(sep..item..sep)
 end
-request_info.http_headers_lower = {}
+local http_headers_lower = {}
 for v, k in pairs(request_info.http_headers) do
-	request_info.http_headers_lower[v:lower()] = k
+	http_headers_lower[v:lower()] = k
 end
 
 -- get parameter
-support = get_var("support") or (function(ua)
+local support = get_var("support") or (function(ua)
 	if ua:find("MSIE") then
 		return "mp3"
 	else
 		return "mp3,wav"
 	end
-end)(request_info.http_headers_lower["user-agent"] or "")
-id = tonumber(get_var("id")) + 0
+end)(http_headers_lower["user-agent"] or "")
+local id = tonumber(get_var("id")) + 0
+local path = nil
+local subsong = 0
 
-path = nil
-subsong = 0
 -- query track path
 local db = sqlite3.open(fb_env.db_file_name)
-for d, f, s in db:urows("SELECT directory_path, filename_ext, subsong FROM "..fb_env.db_track_table.." as t"..
-		" LEFT JOIN "..fb_env.db_path_table.." as p ON (t.pid=p.id)"..
-		" WHERE t.id="..id.." LIMIT 0,1") do
+local sql = string.format([[SELECT directory_path, filename_ext, subsong FROM %s as t
+	LEFT JOIN %s as p ON (t.pid=p.id)
+	WHERE t.id=%d LIMIT 0,1]], fb_env.db_track_table, fb_env.db_path_table, id)
+for d, f, s in db:urows(sql) do
 	path, subsong = d..'\\'..f, s
 end
 db:close()

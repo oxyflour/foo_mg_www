@@ -40,14 +40,14 @@ for i, obj in ipairs(inf.ls) do
 				"<a href='", obj.url, "'>", obj.name , "</a>",
 				"<div class='inf'>", table.concat(obj.bras, ' '), "</div>",
 --			"</div>",
---			"<img width=128 src='resource.lua?pid=", math.floor(obj.id), "' />",
+--			"<img width=128 src='resource2.lua?path=", inf.path:url_encode(), "' />",
 		"</li>")
 	elseif (obj.typ == "track") then
 		first = first or obj.url
 		if lastid and lastid == playid then pnext = obj.url end
 		lastid = obj.id
 		if current_album ~= obj.album then
-			print("<p><a href='browse.lua?id=", obj.pid, "'>", obj.album,
+			print("<p><a href='browse2.lua?path=", (obj.path or inf.path):url_encode(), "'>", obj.album,
 				"</a> (", obj.album_artist, ")</p>")
 			current_album = obj.album
 		end
@@ -62,20 +62,20 @@ print("</ul>")
 
 print("<div style='float:left;width:0;margin-top:30px;'>")
 if playid then
-	print("<img width='320px' src='resource.lua?id=", playid, "'></img>",
+	print("<img width='320px' src='resource2.lua?id=", playid, "'></img>",
 		"<br /><br />",
 		"<audio style='width:320px' autoplay controls src='track.lua?id=", playid, "' onended='goto_next()'>",
 			"your browser too old?</audio>")
 elseif inf.res then
 	local cover = table.each(inf.res, function(i, v) return v:lower():find("cover%.jpg$") and v end)
 	if cover then
-		print("<img width='320px' src='resource.lua?pid=", inf.id, "&res=", cover:url_encode(), "'></img>")
+		print("<img width='320px' src='resource2.lua?path=", inf.path:url_encode(), "&res=", cover:url_encode(), "'></img>")
 	end
 end
 if inf.res then
 	print("<div style='width:320px;margin-top:10px'>")
 	for i, v in ipairs(inf.res) do
-		print("[<a href='resource.lua?pid=", inf.id, "&res=", v:url_encode(), "' target='_blank'>", v, "</a>] ")
+		print("[<a href='resource2.lua?path=", inf.path:url_encode(), "&res=", v:url_encode(), "' target='_blank'>", v, "</a>] ")
 	end
 	print("</div>")
 end

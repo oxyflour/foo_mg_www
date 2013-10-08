@@ -1,4 +1,11 @@
 dofile(fb_env.doc_root.."\\common.lua")
+function get_path(path)
+	if not path or path == '' then path = '\\' end
+	if path:sub(1, 1) ~= '\\' then path = '\\'..path end
+	if path:sub(-1) ~= '\\' then path = path..'\\' end
+	local s, n = path:gsub('\\', '')
+	return path, n
+end
 local sort_fields = {
 	folder = "relative_path",
 	date = "add_date DESC"
@@ -14,8 +21,8 @@ function parse_sort(fields, avail_fields)
 	return s and 'ORDER BY '..s or ''
 end
 function scan_res(ls, path, sub)
-	local p = sub and fb_util.path_canonical(path..'\\'..sub) or path
-	local l = fb_util.list_dir(p.."\\*")
+	local p = sub and fb_util.path_canonical(path..sub..'\\') or path
+	local l = fb_util.list_dir(p.."*")
 	if l then
 		ls = ls or {}
 		for i, x in pairs(l) do
@@ -37,83 +44,52 @@ function scan_res(ls, path, sub)
 	return ls
 end
 
--- id or path, either is ok
-local path = get_var("path")
-local pid = tonumber(get_var("id") or '')
-
+local path, n = get_path(get_var("path"))
 local begin = tonumber(get_var("begin") or '0')
 local count = tonumber(get_var("count") or '1e9')
 local sort = get_var("sort") or ''
-para = {
-	ps = {},
-	ns = {}
-}
 inf = {
-	name = "root",
-	path = nil,
-	id = 0,
-	parent = nil,
-	ls = {},
+	name = path:match('.*\\([^\\]+)\\') or 'root',
+	path = path:sub(2),
+	parent = path:len() > 1 and {
+		path = path:sub(2):match('(.*\\)[^\\]+\\'),
+		name = path:match('.*\\([^\\]+)\\[^\\]+\\')
+	} or nil,
+	id = nil,	-- only folder with tracks will have an id
+	ls = {},	-- the item index is the key (starting from 1)
 	total = 0
 }
 
-if pid and pid > 0 then
-	local i = math.floor(pid)
-	local l = i == pid and "LENGTH(relative_path)" or math.ceil(pid*1000)%1000
-	sql = "SELECT id, directory_path, relative_path, SUBSTR(relative_path, 1, l) as d"..
-		" FROM (SELECT id as i, "..l.." as l, SUBSTR(relative_path, 1, "..l..") as r"..
-			" FROM "..fb_env.db_path_table.." WHERE id="..i..")"..
-		" LEFT JOIN "..fb_env.db_path_table.." ON d=r "..parse_sort(sort, sort_fields)
-elseif path and path ~= '' then
-	sql = "SELECT id, directory_path, relative_path, SUBSTR(relative_path, 1, "..path:utf8_len()..") as d"..
-		" FROM "..fb_env.db_path_table.." WHERE d='"..path:gsub('\'', '\'\'').."' "..parse_sort(sort, sort_fields)
-else
-	sql = "SELECT id, NULL, relative_path, '', SUBSTR(relative_path, 1, INSTR(relative_path||'\\', '\\')) as g"..
-		" FROM "..fb_env.db_path_table.." GROUP BY g "..parse_sort(sort, sort_fields)
+local db = sqlite3.open(fb_env.db_file_name)
+local tls = { }
+local sql = string.format([[SELECT
+	i,
+	SUBSTR(d, 1, e) AS s,
+	SUBSTR(d, r, e-r+1) AS p,
+	LENGTH(d)
+FROM (SELECT *,
+		id AS i,
+		directory_path||'\' AS d,
+		CAST(SUBSTR(path_index, 1, 3) AS INTEGER) AS r,
+		MAX(CAST(SUBSTR(path_index, %d, 3) AS INTEGER),
+			CAST(SUBSTR(path_index, %d, 3) AS INTEGER))+1 AS e
+	FROM %s)
+WHERE SUBSTR(d, r, %d)='%s' GROUP BY p %s]],
+	n*3-2, n*3+1, fb_env.db_path_table, path:utf8_len(), path:gsub('\'', '\'\''), parse_sort(sort, sort_fields))
+for id, dir, sub, len in db:urows(sql) do
+	if sub == path then
+		inf['id'], tls[id] = id, dir
+	else
+		inf.total = table.inspart(inf.ls, {
+			typ = "folder",
+			name = sub:match('.*\\([^\\]+)\\'),
+			path = sub:sub(2),
+			id = dir:utf8_len() == len and id or nil
+		}, inf.total, begin, count)
+	end
 end
 
-local db = sqlite3.open(fb_env.db_file_name)
--- add folders to list
-for id, dir, path, sub in db:urows(sql) do
-	-- get self path and id
-	if not inf.path then
-		inf.path = sub
-		inf.id = sub ~= '' and (id + sub:utf8_len()/1000) or nil
-	end
-	-- add tracks later 
-	if sub == path then
-		para.ps[id] = dir
-	-- get child path and id
-	elseif sub == '' or path:substr(sub:len()+1, 1) == '\\' then
-		local b = sub == '' and 1 or sub:len() + 2				-- it should be the position after '\\' or 1
-		local e = (path:find('\\', b) or (path:len() + 1)) - 1	-- position before next '\\' or path:len()
-		local spath = path:sub(1, e)							-- path without '\\' at the end
-		-- add to result if it is a subdirectory
-		if b < e and not para.ns[spath] then
-			para.ns[spath] = id
-			inf.total = table.inspart(inf.ls, {
-				typ = "folder",
-				name = path:sub(b, e),
-				path = spath,
-				id = id + spath:utf8_len()/1000
-			}, inf.total, begin, count)
-		end
-	end
-end
--- get parent id and path if necessary
-if inf.path and inf.path ~= '' then
-	inf.name = inf.path:match(".*\\([^\\]+)") or inf.path
-	local pos = inf.path:len() - inf.name:len() - 1
-	local parent = pos >= 1 and inf.path:sub(1, pos) or ''
-	inf.parent = {
-		id = parent ~= '' and (math.floor(inf.id) + parent:utf8_len()/1000),
-		path = parent,
-		name = parent:match(".*\\([^\\]+)") or parent,
-	}
-end
--- add tracks to list
-for pid, dir in pairs(para.ps) do
-	-- if there is a mg.lua script in the folder, load and execute it
+for pid, dir in pairs(tls) do
 	local fname = dir.."\\"..CONF.ext_fname
 	local extra = fb_util.file_exists(fname) and {} or nil
 	if extra then
@@ -121,10 +97,9 @@ for pid, dir in pairs(para.ps) do
 			fb_util.log("load extra failed, file: \n", fname)
 		end)()
 	end
-	-- query and add tracks
-	for id, pid, title, num, artist, album, album_artist, length, seconds in
-		db:urows("SELECT id, pid, title, tracknumber, artist, album, album_artist, length, length_seconds"..
-			" FROM "..fb_env.db_track_table.." WHERE pid="..pid.." ORDER BY album, tracknumber") do
+	local sql = string.format([[SELECT id, title, tracknumber, artist, album, album_artist, length, length_seconds
+		FROM %s WHERE pid=%d ORDER BY album, tracknumber]], fb_env.db_track_table, pid)
+	for id, title, num, artist, album, album_artist, length, seconds in db:urows(sql) do
 		inf.total = table.inspart(inf.ls, {
 			typ = "track",
 			name = title,
@@ -135,13 +110,12 @@ for pid, dir in pairs(para.ps) do
 			length = length,
 			seconds = seconds,
 			inf = extra and extra.inf and (extra.inf[num] or extra.inf[title]),
-			pid = pid,
 			id = id
 		}, inf.total, begin, count)
 	end
 	-- try get resource list
 	inf.res = scan_res(inf.res, dir, extra and extra.res_path)
-	if dir:lower():match('disc%s*%d+$') or dir:lower():match('cd%s*%d+$') then
+	if dir:lower():match('disc%s*%d+\\$') or dir:lower():match('cd%s*%d+\\$') then
 		inf.res = scan_res(inf.res, dir, '..')
 	end
 	inf.extra = extra and extra.extra
@@ -163,9 +137,9 @@ else
 	end
 	for i, o in ipairs(inf.ls) do
 		if o.typ == "folder" then
-			o.url = request_info.uri.."?id="..o.id
+			o.url = request_info.uri.."?path="..o.path:url_encode()
 		elseif o.typ == "track" then
-			o.url = request_info.uri.."?id="..o.pid.."&play="..o.id
+			o.url = request_info.uri.."?path="..inf.path:url_encode().."&play="..o.id
 		end
 	end
 	(assert(loadfile(fb_env.doc_root.."\\view.lua")))(inf)
