@@ -26,9 +26,9 @@ $.fn.wait = function(when, done) {
 }
 $.fn.clearClass = function(cls) {
 	return this.each(function(i, e) {
-		var t = $(e), d = t.data("radio-class");
-		if (!d && t.attr("radio-class")) {
-			d = t.data("radio-class", t.attr("radio-class").split(",")).data("radio-class");
+		var t = $(e), d = t.data("class-group");
+		if (!d && t.attr("class-group")) {
+			d = t.data("class-group", t.attr("class-group").split(",")).data("class-group");
 		}
 		for (var i = 0; d && i < d.length; i ++) {
 			if ((' '+d[i]+' ').indexOf(' '+cls+' ') >= 0)
