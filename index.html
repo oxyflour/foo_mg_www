@@ -39,15 +39,14 @@
 .list .sep .link { float: right; margin: 0; padding: 0.5em 1em; color: white; font-weight: bold; font-size: 115%; }
 .small-sep .sep .bg { height: auto; padding: 0.6em 0; background: rgba(180, 180, 180, 0.8); }
 
-.albumart { display: none; }
+.albumart { display: none; background-size: cover; background-position: center; margin-right: 10px; }
 .aa-list-view .list .folder { min-height: 92px; }
-.aa-list-view .list .folder .albumart { display: block; float: left; height: 96px; width: 96px;
-	margin-right: 10px; background-size: cover; background-position: center; }
+.aa-list-view .list .folder .albumart { display: block; float: left; height: 96px; width: 96px; }
 .aa-block-view .list > * { float: left; width: 100%; }
 .aa-block-view .list .track { width: 92%; }
 .aa-block-view .list .folder { width: 42%; max-width: 150px; margin-left: 16px; margin-right: 0;
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: none; }
-.aa-block-view .list .folder .albumart { display: block; width: 150px; height: 150px; float: none; }
+.aa-block-view .list .folder .albumart { display: block; width: 150px; height: 150px; }
 @media only screen and (min-width: 769px) { .aa-block-view .main { right: auto; width: 540px; } 
 	.aa-block-view .side { display: block; left: 540px; } }
 
