@@ -39,13 +39,17 @@
 .list .sep .link { float: right; margin: 0; padding: 0.5em 1em; color: white; font-weight: bold; font-size: 115%; }
 .small-sep .sep .bg { height: auto; padding: 0.6em 0; background: rgba(180, 180, 180, 0.8); }
 
-.block-view .list > * { float: left; width: 100%; }
-.block-view .list .track { width: 92%; }
-.block-view .list .folder { width: 42%; max-width: 150px; margin-left: 16px; margin-right: 0;
+.albumart { display: none; }
+.aa-list-view .list .folder { min-height: 92px; }
+.aa-list-view .list .folder .albumart { display: block; float: left; height: 96px; width: 96px;
+	margin-right: 10px; background-size: cover; background-position: center; }
+.aa-block-view .list > * { float: left; width: 100%; }
+.aa-block-view .list .track { width: 92%; }
+.aa-block-view .list .folder { width: 42%; max-width: 150px; margin-left: 16px; margin-right: 0;
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: none; }
-.block-view .list .folder .albumart { width: 150px; height: 150px; float: none; }
-@media only screen and (min-width: 769px) { .block-view .main { right: auto; width: 540px; } 
-	.block-view .side { display: block; left: 540px; } }
+.aa-block-view .list .folder .albumart { display: block; width: 150px; height: 150px; float: none; }
+@media only screen and (min-width: 769px) { .aa-block-view .main { right: auto; width: 540px; } 
+	.aa-block-view .side { display: block; left: 540px; } }
 
 #bw_extra li, #pl_list li { padding: 5px; margin: 3px; }
 #bw_path .active, #bw_play .active { font-weight: bold; }
@@ -80,7 +84,7 @@
 */
 </style>
 </head>
-<body radio-class="show-play show-conf show-extra show-info show-tool,list-view img-view">
+<body radio-class="show-play show-conf show-extra show-info show-tool,list-view img-view,aa-list-view aa-block-view">
 <div class="foot">
 	<div class="title">
 		<select class="float-right button" onmousedown="event.stopPropagation()"
@@ -175,12 +179,13 @@
 				</select>
 			</div>
 			<h3>UI Setting</h3>
-			<div style="margin:10px 5px;"> display folders as: 
+			<div style="margin:10px 5px;"> display folders with: 
 				<select class="conf_autoload" key='conf.display_block'
 						oninit="update_listview(this.value)"
 						onchange="update_listview(this.value)">
-					<option value="">list</option>
-					<option value="block">block</option>
+					<option value="">no albumart</option>
+					<option value="aa-list-view">albumart list</option>
+					<option value="aa-block-view">albumart block</option>
 				</select>
 			</div>
 			<div style="margin:10px 5px;"> show image in: 
@@ -253,9 +258,8 @@
 </div>
 <img class="img" style="position:absolute;" onclick="$('#pl_ctrl,#pl_info').show().modal('open')" />
 <script>
-function update_listview(val) {
-	var b = $('body'), c = 'block-view';
-	val ? b.addClass(c) : b.removeClass(c);
+function update_listview(c) {
+	$('body').clearClass(c || 'aa-list-view').addClass(c);
 }
 function save_sort(val) {
 	var d = $bw.data('data');
