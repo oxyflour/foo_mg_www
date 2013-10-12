@@ -11,6 +11,7 @@
 <style>
 .hidden { display: none; }
 .clear { width: 100%; clear: both; }
+.visited { color: #aaa; }
 .float-left { float: left; }
 .float-right {float: right; }
 .text-center { text-align: center; }
@@ -111,7 +112,8 @@
 <ul id="bw_list" class="list"></ul>
 </div>
 <div class="side" class="text-center">
-	<img id="pl_albumart" src="nocover.jpg" onclick="show_list(pl_audio.data('l'))" />
+	<img id="pl_albumart" src="nocover.jpg" onmousedown="event.stopPropagation()"
+		onclick="show_list(pl_audio.data('l'));toggle_head_display('show-extra')" />
 	<audio id="pl_audio" class="hidden">your browser too old?</audio>
 	<div id="pl_info2" class="clear text-center">
 		<button onclick="play('-')">&lt;&lt;</button>

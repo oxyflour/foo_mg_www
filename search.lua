@@ -2,7 +2,7 @@ dofile(fb_env.doc_root.."\\common.lua")
 function sql_escape(s)
 	return s and s:gsub('\'', '\'\'')
 end
-function notnum_escape(s)
+function num_escape(s)
 	return s and s:gsub('[^%d,]', '')
 end
 function like_escape(s, c)
