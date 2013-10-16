@@ -8,7 +8,9 @@ function get_path(path)
 end
 local sort_fields = {
 	folder = "relative_path",
-	date = "add_date DESC"
+	folder_desc = "relative_path DESC",
+	date = "add_date DESC",
+	date_desc = "add_date"
 }
 function parse_sort(fields, avail_fields)
 	local s = nil

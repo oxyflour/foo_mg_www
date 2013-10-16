@@ -152,11 +152,13 @@
 		</div>
 		<div id="bw_conf" class="hidden">
 			<h3>Folder Setting</h3>
-			<div style="margin:10px 5px;"> sort this folder with: 
+			<div style="margin:10px 5px;"> sort this folder: 
 				<select id="bw_sort" onchange="save_sort(this.value)">
-					<option value="">none</option>
-					<option value="folder">name</option>
-					<option value="date">date</option>
+					<option value="">with none</option>
+					<option value="folder">by name</option>
+					<option value="folder_desc">by name reverse</option>
+					<option value="date">from latest</option>
+					<option value="date_desc">from oldest</option>
 				</select>
 			</div>
 			<h3>Play Setting</h3>
