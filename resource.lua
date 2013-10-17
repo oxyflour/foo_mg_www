@@ -33,7 +33,7 @@ function get_thumb(cover, s, w)
 	if thumb.attr then return thumb end
 
 	local ftmp = CONF.albumart_cache..os.tmpname()
-	if fb_util.exec(CONF.image_magic, 
+	if fb_util.exec(CONF.image_magic_exe, 
 			string.format('"%s" -thumbnail "%dx%d^" "%s"', cover.fname, w, w, ftmp)) == 0 then
 		fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, thumb.fname))
 	end

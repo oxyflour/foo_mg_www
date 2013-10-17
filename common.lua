@@ -4,7 +4,7 @@ CONF = {
 	-- albumart cache folder
 	albumart_cache = fb_env.doc_root.."\\tmp\\cache",
 	-- image magic convert.exe path
-	image_magic = 'G:\\Share\\foo_mg_www\\tmp\\ImageMagic\\convert.exe',
+	image_magic_exe = fb_env.doc_root.."\\tmp\\ImageMagic\\convert.exe",
 	-- extra lua script name
 	ext_fname = "mg.lua",
 	-- resource types
