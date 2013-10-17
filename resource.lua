@@ -12,7 +12,7 @@ function create_cover(ftrack, pid, fcover)
 	else
 		local ftmp = CONF.albumart_cache..'\\tmp_cover'..pid..'x'..fb_util.random()
 		if fb_stream.extract_albumart(track_file, ftmp) > 0 then
-			fb_util.move_file(ftmp, fcover)
+			fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, fcover))
 		end
 		return fb_util.file_exists(fcover)
 	end
@@ -24,7 +24,7 @@ function create_thumb(fcover, pid, w, fthumb)
 		local ftmp = CONF.albumart_cache..'\\tmp_cache'..pid..'x'..fb_util.random()
 		if fb_util.exec('G:\\Share\\foo_mg_www\\tmp\\ImageMagic\\convert.exe', 
 				string.format('"%s" -thumbnail "%dx%d^" "%s"', fcover, w, w, ftmp)) == 0 then
-			fb_util.move_file(ftmp, fthumb)
+			fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, fthumb))
 		end
 		return fb_util.file_exists(fthumb)
 	 end
