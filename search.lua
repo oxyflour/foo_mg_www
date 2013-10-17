@@ -6,7 +6,7 @@ function num_escape(s)
 	return s and s:gsub('[^%d,]', '')
 end
 function like_escape(s, c)
-	return s and s:gsub('\'', '\'\''):gsub('%+', ' '):gsub('[%%_%[%]'..c..']', c..'%1')
+	return s and s:gsub('\'', '\'\''):gsub('[%%_%[%]'..c..']', c..'%1')
 end
 function parse_search(avail_fields, fields, word, path)
 	local s, c = nil, '~'
@@ -14,7 +14,7 @@ function parse_search(avail_fields, fields, word, path)
 		local k = avail_fields[f]
 		if k then
 			local v = get_var('word'..f) or word
-			for w in v:gmatch("%S+") do
+			for w in v:gmatch("[^|]+") do
 				local q = string.format([[%s LIKE '%%%s%%' ESCAPE '%s']], sql_escape(k), like_escape(w, c), c)
 				s = s and s.." OR "..q or q
 			end
