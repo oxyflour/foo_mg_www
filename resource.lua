@@ -6,6 +6,21 @@ function get_path(path)
 	local s, n = path:gsub('\\', '')
 	return path, n
 end
+function get_size(width, size)
+	local w = tonumber(width or '1000')
+	local s = size
+	if w <= 150 or s == 'small' then
+		w, s = 150, 'small'
+	elseif w <= 400 or s == 'medium' then
+		w, s = 400, 'medium'
+	else
+		w, s = 0, nil
+	end
+	return {
+		width = w,
+		size = s
+	}
+end
 function get_file(fname, hash)
 	return {
 		fname = fname,
@@ -27,14 +42,14 @@ function get_cover(browse_path, track_file)
 	end
 	return get_file(cover.fname, hash)
 end
-function get_thumb(cover, s, w)
-	local thumb = get_file(s and string.format('%s\\%s_s%d_%s',
-		CONF.albumart_cache, cover.hash, cover.attr.size, s) or cover.fname)
+function get_thumb(cover, sz)
+	local thumb = get_file(sz.size and string.format('%s\\%s_s%d_%s',
+		CONF.albumart_cache, cover.hash, cover.attr.size, sz.size) or cover.fname)
 	if thumb.attr then return thumb end
 
 	local ftmp = CONF.albumart_cache..os.tmpname()
 	if fb_util.exec(CONF.image_magic_exe, 
-			string.format('"%s" -thumbnail "%dx%d^" "%s"', cover.fname, w, w, ftmp)) == 0 then
+			string.format('"%s" -thumbnail "%dx%d^" "%s"', cover.fname, sz.width, sz.width, ftmp)) == 0 then
 		fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, thumb.fname))
 	end
 	return get_file(thumb.fname)
@@ -89,21 +104,12 @@ if track_file and track_file ~= '' then
 	if id > 0 then
 		send = fb_stream.stream_albumart(track_file)
 	-- only use cache for folders
-	elseif CONF.albumart_cache then
-		local w = tonumber(get_var('w') or '1000')
-		local s = get_var('s')
-		if w <= 150 or s == 'small' then
-			w, s = 150, 'small'
-		elseif w <= 400 or s == 'medium' then
-			w, s = 400, 'medium'
-		else
-			w, s = 0, nil
-		end
-
-		local cover = get_cover(browse_path, track_file)
-		local thumb = cover.attr and get_thumb(cover, s, w)
-		if thumb and thumb.attr then
-			send = fb_stream.stream_file(thumb.fname)
+	else
+		local fs, sz = {}, get_size(get_var('w'), get_var('s'))
+		if CONF.albumart_cache and
+				table.set(fs, 'cover', get_cover(browse_path, track_file)).attr and
+				table.set(fs, 'thumb', get_thumb(fs.cover, sz)).attr then
+			send = fb_stream.stream_file(fs.thumb.fname)
 		else
 			send = fb_stream.stream_albumart(track_file)
 		end

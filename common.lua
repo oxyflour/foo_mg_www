@@ -26,6 +26,10 @@ string.ansi_to_utf8 = function(s)
 	return fb_util.string_encode(s, 0, 65001)
 end
 
+table.set = function(ls, key, val)
+	ls[key] = val
+	return val
+end
 table.each = function(ls, func, obj)
 	for i, v in pairs(ls) do
 		local r = func(i, v, obj)
