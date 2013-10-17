@@ -23,9 +23,6 @@ end
 string.ansi_to_utf8 = function(s)
 	return fb_util.string_encode(s, 0, 65001)
 end
-string.substr = function(s, b, c)
-	return s:sub(b, c and b + c - 1)
-end
 
 table.each = function(ls, func)
 	for i, v in pairs(ls) do
