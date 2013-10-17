@@ -3,6 +3,8 @@ CONF = {
 	def_albumart = fb_env.doc_root.."\\nocover.jpg",
 	-- albumart cache folder
 	albumart_cache = fb_env.doc_root.."\\tmp\\cache",
+	-- image magic convert.exe path
+	image_magic = 'G:\\Share\\foo_mg_www\\tmp\\ImageMagic\\convert.exe',
 	-- extra lua script name
 	ext_fname = "mg.lua",
 	-- resource types
@@ -24,13 +26,14 @@ string.ansi_to_utf8 = function(s)
 	return fb_util.string_encode(s, 0, 65001)
 end
 
-table.each = function(ls, func)
+table.each = function(ls, func, obj)
 	for i, v in pairs(ls) do
-		local r = func(i, v)
+		local r = func(i, v, obj)
 		if r then
 			return r
 		end
 	end
+	return obj
 end
 table.index = function(ls, item)
 	return table.each(ls, function(i, v)

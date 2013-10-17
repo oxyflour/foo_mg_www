@@ -6,27 +6,32 @@ function get_path(path)
 	local s, n = path:gsub('\\', '')
 	return path, n
 end
-function create_cover(ftrack, pid, fcover)
-	if fb_util.file_exists(fcover) then
-		return true
+function get_cover(ftrack, fcover)
+	local attr = fb_util.file_stat(fcover)
+	if attr then
+		return attr
 	else
-		local ftmp = CONF.albumart_cache..'\\tmp_cover'..pid..'x'..fb_util.random()
+		local ftmp = CONF.albumart_cache..os.tmpname()
 		if fb_stream.extract_albumart(track_file, ftmp) > 0 then
 			fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, fcover))
 		end
-		return fb_util.file_exists(fcover)
+		return fb_util.file_stat(fcover)
 	end
 end
-function create_thumb(fcover, pid, w, fthumb)
-	 if fcover == fthumb then
-		 return true
-	 else
-		local ftmp = CONF.albumart_cache..'\\tmp_cache'..pid..'x'..fb_util.random()
-		if fb_util.exec('G:\\Share\\foo_mg_www\\tmp\\ImageMagic\\convert.exe', 
+function get_thumb(fcover, fthumb, w)
+	if fcover == fthumb then
+		return fb_util.file_stat(fcover)
+	end
+	local attr = fb_util.file_stat(fthumb)
+	if attr then
+		return attr
+	else
+		local ftmp = CONF.albumart_cache..os.tmpname()
+		if fb_util.exec(CONF.image_magic, 
 				string.format('"%s" -thumbnail "%dx%d^" "%s"', fcover, w, w, ftmp)) == 0 then
 			fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, fthumb))
 		end
-		return fb_util.file_exists(fthumb)
+		return fb_util.file_stat(fthumb)
 	 end
 end
 
@@ -68,7 +73,6 @@ for file, dir, path in db:urows(sql) do
 		res_ext = ext
 	else
 		browse_path = path
-		track_path = dir
 		track_file = dir..file
 	end
 end
@@ -81,7 +85,7 @@ if track_file and track_file ~= '' then
 		send = fb_stream.stream_albumart(track_file)
 	-- only use cache for folders
 	else
-		local w = tonumber(get_var('w') or '0')
+		local w = tonumber(get_var('w') or '1000')
 		local s = get_var('s')
 		if w <= 150 or s == 'small' then
 			w, s = 150, '_small'
@@ -96,22 +100,13 @@ if track_file and track_file ~= '' then
 			hash = track_file:match('(.*)\\.*'):md5()
 			fcover = CONF.albumart_cache and CONF.albumart_cache..'\\'..hash
 		end
-		local fthumb = fcover
-		if s ~= '' and fcover then
-			local attr = fb_util.file_stat(fcover)
-			local name = hash..'_s'..(attr and attr.size or '')..s
+		local fthumb, attr = fcover, (fcover and get_cover(track_file, fcover))
+		if s ~= '' and attr then
+			local name = hash..'_s'..attr.size..s
 			fthumb = CONF.albumart_cache and CONF.albumart_cache..'\\'..name
 		end
-		-- cache ready
-		if fthumb and fb_util.file_exists(fthumb) then
-			fb_stream.stream_file(fthumb)
-		-- not cached now, but we can create it
-		elseif fthumb then
-			if create_cover(track_file, hash, fcover) and
-					create_thumb(fcover, hash, w, fthumb) then
-				send = fb_stream.stream_file(fthumb)
-			end
-		-- cache not ready
+		if fthumb and get_thumb(fcover, fthumb, w) then
+			send = fb_stream.stream_file(fthumb)
 		else
 			send = fb_stream.stream_albumart(track_file)
 		end
