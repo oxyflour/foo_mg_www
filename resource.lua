@@ -6,33 +6,38 @@ function get_path(path)
 	local s, n = path:gsub('\\', '')
 	return path, n
 end
-function get_cover(ftrack, fcover)
-	local attr = fb_util.file_stat(fcover)
-	if attr then
-		return attr
-	else
-		local ftmp = CONF.albumart_cache..os.tmpname()
-		if fb_stream.extract_albumart(track_file, ftmp) > 0 then
-			fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, fcover))
-		end
-		return fb_util.file_stat(fcover)
-	end
+function get_file(fname, hash)
+	return {
+		fname = fname,
+		attr = fb_util.file_stat(fname),
+		hash = hash
+	}
 end
-function get_thumb(fcover, fthumb, w)
-	if fcover == fthumb then
-		return fb_util.file_stat(fcover)
+function get_cover(browse_path, track_file)
+	local cover = get_file(browse_path..'cover.jpg', browse_path:md5())
+	if cover.attr then return cover end
+
+	local hash = track_file:match('(.*)\\.*'):md5()
+	cover = get_file(CONF.albumart_cache..'\\'..hash, hash)
+	if cover.attr then return cover end
+
+	local ftmp = CONF.albumart_cache..os.tmpname()
+	if fb_stream.extract_albumart(track_file, ftmp) > 0 then
+		fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, cover.fname))
 	end
-	local attr = fb_util.file_stat(fthumb)
-	if attr then
-		return attr
-	else
-		local ftmp = CONF.albumart_cache..os.tmpname()
-		if fb_util.exec(CONF.image_magic, 
-				string.format('"%s" -thumbnail "%dx%d^" "%s"', fcover, w, w, ftmp)) == 0 then
-			fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, fthumb))
-		end
-		return fb_util.file_stat(fthumb)
-	 end
+	return get_file(cover.fname, hash)
+end
+function get_thumb(cover, s, w)
+	local thumb = get_file(s and string.format('%s\\%s_s%d_%s',
+		CONF.albumart_cache, cover.hash, cover.attr.size, s) or cover.fname)
+	if thumb.attr then return thumb end
+
+	local ftmp = CONF.albumart_cache..os.tmpname()
+	if fb_util.exec(CONF.image_magic, 
+			string.format('"%s" -thumbnail "%dx%d^" "%s"', cover.fname, w, w, ftmp)) == 0 then
+		fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, thumb.fname))
+	end
+	return get_file(thumb.fname)
 end
 
 -- get parameter
@@ -84,29 +89,21 @@ if track_file and track_file ~= '' then
 	if id > 0 then
 		send = fb_stream.stream_albumart(track_file)
 	-- only use cache for folders
-	else
+	elseif CONF.albumart_cache then
 		local w = tonumber(get_var('w') or '1000')
 		local s = get_var('s')
 		if w <= 150 or s == 'small' then
-			w, s = 150, '_small'
+			w, s = 150, 'small'
 		elseif w <= 400 or s == 'medium' then
-			w, s = 400, '_medium'
+			w, s = 400, 'medium'
 		else
-			w, s = 0, ''
+			w, s = 0, nil
 		end
 
-		local fcover, hash = browse_path..'cover.jpg', browse_path:md5()
-		if not fb_util.file_exists(fcover) then
-			hash = track_file:match('(.*)\\.*'):md5()
-			fcover = CONF.albumart_cache and CONF.albumart_cache..'\\'..hash
-		end
-		local fthumb, attr = fcover, (fcover and get_cover(track_file, fcover))
-		if s ~= '' and attr then
-			local name = hash..'_s'..attr.size..s
-			fthumb = CONF.albumart_cache and CONF.albumart_cache..'\\'..name
-		end
-		if fthumb and get_thumb(fcover, fthumb, w) then
-			send = fb_stream.stream_file(fthumb)
+		local cover = get_cover(browse_path, track_file)
+		local thumb = cover.attr and get_thumb(cover, s, w)
+		if thumb and thumb.attr then
+			send = fb_stream.stream_file(thumb.fname)
 		else
 			send = fb_stream.stream_albumart(track_file)
 		end
@@ -123,7 +120,7 @@ elseif res_path and fb_util.file_exists(res_path) then
 		if not content:is_utf8() then
 			content = content:ansi_to_utf8()
 		end
-		print('HTTP/1.0 200 OK\r\n',
+		print('HTTP/1.1 200 OK\r\n',
 			'Content-Type: text/html;charset=utf-8\r\n',
 			'Content-Length: ', content:len(), '\r\n',
 			'\r\n', content)
