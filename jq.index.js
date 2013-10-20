@@ -294,7 +294,7 @@ var audio_callbacks = {
 }
 
 function search(word, fields, path) {
-	if (word) navigate("list", "search.lua?tojson=1&word="+encodeURIComponent(word)+
+	if (word) navigate("list", "browse.lua?tojson=1&word="+encodeURIComponent(word)+
 		(fields ? '&fields='+encodeURIComponent(fields) : '')+
 		(path ? '&path='+encodeURIComponent(path) : '')+
 		'&name='+encodeURIComponent('Searching: '+word));
@@ -367,7 +367,7 @@ function navigate(action, url) {
 	}
 	if (action == 'list' && !window.do_not_use_unicode_url) {
 		var para = url_parse(url), direct = '';
-		if ((para.page == 'browse.lua' || para.page == 'search.lua') && para.dict.tojson) {
+		if (para.page == 'browse.lua' && para.dict.tojson) {
 			var path = para.dict.path ? decodeURIComponent(para.dict.path).replace(/\\/g, '/') : '';
 			para.dict.tojson = para.dict.path = undefined;
 			redirect = para.page.replace(/\..*/g, '') + '/' + path + url_concat(para.dict);
@@ -405,7 +405,7 @@ var playlist_manager = {
 			$bw.reset(d.url);
 			d = {
 				name: name,
-				url: "search.lua?tojson=1&tlist="+tlist+"&name="+encodeURIComponent(name),
+				url: "browse.lua?tojson=1&tlist="+tlist+"&name="+encodeURIComponent(name),
 				ls: ls
 			}
 		}
@@ -433,7 +433,7 @@ var playlist_manager = {
 				tlist = tlist ? (tlist+","+d.id) : d.id;
 				data.ls.push(d);
 			});
-			data.url = "search.lua?tojson=1&tlist="+
+			data.url = "browse.lua?tojson=1&tlist="+
 				(nlist && tlist ? nlist+','+tlist : (nlist || tlist))+"&name="+
 				encodeURIComponent(data.name);
 			localStorage.setItem("playlist."+(name || ''), data.url);
@@ -446,17 +446,11 @@ var page_loader = {
 	list: function(url) {
 		$bw.open({url:url});
 	},
-	browse_or_search: function(path, page) {
+	browse: function(path) {
 		var exec = /(.*\/)(.*)/.exec(path) || [path, '', path];
-		$bw.open({url:page+'?tojson=1' +
+		$bw.open({url: 'browse.lua?tojson=1' +
 			(exec[1] ? '&path='+encodeURIComponent(decodeURI(exec[1]).replace(/\//g, '\\')) : '') + 
 			(exec[2] ? '&'+exec[2] : '')});
-	},
-	browse: function(path) {
-		page_loader.browse_or_search(path, 'browse.lua');
-	},
-	search: function(path) {
-		page_loader.browse_or_search(path, 'search.lua');
 	},
 	img: function(url) {
 		wait(true, 300);

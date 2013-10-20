@@ -1,4 +1,5 @@
 dofile(fb_env.doc_root.."\\common.lua")
+
 function get_path(path)
 	if not path or path == '' then path = '\\' end
 	if path:sub(1, 1) ~= '\\' then path = '\\'..path end
@@ -46,82 +47,172 @@ function scan_res(ls, path, sub)
 	return ls
 end
 
+function sql_escape(s)
+	return s and s:gsub('\'', '\'\'')
+end
+function num_escape(s)
+	return s and s:gsub('[^%d,]', '')
+end
+function like_escape(s, c)
+	return s and s:gsub('\'', '\'\''):gsub('[%%_%[%]'..c..']', c..'%1')
+end
+function parse_search(avail_fields, fields, word, path)
+	local s, c = nil, '~'
+	for f in fields:gmatch("[^,]+") do
+		local k = avail_fields[f]
+		if k then
+			local v = get_var('word'..f) or word
+			for w in v:gmatch("[^|]+") do
+				local q = string.format([[%s LIKE '%%%s%%' ESCAPE '%s']], sql_escape(k), like_escape(w, c), c)
+				s = s and s.." OR "..q or q
+			end
+		end
+	end
+	if s and path then
+		s = string.format([[(%s) AND relative_path||'\' LIKE '%s%%' ESCAPE '%s']], s, like_escape(path, c), c)
+	end
+	return s
+end
+
 local path, n = get_path(get_var("path"))
 local begin = tonumber(get_var("begin") or '0')
 local count = tonumber(get_var("count") or '1e9')
 local sort = get_var("sort") or ''
 inf = {
-	name = path:match('.*\\([^\\]+)\\') or 'root',
+	name = get_var('name') or path:match('.*\\([^\\]+)\\') or 'root',
+	ls = {},	-- the item index is the key (starting from 1)
+	begin = begin,
+	total = 0,
+
+	-- for browse only
 	path = path:sub(2),
 	parent = path:len() > 1 and {
 		path = path:sub(2):match('(.*\\)[^\\]+\\'),
 		name = path:match('.*\\([^\\]+)\\[^\\]+\\')
 	} or nil,
 	id = nil,	-- only folder with tracks will have an id
-	ls = {},	-- the item index is the key (starting from 1)
-	begin = begin,
-	total = 0
+
+	-- for search only
+	fields = get_var("fields") or "folder,title,artist,album",
+	word = get_var("word"),
+	flist = get_var("flist"),
+	tlist = get_var("tlist"),
 }
 
 local db = sqlite3.open(fb_env.db_file_name)
-local tls = { }
-local sql = string.format([[SELECT
-	i,
-	SUBSTR(d, 1, e) AS s,
-	SUBSTR(d, r, e-r+1) AS p,
-	LENGTH(d)
-FROM (SELECT *,
-		id AS i,
-		directory_path||'\' AS d,
-		CAST(SUBSTR(path_index, 1, 3) AS INTEGER) AS r,
-		MAX(CAST(SUBSTR(path_index, %d, 3) AS INTEGER),
-			CAST(SUBSTR(path_index, %d, 3) AS INTEGER))+1 AS e
-	FROM %s)
-WHERE SUBSTR(d, r, %d)='%s' GROUP BY p %s]],
-	n*3-2, n*3+1, fb_env.db_path_table, path:utf8_len(), path:gsub('\'', '\'\''), parse_sort(sort, sort_fields))
-for id, dir, sub, len in db:urows(sql) do
-	if sub == path then
-		inf['id'], tls[id] = id, dir
-	else
-		inf.total = table.inspart(inf.ls, {
-			typ = "folder",
-			name = sub:match('.*\\([^\\]+)\\'),
-			path = sub:sub(2),
-			id = dir:utf8_len() == len and id or nil
-		}, inf.total, begin, count)
+if inf.flist or inf.tlist or inf.word then -- search
+	local cond = inf.flist and "id IN ("..num_escape(inf.flist)..")" or
+		(inf.word and parse_search({
+			folder = "relative_path"
+		}, inf.fields, inf.word, inf.path))
+	inf.flist = ''
+	if cond then
+		local ls = {}
+		local sql = string.format([[SELECT id, relative_path||'\' FROM %s WHERE %s]],
+			fb_env.db_path_table, cond)
+		for id, dir in db:urows(sql) do
+			table.insert(ls, id)
+			inf.total = table.inspart(inf.ls, {
+				typ = "folder",
+				name = dir,
+				path = dir,
+				id = id
+			}, inf.total, begin, count)
+		end
+		inf.flist = table.concat(ls, ',')
 	end
-end
 
-for pid, dir in pairs(tls) do
-	local fname = dir.."\\"..CONF.ext_fname
-	local extra = fb_util.file_stat(fname) and {} or nil
-	if extra then
-		(loadfile(fname:utf8_to_ansi(), 't', extra) or function()
-			fb_util.log("load extra failed, file: \n", fname)
-		end)()
+	local cond = inf.tlist and "t.id IN ("..num_escape(inf.tlist)..")" or
+		(inf.word and parse_search({
+			title = "title",
+			artist = "artist",
+			album = "album"
+		}, inf.fields, inf.word, inf.path))
+	inf.tlist = ''
+	if cond then
+		local ls = {}
+		local sql = string.format([[SELECT t.id, pid, title, tracknumber, artist, album, album_artist,
+				length, length_seconds, relative_path||'\'
+			FROM %s as t
+			LEFT JOIN %s as p ON p.id=t.pid
+			WHERE %s ORDER BY pid, album, tracknumber]], fb_env.db_track_table, fb_env.db_path_table, cond)
+		for id, pid, title, num, artist, album, album_artist, length, seconds, path in db:urows(sql) do
+			table.insert(ls, id)
+			inf.total = table.inspart(inf.ls, {
+				typ = "track",
+				name = title,
+				num = num,
+				artist = artist,
+				album = album,
+				album_artist = album_artist,
+				length = length,
+				seconds = seconds,
+				path = path,
+				id = id
+			}, inf.total, begin, count)
+		end
+		inf.tlist = table.concat(ls, ',')
 	end
-	local sql = string.format([[SELECT id, title, tracknumber, artist, album, album_artist, length, length_seconds
-		FROM %s WHERE pid=%d ORDER BY album, tracknumber]], fb_env.db_track_table, pid)
-	for id, title, num, artist, album, album_artist, length, seconds in db:urows(sql) do
-		inf.total = table.inspart(inf.ls, {
-			typ = "track",
-			name = title,
-			num = num,
-			artist = artist,
-			album = album,
-			album_artist = album_artist,
-			length = length,
-			seconds = seconds,
-			inf = extra and extra.inf and (extra.inf[num] or extra.inf[title]),
-			id = id
-		}, inf.total, begin, count)
+else -- browse
+	local tls = { }
+	local sql = string.format([[SELECT
+		i,
+		SUBSTR(d, 1, e) AS s,
+		SUBSTR(d, r, e-r+1) AS p,
+		LENGTH(d)
+	FROM (SELECT *,
+			id AS i,
+			directory_path||'\' AS d,
+			CAST(SUBSTR(path_index, 1, 3) AS INTEGER) AS r,
+			MAX(CAST(SUBSTR(path_index, %d, 3) AS INTEGER),
+				CAST(SUBSTR(path_index, %d, 3) AS INTEGER))+1 AS e
+		FROM %s)
+	WHERE SUBSTR(d, r, %d)='%s' GROUP BY p %s]],
+		n*3-2, n*3+1, fb_env.db_path_table, path:utf8_len(), path:gsub('\'', '\'\''), parse_sort(sort, sort_fields))
+	for id, dir, sub, len in db:urows(sql) do
+		if sub == path then
+			inf['id'], tls[id] = id, dir
+		else
+			inf.total = table.inspart(inf.ls, {
+				typ = "folder",
+				name = sub:match('.*\\([^\\]+)\\'),
+				path = sub:sub(2),
+				id = dir:utf8_len() == len and id or nil
+			}, inf.total, begin, count)
+		end
 	end
-	-- try get resource list
-	inf.res = scan_res(inf.res, dir, extra and extra.res_path)
-	if dir:lower():match('disc%s*%d+\\$') or dir:lower():match('cd%s*%d+\\$') then
-		inf.res = scan_res(inf.res, dir, '..')
+
+	for pid, dir in pairs(tls) do
+		local fname = dir.."\\"..CONF.ext_fname
+		local extra = fb_util.file_stat(fname) and {} or nil
+		if extra then
+			(loadfile(fname:utf8_to_ansi(), 't', extra) or function()
+				fb_util.log("load extra failed, file: \n", fname)
+			end)()
+		end
+		local sql = string.format([[SELECT id, title, tracknumber, artist, album, album_artist, length, length_seconds
+			FROM %s WHERE pid=%d ORDER BY album, tracknumber]], fb_env.db_track_table, pid)
+		for id, title, num, artist, album, album_artist, length, seconds in db:urows(sql) do
+			inf.total = table.inspart(inf.ls, {
+				typ = "track",
+				name = title,
+				num = num,
+				artist = artist,
+				album = album,
+				album_artist = album_artist,
+				length = length,
+				seconds = seconds,
+				inf = extra and extra.inf and (extra.inf[num] or extra.inf[title]),
+				id = id
+			}, inf.total, begin, count)
+		end
+		-- try get resource list
+		inf.res = scan_res(inf.res, dir, extra and extra.res_path)
+		if dir:lower():match('disc%s*%d+\\$') or dir:lower():match('cd%s*%d+\\$') then
+			inf.res = scan_res(inf.res, dir, '..')
+		end
+		inf.extra = extra and extra.extra
 	end
-	inf.extra = extra and extra.extra
 end
 db:close()
 
