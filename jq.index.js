@@ -334,16 +334,7 @@ function play(d) {
 	}
 }
 function navigate(action, url) {
-	var h = action+'/'+url;
-	function try_unicode_hash(hash) {
-		if (location.hash.replace(/^#/, '') != hash)
-			location.hash = hash;
-		if (location.hash.replace(/^#/, '') != hash) {
-			window.do_not_use_unicode_url = true;
-			history.back();
-			location.hash = h;
-		}
-	}
+	var hash = action+'/'+url;
 	function url_parse(u) {
 		var f = u.search('\\?'),
 			p = f >= 0 ? u.substr(0, f) : null,
@@ -381,11 +372,13 @@ function navigate(action, url) {
 			para.dict.tojson = para.dict.path = undefined;
 			redirect = para.page.replace(/\..*/g, '') + '/' + path + url_concat(para.dict);
 		}
-		if (redirect)
-			return try_unicode_hash(redirect)
+		if (redirect) {
+			location.hash = redirect;
+			return;
+		}
 	}
-	if (location.hash.replace(/^#/, '') != h)
-		location.hash = h;
+	if (location.hash.replace(/^#/, '') != hash)
+		location.hash = hash;
 }
 function wait(show, delay) {
 	$("#loading").wait(function(t) {
@@ -550,6 +543,11 @@ $(document).ready(function(e) {
 	$bw.res = $("#bw_res");
 	$bw.path = $("#bw_path");
 	$bw.sort = $("#bw_sort");
+
+	var href = location.href, hash = '#'+decodeURI('%E4%B8%AD%E5%9B%BD');
+	history.replaceState(null, null, hash);
+	if (location.hash != hash) window.do_not_use_unicode_url = true;
+	history.replaceState(null, null, href);
 
 	$(window).trigger("hashchange");
 });
