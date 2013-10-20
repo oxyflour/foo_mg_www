@@ -245,7 +245,7 @@ var item_callbacks = {
 var audio_callbacks = {
 	play: function(e) {
 		var a = pl_audio[0], d = pl_audio.data("d");
-		pl_albumart.attr("src", "resource.lua?id="+d.id);
+		pl_albumart.attr("src", "resource.lua?id="+d.id+"&res=albumart");
 		$("li[pl-id="+d.id+']').siblings().removeClass("play")
 			.find('.duration .timer').remove();
 		pl_info.find(".title").text(d.artist+' - '+d.name);
@@ -327,7 +327,7 @@ function play(d) {
 	else {
 		pl_audio.data("d", d);
 		var support = localStorage.getItem('conf.transcoding');
-		pl_audio[0].src = "track.lua?id="+d.id+
+		pl_audio[0].src = "resource.lua?id="+d.id+
 			(support ? "&support="+support : '');
 //		pl_audio[0].load();
 		pl_audio[0].play();

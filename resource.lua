@@ -1,4 +1,7 @@
 dofile(fb_env.doc_root.."\\common.lua")
+function opt_find(opts, item, sep)
+	return (sep..opts..sep):find(sep..item..sep)
+end
 function get_path(path)
 	if not path or path == '' then path = '\\' end
 	if path:sub(1, 1) ~= '\\' then path = '\\'..path end
@@ -55,7 +58,6 @@ function get_thumb(cover, sz)
 	return get_file(thumb.fname)
 end
 
--- get parameter
 local id = tonumber(get_var("id") or '0')
 local path, n = get_path(get_var("path"))
 local res = get_var("res")
@@ -65,7 +67,8 @@ local sql = id > 0 and
 string.format([[SELECT
 	filename_ext,
 	directory_path||'\',
-	directory_path||'\'
+	directory_path||'\',
+	subsong
 FROM %s AS tp
 LEFT JOIN %s AS tt
 	ON pid=tp.id
@@ -73,7 +76,8 @@ WHERE tt.id=%d ORDER BY add_date DESC LIMIT 0,1]], fb_env.db_path_table, fb_env.
 string.format([[SELECT
 	filename_ext,
 	d,
-	SUBSTR(d, 1, b+1) AS s
+	SUBSTR(d, 1, b+1) AS s,
+	subsong
 FROM (SELECT *,
 		id AS i,
 		directory_path||'\' AS d,
@@ -84,27 +88,43 @@ LEFT JOIN %s
 	ON pid=i
 WHERE SUBSTR(d, r, %d)='%s' ORDER BY add_date DESC LIMIT 0,1]],
 	n*3-2, fb_env.db_path_table, fb_env.db_track_table, path:utf8_len(), path:gsub('\'', '\'\''))
-for file, dir, path in db:urows(sql) do
-	if res then
-		local ext = res:match(".*%.(.*)")
-		-- check file extension
-		res_path = ext and table.index(CONF.res_fmt, ext:lower()) and
-			fb_util.path_canonical(path..res)
-		res_ext = ext
-	else
-		browse_path = path
-		track_file = dir..file
-	end
+for file, dir, path, subsong in db:urows(sql) do
+	browse_path = path
+	track_file = dir..file
+	track_sub = subsong
 end
 db:close()
 
-if track_file and track_file ~= '' then
-	local send = -1
-	-- do not use cache for tracks
-	if id > 0 then
-		send = fb_stream.stream_albumart(track_file)
-	-- only use cache for folders
+if not res and id > 0 and track_file and track_file ~= '' and track_sub >= 0 then
+	local ua = table.each(request_info.http_headers, function(i, v, d)
+		d[i:lower()] = v
+	end, {})["user-agent"]
+	local support = get_var("support") or (function(ua)
+		if ua:find("MSIE") then
+			return "mp3"
+		else
+			return "mp3,wav"
+		end
+	end)(ua or "")
+
+	local file_ext = track_file:match(".*%.(.*)")
+	if file_ext and track_sub == 0 and opt_find(support, file_ext, ',') and
+			not opt_find(support, 'force', ',') then
+		send = fb_stream.stream_file(track_file)					-- no decoding
+	elseif  opt_find(support, "wav", ',') then
+		send = fb_stream.stream_wav(track_file, track_sub, 0, 16)	-- 16bit wave
 	else
+		send = fb_stream.stream_mp3(track_file, track_sub, 0, 2)	-- vbr mp3, quality 2, [320kbps]
+	end
+
+	if send < 0 then
+		print("HTTP/1.0 500 OK\r\n\r\n")
+	end
+elseif res == 'albumart' and track_file and track_file ~= '' then
+	local send = -1
+	if id > 0 then -- do not use cache for tracks
+		send = fb_stream.stream_albumart(track_file)
+	else -- only use cache for folders
 		local fs, sz = {}, get_size(get_var('w'), get_var('s'))
 		if CONF.albumart_cache and
 				table.set(fs, 'cover', get_cover(browse_path, track_file)).attr and
@@ -118,8 +138,12 @@ if track_file and track_file ~= '' then
 	if send < 0 and not get_var("nofallback") then
 		fb_stream.stream_file(CONF.def_albumart)
 	end
-elseif res_path and fb_util.file_stat(res_path) then
-	if res_ext == 'txt' then
+elseif res and browse_path and browse_path ~= '' and
+		table.set(_G, 'file_ext', res:match(".*%.(.*)")) and 
+		table.index(CONF.res_fmt, file_ext:lower()) and
+		table.set(_G, 'res_path', fb_util.path_canonical(browse_path..res)) and
+		fb_util.file_stat(res_path) then
+	if file_ext == 'txt' then
 		local file = io.open(res_path:utf8_to_ansi(), 'r')
 		local content = file:read('*all')
 		file:close()
