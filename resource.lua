@@ -110,7 +110,7 @@ if track_file and track_file ~= '' then
 				table.set(fs, 'cover', get_cover(browse_path, track_file)).attr and
 				table.set(fs, 'thumb', get_thumb(fs.cover, sz)).attr then
 			send = fb_stream.stream_file(fs.thumb.fname)
-		else
+		elseif fs.cover.attr then
 			send = fb_stream.stream_albumart(track_file)
 		end
 	end
@@ -118,7 +118,7 @@ if track_file and track_file ~= '' then
 	if send < 0 and not get_var("nofallback") then
 		fb_stream.stream_file(CONF.def_albumart)
 	end
-elseif res_path and fb_util.file_exists(res_path) then
+elseif res_path and fb_util.file_stat(res_path) then
 	if res_ext == 'txt' then
 		local file = io.open(res_path:utf8_to_ansi(), 'r')
 		local content = file:read('*all')
