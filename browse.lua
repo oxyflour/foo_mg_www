@@ -7,8 +7,8 @@ function get_path(path)
 	return path, n
 end
 local sort_fields = {
-	folder = "relative_path",
-	folder_desc = "relative_path DESC",
+	folder = "directory_path",
+	folder_desc = "directory_path DESC",
 	date = "add_date DESC",
 	date_desc = "add_date"
 }
@@ -59,6 +59,7 @@ inf = {
 	} or nil,
 	id = nil,	-- only folder with tracks will have an id
 	ls = {},	-- the item index is the key (starting from 1)
+	begin = begin,
 	total = 0
 }
 
@@ -93,7 +94,7 @@ end
 
 for pid, dir in pairs(tls) do
 	local fname = dir.."\\"..CONF.ext_fname
-	local extra = fb_util.file_exists(fname) and {} or nil
+	local extra = fb_util.file_stat(fname) and {} or nil
 	if extra then
 		(loadfile(fname:utf8_to_ansi(), 't', extra) or function()
 			fb_util.log("load extra failed, file: \n", fname)

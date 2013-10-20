@@ -36,6 +36,7 @@ inf = {
 	flist = get_var("flist"),
 	tlist = get_var("tlist"),
 	ls = {},
+	begin = begin,
 	total = 0
 }
 local db = sqlite3.open(fb_env.db_file_name)
