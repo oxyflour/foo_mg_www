@@ -192,20 +192,25 @@ app.directive('plAudio', function() {
 	return function (scope, elem, attrs, ctrl) {
 		var audio = scope.audio = (scope.audio || {});
 		audio.current = {};
-		var update = function() {
+		var timeout = 0;
+		var update = function(start) {
+			if (start && timeout > 0)
+				clearTimeout(timeout);
 			var a = elem[0], t = a.currentTime;
 			// save to current object to speed up
 			audio.current.sec = t;
 			audio.current.mmss = sec2Mmss(t);
 			if (!a.ended && !a.paused)
-				setTimeout(update, (Math.floor(t) + 1.05 - t) * 1000)
+				timeout = setTimeout(update, (Math.floor(t) + 1.05 - t) * 1000)
+			else
+				timeout = 0;
 			// do not use $timeout because we only need to update elements
 			scope.$apply();
 		}
 		audio.state = 'ready';
 		elem.bind('play', function(e) {
 			audio.state = 'play';
-			update();
+			update(true);
 		}).bind('pause', function(e) {
 			audio.state = 'pause';
 		}).bind('ended', function(e) {
