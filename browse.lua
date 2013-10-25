@@ -1,5 +1,4 @@
 dofile(fb_env.doc_root.."\\common.lua")
-
 function get_path(path)
 	if not path or path == '' then path = '\\' end
 	if path:sub(1, 1) ~= '\\' then path = '\\'..path end
@@ -7,12 +6,6 @@ function get_path(path)
 	local s, n = path:gsub('\\', '')
 	return path, n
 end
-local sort_fields = {
-	folder = "directory_path",
-	folder_desc = "directory_path DESC",
-	date = "add_date DESC",
-	date_desc = "add_date"
-}
 function parse_sort(fields, avail_fields)
 	local s = nil
 	for f in fields:gmatch("[^,]+") do
@@ -61,7 +54,7 @@ function parse_search(avail_fields, fields, word, path)
 	for f in fields:gmatch("[^,]+") do
 		local k = avail_fields[f]
 		if k then
-			local v = get_var('word'..f) or word
+			local v = get_var('word_'..f) or word
 			for w in v:gmatch("[^|]+") do
 				local q = string.format([[%s LIKE '%%%s%%' ESCAPE '%s']], sql_escape(k), like_escape(w, c), c)
 				s = s and s.." OR "..q or q
@@ -93,14 +86,28 @@ inf = {
 	id = nil,	-- only folder with tracks will have an id
 
 	-- for search only
-	fields = get_var("fields") or "folder,title,artist,album",
+	fields = get_var("fields"),
 	word = get_var("word"),
 	flist = get_var("flist"),
 	tlist = get_var("tlist"),
 }
+local folder_sort_fields = {
+	flist = inf.flist and string.format("instr(',%s,', ','||id||',')", num_escape(inf.flist)),
+	folder = "directory_path",
+	folder_desc = "directory_path DESC",
+	date = "add_date DESC",
+	date_desc = "add_date"
+}
+local track_sort_fields = {
+	tlist = inf.tlist and string.format("instr(',%s,', ','||t.id||',')", num_escape(inf.tlist)),
+	path = 'pid',
+	album = 'album',
+	num = 'tracknum'
+}
 
 local db = sqlite3.open(fb_env.db_file_name)
 if inf.flist or inf.tlist or inf.word then -- search
+	inf.fields = inf.fields or "folder,title,artist,album"
 	local cond = inf.flist and "id IN ("..num_escape(inf.flist)..")" or
 		(inf.word and parse_search({
 			folder = "relative_path"
@@ -108,8 +115,8 @@ if inf.flist or inf.tlist or inf.word then -- search
 	inf.flist = ''
 	if cond then
 		local ls = {}
-		local sql = string.format([[SELECT id, relative_path||'\' FROM %s WHERE %s]],
-			fb_env.db_path_table, cond)
+		local sql = string.format([[SELECT id, relative_path||'\' FROM %s WHERE %s %s]],
+			fb_env.db_path_table, cond, parse_sort(sort, folder_sort_fields))
 		for id, dir in db:urows(sql) do
 			table.insert(ls, id)
 			inf.total = table.inspart(inf.ls, {
@@ -135,7 +142,8 @@ if inf.flist or inf.tlist or inf.word then -- search
 				length, length_seconds, relative_path||'\'
 			FROM %s as t
 			LEFT JOIN %s as p ON p.id=t.pid
-			WHERE %s ORDER BY pid, album, tracknumber]], fb_env.db_track_table, fb_env.db_path_table, cond)
+			WHERE %s %s]], fb_env.db_track_table, fb_env.db_path_table, cond,
+			parse_sort(sort or 'pid,album,tracknumber', track_sort_fields))
 		for id, pid, title, num, artist, album, album_artist, length, seconds, path in db:urows(sql) do
 			table.insert(ls, id)
 			inf.total = table.inspart(inf.ls, {
@@ -168,7 +176,7 @@ else -- browse
 				CAST(SUBSTR(path_index, %d, 3) AS INTEGER))+1 AS e
 		FROM %s)
 	WHERE SUBSTR(d, r, %d)='%s' GROUP BY p %s]],
-		n*3-2, n*3+1, fb_env.db_path_table, path:utf8_len(), path:gsub('\'', '\'\''), parse_sort(sort, sort_fields))
+		n*3-2, n*3+1, fb_env.db_path_table, path:utf8_len(), path:gsub('\'', '\'\''), parse_sort(sort, folder_sort_fields))
 	for id, dir, sub, len in db:urows(sql) do
 		if sub == path then
 			inf['id'], tls[id] = id, dir
