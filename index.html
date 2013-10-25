@@ -1,381 +1,286 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="app">
 <head>
 <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title>foo_mg_www</title>
 <link type="text/css" href="theme.css" rel="stylesheet" />
-<script src="jquery-2.0.2.min.js"></script>
-<script src="jq.index.js"></script>
-<script src="jq.index2.js"></script>
 <style>
-.hidden { display: none; }
-.clear { width: 100%; clear: both; }
-.visited { color: #aaa; }
-.float-left { float: left; }
-.float-right {float: right; }
-.text-center { text-align: center; }
-.margin-center { margin: 0 auto; }
-.no-wrap { white-space: nowrap; }
-.no-overflow { overflow: hidden; }
+.list .loading { -webkit-transition: opacity 1s ease; -moz-transition: opacity 2s ease;
+	-ms-transition: opacity 1s ease; transition: opacity 1s ease; }
 
-.title select.button { -webkit-appearance: none; border: none; background-color: transparent; width: 60px; height: 44px;
-	line-height: 44px; padding: 0 20px; margin:0; font-weight: bold; font-size: 105%; }
+.head .return { position: absolute; padding-left: 0; left: 0; right: 120px; text-align: left; background-color: #fff; }
+.show-tool .head .return { right: 240px; }
+@media only screen and (min-width: 620px) {
+	.head .return { right: 250px; } 
+}
 
-#loading { background-color: #eee; line-height: 45px; color: #888; }
+.list .info { font-size: 85%; color: #999; margin-top: 3px; }
+.sep .bg { height: 90px; padding: 0.5em 0; padding-left: 0.5em; color: #fff; background: rgba(180, 180, 180, 0.4); }
+.sep .link { float: right; margin: 0; padding: 0.5em 1em; color: white; font-weight: bold; }
+.small-sep .sep .bg { height: auto; background: rgba(180, 180, 180, 0.8); }
+.track .num { float: left; font-size: 125%; margin-top: -1px; margin-right: 5px; margin-bottom: 10px; color: #999; }
+.track .duration { float: right; margin: -10px; padding: 10px; x-padding-bottom: 20px; }
+.track .current { display: none; }
+.track .check { float: right; margin-right: 7px; margin-top: 2px; width: 12px; height: 12px; border: 2px solid transparent; }
 
-.show-play #bw_play, .show-conf #bw_conf, .show-extra #bw_extra, .show-info #bw_info, .show-tool #bw_tool { display: block; }
-.img-view .img { display: block; }
-.img, .img-view .head, .img-view .main, .img-view .side, .img-view .foot { display: none; }
-
-.show-head.show-play #tab_play, .show-head.show-conf #tab_conf, .show-head.show-extra #tab_extra,
-.show-head.show-info #tab_info, .show-head.show-tool #tab_tool { background-color: #ddd; }
-#bw_toolbar button { padding: 0; width: 60px; }
-#bw_title { position: absolute; padding: 0; left: 0; right: 130px; overflow: hidden; background-color: #fff; text-align: left;
-	-webkit-transition: right .3s ease; -ms-transition: right .3s ease; transition: right .3s ease; }
-.show-head #bw_title { right: 260px; }
-@media only screen and (min-width: 621px) { #bw_title { right: 260px; } }
-
-.list .sep .bg { display: block; height: 90px; padding: 1em 0; padding-left: 0.5em; color: #fff; background: rgba(180, 180, 180, 0.4); }
-.list .sep .link { float: right; margin: 0; padding: 0.5em 1em; color: white; font-weight: bold; font-size: 115%; }
-.small-sep .sep .bg { height: auto; padding: 0.6em 0; background: rgba(180, 180, 180, 0.8); }
-
-.albumart { display: none; background-size: cover; background-position: center; margin-right: 10px; }
-.aa-list-view .list .folder { min-height: 92px; }
-.aa-list-view .list .folder .albumart { display: block; float: left; height: 96px; width: 96px; }
-.aa-block-view .list > * { float: left; width: 100%; }
-.aa-block-view .list .track { width: 92%; }
-.aa-block-view .list .folder { width: 42%; max-width: 150px; margin-left: 16px; margin-right: 0;
+.folder .albumart { display: none; background-size: cover; background-position: center; margin-right: 10px; }
+.aa-list-view .folder { min-height: 92px; }
+.aa-list-view .folder .albumart { display: block; float: left; height: 96px; width: 96px; }
+.aa-block-view .list>* { float: left; width: 100%; }
+.aa-block-view .track { width: 92%; }
+.aa-block-view .folder { width: 42%; max-width: 150px; margin-left: 16px; margin-right: 0;
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: none; }
-.aa-block-view .list .folder .albumart { display: block; width: 150px; height: 150px; }
-@media only screen and (min-width: 769px) { .aa-block-view .main { right: auto; width: 540px; } 
-	.aa-block-view .side { left: 540px; } }
+.aa-block-view .folder .info { min-height: 1.5em; overflow: hidden; text-overflow: ellipsis; }
+.aa-block-view .folder .albumart { display: block; width: 150px; height: 150px; }
+@media only screen and (min-width: 1080px) {
+	.list { right: auto; width: 540px; } 
+	.tool, .player { left: 540px; } 
+}
 
-#bw_extra li, #pl_list li { padding: 5px; margin: 3px; }
-#bw_path .active, #bw_play .active { font-weight: bold; }
-#bw_path button { max-width: 90px; overflow: hidden; text-overflow: ellipsis; padding: 0; }
-#bw_path span { color: #ccc; }
-#bw_play .playing { border-left: 13px solid #ddd; margin-left: -10px; }
+.track.play, .track.pause, .track.ended { border-left: 12px #fff solid; margin-left: 0px; font-weight: bold; }
+.track.play { border-left: 12px #aaa solid; }
+.track.pause { border-left: 12px #ccc solid; }
+@media only screen and (max-width: 620px) {
+	.track.play .current { display: inline; }
+}
+.on-edit .track .check { border-color: #888; }
+.on-edit .track.dragging { opacity: 0.6; background-color: #eee; }
+.on-edit .track.selected { background-color: #eee; }
+.on-edit .track.selected .check { background-color: #aaa; }
 
-#pl_albumart { cursor: pointer; padding-top: 12px; display: block; margin:0 auto; width: 94%; max-width: 420px; }
-#pl_ctrl button { font-weight: bold; background-color: transparent; border: 0; color: #fff;}
-#pl_info { background-color: #eee; }
-#pl_info2 button { width: 20%; font-size: 120%; padding: 0.8em 0; }
+.player { text-align: center; }
+.player .albumart { float: left; cursor: pointer; background-image: url(../nocover.jpg); background-size: cover; background-position: center; }
+.player .albumart div { width: 100%; height: 100%; background-size: cover; background-position: center; }
+.player .buttonbar { max-width: 720px; margin: 5px auto; white-space: nowrap;; }
+.player .buttonbar button { font-size: 120%; width: 30%; font-weight: bold; }
+.player .info { margin-top: 5px; }
+.player .processbar { width: 100%; background-color: #ddd; cursor: pointer; }
+.player .processbar div { background-color: #666; width: 0; height: 8px; }
+@media only screen and (max-width: 620px) {
+	.player { font-size: 85%; white-space: nowrap; }
+	.player .albumart { height: 80px; width: 80px; margin: 5px; }
+	.player .buttonbar { padding-left: 80px; }
+	.player .processbar { position: fixed; bottom: 0; }
+	.player .processbar div { bottom: 0; height: 2px; }
+}
+@media only screen and (min-width: 621px) {
+	.player { padding-left: 20px; }
+	.player .buttonbar { margin: 20px; }
+	.player .albumart { height: 130px; width: 130px; margin: 15px; }
+	.player .buttonbar { padding-left: 140px; }
+	.player .processbar { position: absolute; bottom: 0; }
+}
+@media only screen and (min-width: 1080px) {
+	.tool { bottom: 200px; }
+	.player { height: 200px; }
+	.player .albumart { height: 170px; width: 170px; }
+}
 
-.player { color: #666; position: relative; width: 100%; text-align: center; }
-.player .title { font-size: 105%; font-weight: bold; }
-.player .time { font-size: 80%; }
-.player .info { margin-top: 8px; font-size: 70%; }
-.player .status { margin-top: 5px; font-size: 50%; }
-.proc { background-color:#ddd; border-left: 0 solid #666; height: 3px; cursor: pointer; }
+.head .tab { float: right; background-color: #eee;  }
+.head .tab.ng-hide { display: block !important; background-color: transparent; }
+.tool .close-tool { float: right; }
+.tool .content { margin: 10px 0; }
+.content h3 { border-left: 12px solid #888; padding-left: 8px; }
+.content li { padding: 0.3em; margin: 0.2em; }
+.content .field { margin: 10px; }
+.content .search { margin: 5px 0; }
+.content .search input[type=text] { width: 70%; }
+.content .search input[type=submit] { width: 25%; max-width: 80px; }
+@media only screen and (min-width: 621px) {
+	.tool .close-tool { display: none; }
+	.tool .content { margin: 20px; }
+}
 
-.bw-list { display: none; /*	z-index: 0; opacity: 0;
-	-webkit-transition: all .3s ease; -moz-transition: all .3s ease;
-	-ms-transition: all .3s ease; transition: all .3s ease; */ }
-.bw-list.bw-show { display: block; /* z-index: 1; opacity: 1; margin-left: 0;
-	-webkit-transform: none; -ms-transform: none; */ }
-/*
-.bw-list.no-anim { -webkit-transition: none; -moz-transition: none;
-	-ms-transition: none; transition: none; }
-.bw-list.bw-showup { -webkit-transform-origin: left center; -ms-transform-origin: left center;
-	-webkit-transform: rotateY(-30deg); -ms-transform: rotateY(-30deg); }
-.bw-list.bw-showdown { -webkit-transform-origin: right center; -ms-transform-origin: right center;
-	-webkit-transform: rotateY(30deg); -ms-transform: rotateY(30deg); }
-*/
+.content .playlist { margin: 0; padding: 0; }
+.playlist form { padding: 0.3em; margin: 0.2em; }
+.playlist input { width: 0; padding: 5px 0; margin-left: -10px; border: 1px solid #ddd; border-left: 28px solid #ddd; }
+.playlist input:focus { width: 90%; }
+.playlist input:focus+a { display: none; }
+.playlist.active { font-weight: bold; }
+.playlist.play input { border-color: #999; }
+
+body.img-mode>.head, body.img-mode>.list, body.img-mode>.tool, body.img-mode>.player { display: none; }
+body.list-mode>.img { display: none; }
 </style>
 </head>
-<body class-group="show-play show-conf show-extra show-info show-tool,list-view img-view,aa-list-view aa-block-view">
-<div class="foot">
-	<div class="title">
-		<select class="float-right button" onmousedown="event.stopPropagation()"
-				onchange="$('body').clearClass('show-play').addClass('show-head show-play');
-					$('#playlist_action').val(this.value); load_playlist(); this.selectedIndex = 0">
-			<option value="">+</option>
-			<option value="+s">Add Selected to</option>
-			<option value="+a">Add All to</option>
-			<option value="=s">Save Selected as</option>
-			<option value="=a">Save All as</option>
-		</select>
-		<button class="float-right" onclick="$bw.elem.find('li.selected').removeClass('selected');
-			$('body').removeClass('show-foot show-select')">x</button>
-		<!--button class="float-right" onmousedown="event.stopPropagation()"
-			onclick="$('body').clearClass('show-play').addClass('show-head show-play');load_playlist()">+</button-->
-		<button class="float-left"
-			onclick="$bw.elem.find('li.selected').slideUp(function(){$(this).remove()})">-</button>
-		<button class="float-left"
-			onclick="$bw.elem.find('li.selected').shiftUp()">&and;</button>
-		<button class="float-left"
-			onclick="$bw.elem.find('li.selected').shiftDown()">&or;</button>
-	</div>
-</div>
-<div class="main">
-<ul id="bw_list" class="list"></ul>
-</div>
-<div class="side" class="text-center">
-	<img id="pl_albumart" src="nocover.jpg" onmousedown="event.stopPropagation()"
-		onclick="show_list(pl_audio.data('l'));toggle_head_display('show-extra')" />
-	<audio id="pl_audio" class="hidden">your browser too old?</audio>
-	<div id="pl_info2" class="clear text-center">
-		<button onclick="play('-')">&lt;&lt;</button>
-		<button onmousedown="event.stopPropagation()" onclick="toggle_head_display('show-conf')">...</button>
-		<button id="pl_button2" onclick="play_pause()">&gt;||</button>
-		<button onclick="play('+')">&gt;&gt;</button>
-		<div style="margin:0 auto;width:94%;max-width:500px;">
-			<div id="pl_process2" class="proc" style="height:8px;"></div>
-		</div>
-		<div class="player" onclick="show_list(pl_audio.data('l'))" style="padding-top:20px;cursor:pointer;">
-			<span class="title">not playing</span>&nbsp;<span class="time"></span>
-			<div class="info">click [Add] to add tracks</div>
-		</div>
-	</div>
-</div>
+<body ng-class="[showTool&&'show-tool', setting.folder_view_class||'aa-block-view', location.path+'-mode']"
+	bw-main pl-ctrl ng-controller="main">
 <div class="head">
-	<div class="menu">
-		<div id="bw_tool" class="hidden">
-			<h3>Search</h3>
-			<form action="javascript:void(null)" onsubmit="search_word(this)">
-				<input name="searchi" style="margin:0 5px;min-width:70%" /><input type="submit" value="Search" /><br />
-				<input type="checkbox" name="fields" value="folder" />Folder
-				<input type="checkbox" name="fields" value="album" />Album
-				<input type="checkbox" name="fields" value="artist" />Artist
-				<input type="checkbox" name="fields" value="title" />Title
-				<br />
-				<input type="checkbox" name="path" checked />Search under current folder
-			</form>
-			<h3>Go To</h3>
-			<button onclick="$('body').clearClass('show-extra').addClass('show-extra')">[Resource]</button>
-			<button onclick="$('body').clearClass('show-conf').addClass('show-conf')">[Setting]</button>
-			<button onclick="show_list(pl_audio.data('l'))">[Playing]</button>
+	<button class="return" ng-click="browse(listParentPath)">{{listName}}</button>
+	<button class="tab" ng-show="!showTool||showTool=='play'" ng-click="ctrl.toggleTool('play')">+</button>
+	<button class="tab" ng-show="showTool=='nav'" ng-click="ctrl.toggleTool('nav')">#</button>
+	<button class="tab" ng-show="showTool=='res'" ng-click="ctrl.toggleTool('res')">*</button>
+	<button class="tab" ng-show="showTool=='conf'" ng-click="ctrl.toggleTool('conf')">...</button>
+</div>
+<ul class="list ng-hide" ng-class="[list.groupCount>3&&'small-sep',onEdit&&'on-edit']" bw-list ng-non-bindable ng-show="url==listUrl">
+	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
+		<a ng-show="setting.res_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
+		<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
+		<div class="bg" ng-click="i.path ? browse(i.path) : ctrl.toggleTool('res', 'res')">
+			<big class="stress">{{i.album}}</big> ({{i.album_artist}})
+		</div>
+	</div>
+	<li class="folder" bw-id="{{i.id}}" ng-attr-title="{{i.name}}" ng-if="i.typ=='folder'" ng-click="browse(i.path)">
+		<div class="albumart" ng-attr-style="background-image:{{i.aaCssUrl}}"></div>
+		<span class="float-right">&gt;</span>
+		{{i.shortName}}
+		<div class="info">{{i.bracS}} {{i.bracR}}</div>
+	</li>
+	<li class="track {{i.id==audio.id&&audio.state}}" pl-id="{{i.id}}" ng-repeat-end
+		ng-if="i.typ=='track'" ng-click="list.onEdit ? select.toggle(i.id) : ctrl.playCurrent(i.id)">
+		<span class="num">{{i.num}}</span>
+		<span class="duration" ng-click="select.toggle(i.id);$event.stopPropagation()">
+			<span class="current">{{audio.current.mmss}}/</span>{{i.length}}<br />
+			<div class="check"></div>
+		</span>
+		{{i.name}}
+		<div class="info">&lt;{{i.artist}}&gt;</div>
+	</li>
+	<div class="loading" show-delay="500" ng-click="load()" ng-hide="ls.length==total">loading ({{ls.length}}/{{total||'?'}})</div>
+	<div class="empty" ng-hide="total!=0">No thing here</div>
+</ul>
+<div class="tool">
+	<button class="close-tool" style="padding: 0.6em 1.2em;" ng-click="showTool=false">X</button>
+	<div class="content" ng-show="!showTool||showTool=='play'">
+		<h3>Playlists</h3>
+		<button ng-hide="list.onEdit" ng-click="list.onEdit=true;ctrl.autoHideTool()">[ Select ]</button>
+		<span class="edit-list" ng-show="list.onEdit">
+			<button ng-click="select.finish();ctrl.autoHideTool()">[ Done ]</button>
+			<button ng-click="select.toggle()">[ Toggle ]</button>
+		</span>
+		<span ng-hide="list.onEdit&&!select.length()">
+			<button ng-click="ctrl.saveAsPlaylist()">[ Save ]</button>
+			<button class="no-overflow">
+				<select class="absolute no-opacity" style="max-width:80px;" ng-model="selectedUrl" ng-change="ctrl.addToPlaylist()">
+					<option></option>
+					<option ng-repeat="(u, n) in playlists" ng-value="u" ng-if="n">{{n}}</option>
+				</select>[ AddTo ]
+			</button>
+		</span>
+		<ul ng-init="playlists=('playlists@'|localStoreDict)">
+			<!-- neither ng-class nor ng-show works with ng-repeat -->
+			<li ng-repeat="(u, n) in playlists" class="playlist {{u==listUrl&&'active'}} {{u==playUrl&&'play'}}">
+				<form ng-show="n.length||f" action="javascript:$('button:first').focus()">
+					<input auto-select local-store="playlists@{{u}}" local-store-init="n"
+						pl-url="{{u}}" ng-focus='f=1' ng-blur='f=0' ng-model="playlists[u]" />
+					<a ng-href="#list?url={{u|urlEncode}}">{{n}}</a>
+				</form>
+			</li>
+		</ul>
+	</div>
+	<div class="content" ng-show="showTool=='nav'">
+		<h3>Search</h3>
+		<form action="javascript:void(null)" ng-submit="ctrl.searchWord()">
+			<div class="search">
+				<input type="text" name="word" ng-model="search.word" /><input type="submit" value="Search" /><br />
+			</div>
+			<input type="checkbox" ng-model="search.fields.folder" />Folder
+			<input type="checkbox" ng-model="search.fields.album" />Album
+			<input type="checkbox" ng-model="search.fields.artist" />Artist
+			<input type="checkbox" ng-model="search.fields.title" />Title
 			<br />
-			<button onclick="$bw.open({reload:1})">[Reload List]</button>
-			<button onclick="location.reload()">[Reload Page]</button>
-		</div>
-		<div id="bw_conf" class="hidden">
-			<h3>Folder Setting</h3>
-			<div style="margin:10px 5px;"> sort this folder: 
-				<select id="bw_sort" onchange="save_sort(this.value)">
-					<option value="">with none</option>
-					<option value="folder">by name</option>
-					<option value="folder_desc">by name reverse</option>
-					<option value="date">from latest</option>
-					<option value="date_desc">from oldest</option>
-				</select>
-			</div>
-			<h3>Play Setting</h3>
-			<div style="margin:10px 5px;"> play mode: 
-				<select class="conf_autoload" key='conf.play_loop'>
-					<option value="yes">repeat</option>
-					<option value="">norepeat</option>
-				</select>
-				<select class="conf_autoload" key='conf.play_next'>
-					<option value="yes">list</option>
-					<option value="">track</option>
-				</select>
-			</div>
-			<div style="margin:10px 5px;"> trancoding: 
-				<select class="conf_autoload" key='conf.transcoding'>
-					<option value="">auto</option>
-					<option value="wav">wav</option>
-					<option value="mp3">mp3</option>
-					<option value="force,wav">force wav</option>
-					<option value="force,mp3">force mp3</option>
-				</select>
-			</div>
-			<h3>UI Setting</h3>
-			<div style="margin:10px 5px;"> display folders with: 
-				<select class="conf_autoload" key='conf.display_block'
-						oninit="update_listview(this.value)"
-						onchange="update_listview(this.value)">
-					<option value="">no albumart</option>
-					<option value="aa-list-view">albumart list</option>
-					<option value="aa-block-view">albumart block</option>
-				</select>
-			</div>
-			<div style="margin:10px 5px;"> open image in: 
-				<select class="conf_autoload" key='conf.open_img_self'>
-					<option value="">a new window</option>
-					<option value="yes">current window</option>
-				</select>
-			</div>
-		</div>
-		<div id="bw_extra" class="hidden">
-			<div id="bw_path" class="no-wrap no-overflow"></div>
-			<ul id="bw_res" style="margin: 0 10px;border-top:1px solid #ccc;"></ul>
-		</div>
-		<div id="bw_info" class="hidden">
-			<div class="no-wrap no-overflow" onclick="$('body').clearClass('show-extra').addClass('show-extra')">
-				&lt;&lt;&nbsp;<button class="name"></button></div>
-			<pre class="content" style="margin: 0 10px;border-top:1px solid #ccc;"></pre>
-		</div>
-		<div id="bw_play" class="hidden">
-			<!--div class="show-narrowview-only">
-				<div id="pl_info3" style="line-height:44px;font-weight:bold;white-space:nowrap;overflow-x:hidden;">
-					<a class="title" onclick="show_list(pl_audio.data('l'))" style="border:none;">ready to play</a>&nbsp;
-					<a class="time" onclick="play_pause()"></a>
+			<input type="checkbox" ng-init="search.onpath=true" ng-model="search.onpath" />Search under current folder
+		</form>
+		<h3>Go To</h3>
+		<button ng-click="browse()">[ root ]</button>
+		<br />
+		<button ng-click="reload()">[ reload list ]</button>
+		<button onclick="location.reload()">[ reload page ]</button>
+	</div>
+	<div class="content" ng-show="showTool=='res'">
+		<h3>Resource</h3>
+		<div class="gray" ng-hide="list.resList.length">No Resource Here</div>
+		<ul>
+			<li ng-repeat="i in list.resList" ng-switch on="i.typ">
+				<div ng-switch-when="img">
+					<a ng-show="setting.res_open_self" ng-href="#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
+					<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 				</div>
-				<div id="pl_process3" class="proc"></div>
-			</div-->
-			<div class="no-wrap no-overflow">
-				<button onclick="rename_playlist($('<li></li>').prependTo(pl_list))">New</button>
-				<button onclick="edit_playlist()">Edit</button>
-				<select id="playlist_action">
-					<option value="">Go to...</option>
-					<option value="+s">Add Selected to</option>
-					<option value="+a">Add All to</option>
-					<option value="=s">Save Selected As</option>
-					<option value="=a">Save All As</option>
-				</select>
-			</div>
-			<ul id="pl_list" style="margin: 0 10px;border-top:1px solid #ccc;"></ul>
+				<a ng-switch-default target="blank" ng-href="{{i.url}}">{{i.name}}</a>
+			</li>
+		</ul>
+	</div>
+	<div class="content" ng-show="showTool=='conf'">
+		<h3>Folder Settings</h3>
+		<div class="field">sort current folder:
+			<select local-store local-store-bind="'setting.sort@'+listUrl" ng-model="setting.list_sort_field" ng-change="reload()">
+				<option value="">with none</option>
+				<option value="folder">by name</option>
+				<option value="folder_desc">by name reverse</option>
+				<option value="date">from latest</option>
+				<option value="date_desc">from oldest</option>
+			</select>
+		</div>
+		<h3>Play Settings</h3>
+		<div class="field">play mode:
+			<select local-store ng-model="setting.play_no_loop">
+				<option value="">repeat</option>
+				<option value="yes">norepeat</option>
+			</select>
+			<select local-store ng-model="setting.play_single_track">
+				<option value="">list</option>
+				<option value="yes">track</option>
+			</select>
+		</div>
+		<div class="field">transcoding:
+			<select local-store ng-model="setting.music_format_support">
+				<option value="">auto</option>
+				<option value="mp3">mp3</option>
+				<option value="wav">wav</option>
+				<option value="force,mp3">force mp3</option>
+				<option value="force,wav">force wav</option>
+			</select>
+		</div>
+		<h3>Global Settings</h3>
+		<div class="field">display folders with:
+			<select local-store ng-model="setting.folder_view_class">
+				<option value="aa-none">no albumart</option>
+				<option value="aa-list-view">small albumart</option>
+				<option value="">big albumart</option>
+			</select>
+		</div>
+		<div class="field">open resource in:
+			<select local-store ng-model="setting.res_open_self">
+				<option value="">a new window</option>
+				<option value="yes">current window</option>
+			</select>
 		</div>
 	</div>
-	<div class="title">
-		<button id="bw_title" onclick="browse('..')"></button>
-		<div id="bw_toolbar" class="float-right">
-			<button id="tab_conf" onclick="toggle_head_display('show-conf')">...</button>
-			<button id="tab_extra" onclick="toggle_head_display('show-extra')">*</button>
-			<button id="tab_tool" onclick="toggle_head_display('show-tool');$('#bw_tool input[name=searchi]').focus().select()">#</button>
-			<button id="tab_play" onclick="toggle_head_display('show-play');
-				if ($('body').hasClass('show-head')) load_playlist();">+</button>
+</div>
+<div class="player">
+	<audio pl-audio></audio>
+	<input type="hidden" local-store ng-model="audio.id" />
+	<input type="hidden" local-store ng-model="playUrl" />
+	<input type="hidden" local-store ng-model="playlist" />
+	<div class="albumart" ng-click="listUrl=playUrl;ctrl.autoHideTool()">
+		<div ng-attr-style="background-image:{{audio.aaCssUrl}}"></div>
+	</div>
+	<div class="buttonbar">
+		<button ng-click="playnext(-1, true)">[ &laquo; ]</button>
+		<button ng-click="play()" ng-hide="audio.state=='play'">[ &gt; ]</button>
+		<button ng-click="pause()" ng-show="audio.state=='play'">[ || ]</button>
+		<button ng-click="playnext(1, true)">[ &raquo; ]</button>
+	</div>
+	<div ng-show="audio.id">
+		<big>{{audio.info.artist}} - {{audio.info.name}}</big>
+		<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
+		<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
+		<div class="info">
+			<small>{{audio.info.album}} [{{audio.info.num}}]</small>
 		</div>
 	</div>
-</div>
-<div id="loading" class="pg-modal-pop hidden text-center" style="min-height:4em;line-height:4em;" modal-no-overlay="1" modal-width="280px">
-	Loading...
-</div>
-<div id="pl_ctrl" class="pg-modal-pop hidden text-center" modal-width="*1">
-	<button class="float-left" onclick="play('-')" style="width:18%;font-size:150%">&lt;&lt;</button>
-	<button class="float-right" onclick="play('+')" style="width:18%;font-size:150%">&gt;&gt;</button>
-	<button id="pl_button" style="font-size:300%;margin-top:-15px" onclick="play_pause()">&gt;||</Button>
-</div>
-<div id="pl_info" class="pg-modal-pop hidden" modal-alignY="bottom" modal-width="*1">
-	<div class="player" style="padding:5px;padding-top:10px;">
-		<button class="float-left" onclick="show_list($bw.data('d'))">+</button>
-		<button class="float-right" onclick="">...</button>
-		<div onclick="show_list(pl_audio.data('l') || $bw.data('data'))">
-			<span class="title">ready to play</span>&nbsp;<span class="time"></span>
-			<div class="info">click [Add] to add tracks</div>
-		</div>
+	<big ng-hide="audio.id">Ready to play</big>
+	<div ng-show="audio.id" class="processbar">
+		<div ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>
 	</div>
-	<div id="pl_process" class="proc"></div>
 </div>
-<img class="img" style="position:absolute;" onclick="$('#pl_ctrl,#pl_info').show().modal('open')" />
-<script>
-function update_listview(c) {
-	$('body').clearClass(c || 'aa-list-view').addClass(c);
-}
-function save_sort(val) {
-	var d = $bw.data('data');
-	if (d && d.url) {
-		$ul.storage('conf.sort.'+d.url, val || null);
-		$bw.open({reload:1});
-	}
-}
-function toggle_head_display(cls) {
-	var b = $('body');
-	(b.hasClass(cls) && b.hasClass(cls)) ?
-		b.toggleClass('show-head') :
-		b.clearClass(cls).addClass('show-head '+cls);
-}
-function show_list(d) {
-	(d && navigate('list', d.url));
-	$('body').removeClass('show-head');
-};
-function search_word(e) {
-	var word = $(e).find('input[name=searchi]').val();
-	var fields = $ul.ieach($(e).find('input[name=fields]'), function(i, v, l, p) {
-		if (v.checked) p.o = p.o ? p.o+','+$(v).val() : $(v).val()
-	}, {}).o
-	var path = $(e).find('input[name=path]')[0].checked &&
-		$bw.data('data') && $bw.data('data').path;
-	search(word, fields, path);
-}
-function load_playlist() {
-	var list = pl_list.empty();
-	$ul.storage(function(k, v) {
-		if (k.substr(0, 9) == 'playlist.')
-			var i = item_formatter.playlist({
-				name: k.substr(9),
-				url: v
-			}).appendTo(list);
-			if ($bw.data('data') && $bw.data('data').url == v)
-				i.addClass('active');
-			if (pl_audio.data('l') && pl_audio.data('l').url == v)
-				i.addClass('playing');
-	});
-	var sel = $('#playlist_action');
-	if ($bw.elem.find('li.selected').length) {
-		if (!sel.val()) sel[0].selectedIndex = 1;
-	}
-	else {
-		sel[0].selectedIndex = 0;
-	}
-}
-function edit_playlist() {
-	var edit = pl_list.children('.on-edit');
-	if (edit.length) {
-		edit.each(function(i, e) {
-			$(e).removeClass('on-edit').find('div.edit-bar').remove();
-		});
-	}
-	else {
-		pl_list.children().each(function(i, e) {
-			$(e).prepend('<div class="edit-bar float-left">'+
-				'<span style="padding: 0 10px; cursor: pointer; color: #aaa;" '+
-					'onclick="$(this).parents(\'li\').first().addClass(\'to-remove\');remove_playlist()">x</span>'+
-				'<span style="padding: 0 10px; cursor: pointer; color: #aaa;" '+
-					'onclick="$(this).parents(\'li\').first().addClass(\'to-rename\');rename_playlist()">r</span>'+
-			'</div>').addClass('on-edit');
-		})
-	}
-}
-function remove_playlist() {
-	pl_list.children('.to-remove').each(function(i, e) {
-		var d = $(e).data('d');
-		$(e).remove();
-		localStorage.removeItem('playlist.'+d.name);
-	});
-}
-function rename_playlist(s) {
-	(s && s.length ? s : pl_list.children('.to-rename')).each(function(i, e) {
-		var d = $(e).data('d') || {name:'new', url:'search.lua?tojson=1&name=new'};
-		$('<li><form action="javascript:void(null)" onsubmit="submit_rename_playlist(this.parentNode)">'+
-			'<input name="name" style="min-width:70%" value="'+(d.name || '')+'" /><input type="submit" value="OK" /></form></li>')
-			.data('d', d).replaceAll(e);
-	});
-}
-function submit_rename_playlist(e) {
-	var name = $(e).find('input[name=name]').val(), d = $(e).data('d');
-	if (name && d) {
-		localStorage.removeItem('playlist.'+d.name);
-		d.name = name;
-		$(e).replaceWith(item_formatter.playlist(d));
-		localStorage.setItem('playlist.'+d.name, d.url);
-	}
-	else {
-		if (d.name) localStorage.removeItem('playlist.'+d.name);
-		$(e).remove();
-	}
-}
-function play_pause() {
-	if (!pl_audio[0].src)
-		return;
-	pl_audio[0].paused ?
-		pl_audio[0].play() :
-		pl_audio[0].pause()
-}
-$('select.conf_autoload').each(function (i, e) {
-	var p = $(e), s = p.children('[value="'+localStorage.getItem(p.attr('key'))+'"]');
-	if (s.length)
-		s.attr('selected', true);
-	else {
-		s = p.children().first().attr('selected', true);
-		localStorage.setItem(p.attr('key'), s.val());
-	}
-	if (p.attr('oninit')) eval(p.attr('oninit'));
-}).bind('change', function(e) {
-	localStorage.setItem($(this).attr('key'), this.value);
-});
-</script>
+<div class="img">
+	<img ng-src="{{imgUrl}}" />
+</div>
+<script src="jquery-1.8.0.min.js"></script>
+<script src="jq.util.js"></script>
+<script src="angular.min.js"></script>
+<script src="index.js"></script>
 </body>
 </html>
