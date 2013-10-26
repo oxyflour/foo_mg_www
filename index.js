@@ -52,19 +52,10 @@ app.directive('bwMain', function($compile) {
 		}
 	}
 	return function (scope, elem, attrs, ctrl) {
-		scope.open = function(url) {
+		scope.open = function(url, reopen) {
 			if (!url) return;
-			scope.listUrl = url;
-			open(elem, scope, scope.listUrl);
+			open(elem, scope, url, reopen);
 		};
-		scope.browse = function(path, extra) {
-			scope.open((path || '/').replace(/\\/g, '/') +
-				(extra ? '?'+$.url_concat(extra) : ''));
-		};
-		scope.reload = function() {
-			if (!scope.listUrl) return;
-			open(elem, scope, scope.listUrl, true);
-		}
 	}
 })
 app.directive('bwList', function($http) {
@@ -270,7 +261,7 @@ app.directive('autoSelect', function() {
 	}
 })
 
-app.controller('main', function($scope, $location, $http) {
+app.controller('main', function($scope, $location, $http, $timeout) {
 	function get_full_url(url) {
 		return '' + url;
 	}
@@ -293,6 +284,7 @@ app.controller('main', function($scope, $location, $http) {
 			p.dict.tojson = 1;
 			p.dict.begin = parseInt(p.begin || '0') + (begin || 0);
 			p.dict.count = count;
+			// do not use setting.list_sort_field
 			p.dict.sort = localStorage.getItem('setting.sort@'+url) || p.dict.sort;
 			return get_full_url('browse.lua?' + $.url_concat(p.dict));
 		},
@@ -362,15 +354,25 @@ app.controller('main', function($scope, $location, $http) {
 			if (parseInt($('.tool').css('left'))==0)
 				$scope.showTool = false;
 		},
+		openUrl: function(url) {
+			$scope.listUrl = url;
+		},
+		browsePath: function(path) {
+			$scope.listUrl = (path.replace(/\\/g, '/') || '/');
+		},
 		searchWord: function() {
 			var s = $scope.search;
 			var fields = $.keach(s.fields, function(k, v, d) {
 				if (k && v) d.push(k);
 			}, []).join(',');
-			$scope.browse(s.onpath && $scope.list.path, {
+			listUrl = (s.onpath ? $scope.list.path.replace(/\\/g, '/') : '/')+'?'+$.url_concat({
 				fields: fields,
 				word: s.word
 			});
+		},
+		reload: function() {
+			if (!scope.listUrl) return;
+			$scope.open(scope.listUrl, true);
 		},
 		// save (all items or current selection) as playlist
 		saveAsPlaylist: function() {
