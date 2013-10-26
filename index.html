@@ -152,8 +152,7 @@ body.list-mode>.img { display: none; }
 		<span ng-hide="list.onEdit&&!select.length()">
 			<button ng-click="ctrl.saveAsPlaylist()">[ Save ]</button>
 			<span class="no-overflow no-wrap">
-				<select class="absolute no-opacity" style="max-width:90px;"
-					ng-show="showTool" ng-model="addToUrl" ng-change="ctrl.addToPlaylist()">
+				<select class="absolute no-opacity" style="max-width:90px;" ng-model="addToUrl" ng-change="ctrl.addToPlaylist()">
 					<option></option>
 					<option ng-repeat="(u, n) in playlists" ng-value="u" ng-if="n">{{n}}</option>
 				</select>

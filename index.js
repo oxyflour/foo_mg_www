@@ -52,20 +52,19 @@ app.directive('bwMain', function($compile) {
 		}
 	}
 	return function (scope, elem, attrs, ctrl) {
+		scope.open = function(url) {
+			if (!url) return;
+			scope.listUrl = url;
+			open(elem, scope, scope.listUrl);
+		};
 		scope.browse = function(path, extra) {
-			scope.listUrl = (path || '/').replace(/\\/g, '/') +
-				(extra ? '?'+$.url_concat(extra) : '');
+			scope.open((path || '/').replace(/\\/g, '/') +
+				(extra ? '?'+$.url_concat(extra) : ''));
 		};
 		scope.reload = function() {
-			if (scope.listUrl) {
-				open(elem, scope, scope.listUrl, true);
-			}
+			if (!scope.listUrl) return;
+			open(elem, scope, scope.listUrl, true);
 		}
-
-		scope.$watch('listUrl', function(url) {
-			if (url) // undefined when initlize
-				open(elem, scope, url);
-		});
 	}
 })
 app.directive('bwList', function($http) {
@@ -233,7 +232,7 @@ app.directive('localStore', function() {
 				localStorage.removeItem(k);
 		}
 		if (attrs.localStoreBind) scope.$watch(attrs.localStoreBind, function(k, k0) {
-			if (!k) return; // here should not skip initilization
+			if (!k) return; // here we should not skip initilization
 			elem.attr('local-store', k);
 			get_val(k);
 		});
@@ -447,11 +446,10 @@ app.controller('main', function($scope, $location, $http) {
 		if (!v || !ls || ls.total === undefined) return;
 		$scope.ctrl.autoHideTool();
 
-		var url = ls.url;
 		$scope.listName = (ls.parent ? '< ' : '') + ls.name;
 		$scope.listParentPath = ls.parent && ls.parent.path;
-		if (pl[url]) {
-			$scope.listName = "Playlist: " + pl[url];
+		if (pl[ls.url]) {
+			$scope.listName = "Playlist: " + pl[ls.url];
 		}
 		else if (ls.word) {
 			$scope.listName = "Search: '" + ls.word + "' in " + ls.name;
@@ -475,11 +473,13 @@ app.controller('main', function($scope, $location, $http) {
 	$scope.$watch('listUrl', function(url, url0) {
 		if (url === url0) return;
 		$location.path('/list').search({url: url});
+		// call bwMain method to open
+		$scope.open(url);
 	})
 	$scope.$watch('imgUrl', function(url, url0) {
 		if (url === url0) return;
 		$location.path('/img').search({url: url});
-
+		// display image
 		var tmpl = '<span class="loader" style="position:fixed;left:0;top:0;width:100%;color:#888;background-color:#eee;text-align:center;padding:1.5em 0;">Loading...</span>';
 		var i = $('.img').find('img').hide(), l = $($('.img').find('.loader')[0] || $(tmpl).insertAfter(i).hide()[0]);
 		var c = 0, p = "/''\\..";
@@ -500,6 +500,7 @@ app.controller('main', function($scope, $location, $http) {
 			}
 		}, 200);
 	})
+
 	// hash router
 	$scope.$watch(function() {
 		return $location.absUrl()
