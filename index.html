@@ -153,7 +153,7 @@ body.list-mode>.img { display: none; }
 			<button ng-click="select.toggle()">[ Toggle ]</button>
 		</span>
 		<span ng-hide="list.onEdit&&!select.length()">
-			<button ng-click="browser.saveAs()">[ Save ]</button>
+			<button ng-click="browser.save()">[ Save ]</button>
 			<span class="no-overflow no-wrap">
 				<select class="absolute no-opacity" style="max-width:90px;" ng-model="addToUrl" ng-change="browser.addTo()">
 					<option></option>
@@ -275,7 +275,7 @@ body.list-mode>.img { display: none; }
 	</div>
 	<big ng-hide="audio.id">Ready to play</big>
 	<a class="processbar" ng-show="audio.id"ng-mousemove="player.getHoverPosition($event)"
-		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec)">
+		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec);play()">
 		<span class="text">{{player.hoverMmss}}</span>
 		<div class="bar" ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>
 	</a>
