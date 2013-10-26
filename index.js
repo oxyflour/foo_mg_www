@@ -74,7 +74,7 @@ app.directive('bwList', function($http) {
 		var load = function() {
 			if (scope.ls.length >= scope.total)
 				return;
-			var url = scope.util.list_url(scope.url, scope.ls.length, 30);
+			var url = scope.conf.list_url(scope.url, scope.ls.length, 30);
 			$http.get(url).success(function(data) {
 				if (scope.ls.length != data.begin)
 					return;
@@ -86,8 +86,8 @@ app.directive('bwList', function($http) {
 						d.currentGroup = v.group;
 						d.groupCount = (d.groupCount || 0) + 1;
 						v.newGroup = true;
-						v.aaUrl = scope.util.res_url('albumart', v.id, undefined);
-						v.aaUrlNfb = scope.util.res_url('albumart', v.id, undefined, {nofallback:1});
+						v.aaUrl = scope.conf.res_url('albumart', v.id, undefined);
+						v.aaUrlNfb = scope.conf.res_url('albumart', v.id, undefined, {nofallback:1});
 						v.aaCssUrl = 'url('+v.aaUrlNfb.replace(/([\(\)'"])/g, '\\$1')+')';
 					}
 					if (v.typ == "folder") {
@@ -95,7 +95,7 @@ app.directive('bwList', function($http) {
 						v.shortName = b[0];
 						v.bracR = b[1].join(' ') || '';
 						v.bracS = b[2].length ? $.formatcat(b[2], '[{{2}}]', ' ') : '';
-						v.aaUrl = scope.util.res_url('albumart', undefined, v.path, {w:64});
+						v.aaUrl = scope.conf.res_url('albumart', undefined, v.path, {w:64});
 						v.aaCssUrl = 'url('+v.aaUrl.replace(/([\(\)'"])/g, '\\$1')+')';
 					}
 					d.ls.push(v);
@@ -106,7 +106,7 @@ app.directive('bwList', function($http) {
 				if (data.res && !scope.resList) scope.resList = $.ieach(data.res, function(i, v, d) {
 					d.push({
 						name: v.split('\\').pop(),
-						url: scope.util.res_url(v, undefined, data.path),
+						url: scope.conf.res_url(v, undefined, data.path),
 						typ: {jpg:'img',png:'img',bmp:'img'}[v.split('.').pop().toLowerCase()]
 					});
 				}, []);
@@ -135,10 +135,10 @@ app.directive('plCtrl', function($http) {
 			var ad = scope.audio;
 			if (id > 0 && ad) {
 				ad.id = id;
-				ad.aaUrl = scope.util.res_url('albumart', id);
+				ad.aaUrl = scope.conf.res_url('albumart', id);
 				ad.aaCssUrl = 'url('+ad.aaUrl.replace(/([\(\)'"])/g, '\\$1')+')';
-				a[0].src = scope.util.track_url(id);
-				var url = scope.util.list_url('?tlist='+id)
+				a[0].src = scope.conf.track_url(id);
+				var url = scope.conf.list_url('?tlist='+id)
 				$http.get(url).success(function(data) {
 					ad.info = data.ls[0];
 					ad.length = data.ls[0].seconds;
@@ -277,7 +277,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}, []);
 	}
 
-	$scope.util = {
+	$scope.conf = {
 		list_url: function(url, begin, count) {
 			var p = $.url_parse(url);
 			p.dict.path = p.path.replace(/\//g, '\\');
@@ -308,7 +308,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		if (list.total == list.ls.length)
 			f(list.ls);
 		else {
-			url = $scope.util.list_url(url);
+			url = $scope.conf.list_url(url);
 			$http.get(url).success(function(data) {
 				f(data.ls);
 			});
@@ -346,26 +346,20 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}, 100);
 	}
 
-	$scope.ctrl = {
-		toggleTool: function(first, second) {
-			$scope.showTool = $scope.showTool != first ? first : second;
-		},
-		autoHideTool: function() {
-			if (parseInt($('.tool').css('left'))==0)
-				$scope.showTool = false;
-		},
-		openUrl: function(url) {
+	$scope.browser = {
+		open: function(url) {
 			$scope.listUrl = url;
 		},
-		browsePath: function(path) {
-			$scope.listUrl = (path.replace(/\\/g, '/') || '/');
+		browse: function(path) {
+			$scope.listUrl = (path || '/').replace(/\\/g, '/');
 		},
-		searchWord: function() {
+		search: function() {
 			var s = $scope.search;
 			var fields = $.keach(s.fields, function(k, v, d) {
 				if (k && v) d.push(k);
 			}, []).join(',');
-			listUrl = (s.onpath ? $scope.list.path.replace(/\\/g, '/') : '/')+'?'+$.url_concat({
+			var path = (s.onpath && $scope.list.path) ? $scope.list.path.replace(/\\/g, '/') : '/';
+			$scope.listUrl = path + '?' + $.url_concat({
 				fields: fields,
 				word: s.word
 			});
@@ -375,7 +369,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.open(scope.listUrl, true);
 		},
 		// save (all items or current selection) as playlist
-		saveAsPlaylist: function() {
+		save: function() {
 			get_selected_list(function(selected, total) {
 				var url = selected.join(',') == total.join(',') ?
 					$scope.listUrl : '?tlist='+selected.join(',')+'&sort=tlist,flist';
@@ -387,10 +381,10 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		// add (all items or current selection) to another playlist (addToUrl).
 		// addToUrl will be removed,
 		// and a new one is create with the same name
-		addToPlaylist: function() {
+		addTo: function() {
 			var u = $scope.addToUrl;
 			if (u) get_selected_list(function(selected) {
-				var url = $scope.util.list_url(u);
+				var url = $scope.conf.list_url(u);
 				$http.get(url).success(function(data) {
 					var dataList = get_tracks_from_data(data.ls);
 					selected = dataList.concat(selected);
@@ -413,17 +407,28 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		playCurrent: function(id) {
 			$scope.playpause(id);
 			$scope.playUrl = $scope.listUrl;
-			// alway load playlist from url
-			var url = $scope.util.list_url($scope.playUrl);
-			$http.get(url).success(function(data) {
-				$scope.playlist = $.ieach(data.ls, function(i, v, d) {
-					d.push(v.id);
-				}, []).join(',');
+			get_full_list(function(list) {
+				var dataList = get_tracks_from_data(list);
+				$scope.playlist = dataList.join(',');
 			});
 		}
 	}
 
+	$scope.tool = {
+		show: false,
+		toggle: function(first, second) {
+			$scope.tool.show = $scope.tool.show != first ? first : second;
+		},
+		autoHide: function() {
+			if (parseInt($('.tool').css('left'))==0)
+				$scope.tool.show = false;
+		}
+	}
+
 	$scope.select = {
+		start: function() {
+			 $scope.list.onEdit = true;
+		},
 		length: function() {
 			var bwList = $('.list:not(.ng-hide)');
 			return bwList.children('li.selected').length;
@@ -435,7 +440,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		toggle: function(id) {
 			var bwList = $('.list:not(.ng-hide)');
 			bwList.children(id ? 'li[pl-id='+id+']' : 'li').toggleClass('selected');
-			bwList.children('.selected').length ? $scope.list.onEdit = true : $scope.select.finish();
+			bwList.children('.selected').length ? $scope.select.start() : $scope.select.finish();
 		},
 		finish: function() {
 			$scope.select.clear();
@@ -446,7 +451,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	$scope.$watch('list.url+list.total', function(v) {
 		var ls = $scope.list, pl = $scope.playlists
 		if (!v || !ls || ls.total === undefined) return;
-		$scope.ctrl.autoHideTool();
+		$scope.tool.autoHide();
 
 		$scope.listName = (ls.parent ? '< ' : '') + ls.name;
 		$scope.listParentPath = ls.parent && ls.parent.path;
@@ -516,7 +521,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		else if (l.path == 'img' && l.search.url)
 			$scope.imgUrl = l.search.url;
 		else
-			$scope.browse();
+			$scope.listUrl = '/'
 	})
 
 	// only use jquery dom event here
@@ -527,7 +532,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	})
 	$(document).bind("scroll touchstart mousedown", function(e) {
 		if ($(e.target.childNodes[0] || e.target).parents(".list").length) {
-			$scope.ctrl.autoHideTool();
+			$scope.tool.autoHide();
 			$scope.$apply();
 		}
 	})
