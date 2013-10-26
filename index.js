@@ -383,11 +383,11 @@ app.controller('main', function($scope, $location, $http) {
 			});
 			$scope.select.finish();
 		},
-		// add (all items or current selection) to another playlist (selectedUrl).
-		// selectedUrl will be removed,
+		// add (all items or current selection) to another playlist (addToUrl).
+		// addToUrl will be removed,
 		// and a new one is create with the same name
 		addToPlaylist: function() {
-			var u = $scope.selectedUrl;
+			var u = $scope.addToUrl;
 			if (u) get_selected_list(function(selected) {
 				var url = $scope.util.list_url(u);
 				$http.get(url).success(function(data) {
@@ -405,7 +405,7 @@ app.controller('main', function($scope, $location, $http) {
 				});
 			});
 			// reset select value
-			$scope.selectedUrl = '';
+			$scope.addToUrl = '';
 			$scope.select.finish();
 		},
 		// play (every items) under current listUrl
