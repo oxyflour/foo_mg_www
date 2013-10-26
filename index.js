@@ -232,7 +232,7 @@ app.directive('localStore', function() {
 				localStorage.removeItem(k);
 		}
 		if (attrs.localStoreBind) scope.$watch(attrs.localStoreBind, function(k, k0) {
-			if (!k) return; // here we should not skip initilization
+			if (k === k0) return;
 			elem.attr('local-store', k);
 			get_val(k);
 		});
@@ -293,7 +293,7 @@ app.controller('main', function($scope, $location, $http) {
 			p.dict.tojson = 1;
 			p.dict.begin = parseInt(p.begin || '0') + (begin || 0);
 			p.dict.count = count;
-			p.dict.sort = $scope.setting.list_sort_field || p.dict.sort;
+			p.dict.sort = localStorage.getItem('setting.sort@'+url) || p.dict.sort;
 			return get_full_url('browse.lua?' + $.url_concat(p.dict));
 		},
 		res_url: function(res, id, path, dict) {
