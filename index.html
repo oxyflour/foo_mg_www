@@ -50,7 +50,7 @@
 .on-edit .track.selected .check { background-color: #aaa; }
 
 .player { text-align: center; }
-.player .albumart { float: left; cursor: pointer; background-image: url(../nocover.jpg); background-size: cover; background-position: center; }
+.player .albumart { float: left; cursor: pointer; background-image: url(nocover.jpg); background-size: cover; background-position: center; }
 .player .albumart div { width: 100%; height: 100%; background-size: cover; background-position: center; }
 .player .buttonbar { max-width: 720px; margin: 5px auto; white-space: nowrap;; }
 .player .buttonbar button { font-size: 120%; width: 30%; font-weight: bold; }
@@ -151,12 +151,14 @@ body.list-mode>.img { display: none; }
 		</span>
 		<span ng-hide="list.onEdit&&!select.length()">
 			<button ng-click="ctrl.saveAsPlaylist()">[ Save ]</button>
-			<button class="no-overflow">
-				<select class="absolute no-opacity" style="max-width:80px;" ng-model="selectedUrl" ng-change="ctrl.addToPlaylist()">
+			<span class="no-overflow no-wrap">
+				<select class="absolute no-opacity" style="max-width:90px;"
+					ng-show="showTool" ng-model="selectedUrl" ng-change="ctrl.addToPlaylist()">
 					<option></option>
 					<option ng-repeat="(u, n) in playlists" ng-value="u" ng-if="n">{{n}}</option>
-				</select>[ AddTo ]
-			</button>
+				</select>
+				<button>[ AddTo ]</button>
+			</span>
 		</span>
 		<ul ng-init="playlists=('playlists@'|localStoreDict)">
 			<!-- neither ng-class nor ng-show works with ng-repeat -->

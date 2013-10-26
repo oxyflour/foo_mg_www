@@ -9,6 +9,7 @@ a { color: #333; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 .absolute { position: absolute; }
+.no-wrap { white-space: nowrap; }
 .no-overflow { overflow: hidden; }
 .no-opacity { opacity: 0; }
 .float-left { float: left; }
