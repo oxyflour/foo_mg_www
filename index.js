@@ -1,3 +1,7 @@
+function sec2Mmss(sec) {
+	var m = Math.floor(sec / 60), s = Math.floor(sec) - m*60;
+	return m + ':' + (s > 9 ? s : '0'+s);
+}
 var app = angular.module('app', []);
 app.filter('urlEncode', function() {
 	return function(str) {
@@ -166,7 +170,7 @@ app.directive('plCtrl', function($http) {
 				a[0].paused ? a[0].play() : a[0].pause();
 		}
 		scope.seek = function(time) {
-			a[0].current = time;
+			a[0].currentTime = time;
 		}
 
 		// try to restore play state
@@ -176,10 +180,6 @@ app.directive('plCtrl', function($http) {
 	}
 })
 app.directive('plAudio', function() {
-	function sec2Mmss(sec) {
-		var m = Math.floor(sec / 60), s = Math.floor(sec) - m*60;
-		return m + ':' + (s > 9 ? s : '0'+s);
-	}
 	return function (scope, elem, attrs, ctrl) {
 		var audio = scope.audio = (scope.audio || {});
 		audio.current = {};
@@ -411,6 +411,14 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 				var dataList = get_tracks_from_data(list);
 				$scope.playlist = dataList.join(',');
 			});
+		}
+	}
+
+	$scope.player = {
+		getHoverPosition: function(e) {
+			var t = $(e.currentTarget), p = t.offset(), w = t.width(), x = e.pageX;
+			$scope.player.hoverSec = $scope.audio ? $scope.audio.length * (x - p.left) / w : 0;
+			$scope.player.hoverMmss = $scope.audio ? sec2Mmss($scope.player.hoverSec) : '';
 		}
 	}
 

@@ -55,17 +55,20 @@
 .player .buttonbar { max-width: 720px; margin: 5px auto; white-space: nowrap;; }
 .player .buttonbar button { font-size: 120%; width: 30%; font-weight: bold; }
 .player .info { margin-top: 5px; }
-.player .processbar { width: 100%; background-color: #ddd; cursor: pointer; }
-.player .processbar div { background-color: #666; width: 0; height: 8px; }
+.player .processbar { display: block; text-decoration: none; width: 100%; height: 8px; background-color: #ddd; cursor: pointer;
+	-webkit-transition: height .4s ease; -moz-transition: height .4s ease;
+	-ms-transition: height .4s ease; transition: height .4s ease; }
+.player .processbar .text { float: right; margin-right: 10px; }
+.player .processbar .bar { background-color: #999; width: 0; height: 100%; }
+.player .processbar:hover { height: 1.2em; }
 @media only screen and (max-width: 620px) {
 	.player { font-size: 85%; white-space: nowrap; }
 	.player .albumart { height: 80px; width: 80px; margin: 5px; }
 	.player .buttonbar { padding-left: 80px; }
-	.player .processbar { position: fixed; bottom: 0; }
-	.player .processbar div { bottom: 0; height: 2px; }
+	.player .processbar { position: fixed; bottom: 0; height: 3px; }
+	.player .processbar .bar { bottom: 0; }
 }
 @media only screen and (min-width: 621px) {
-	.player { padding-left: 20px; }
 	.player .buttonbar { margin: 20px; }
 	.player .albumart { height: 130px; width: 130px; margin: 15px; }
 	.player .buttonbar { padding-left: 140px; }
@@ -271,9 +274,11 @@ body.list-mode>.img { display: none; }
 		<div class="info"><small>{{audio.info.album}} [{{audio.info.num}}]</small></div>
 	</div>
 	<big ng-hide="audio.id">Ready to play</big>
-	<div ng-show="audio.id" class="processbar">
-		<div ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>
-	</div>
+	<a class="processbar" ng-show="audio.id"ng-mousemove="player.getHoverPosition($event)"
+		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec)">
+		<span class="text">{{player.hoverMmss}}</span>
+		<div class="bar" ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>
+	</a>
 </div>
 <div class="img">
 	<img ng-src="{{imgUrl}}" />
