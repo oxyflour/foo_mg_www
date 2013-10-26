@@ -32,6 +32,7 @@ app.directive('bwMain', function($compile) {
 			}
 		}, {});
 		if (lists.length > 4 && find.oldest) {
+			find.oldest.scope().$destroy();
 			find.oldest.remove();
 		}
 		if (reopen && find.current) {
