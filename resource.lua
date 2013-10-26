@@ -130,7 +130,9 @@ elseif res == 'albumart' and track_file and track_file ~= '' then
 				table.set(fs, 'cover', get_cover(browse_path, track_file)).attr and
 				table.set(fs, 'thumb', get_thumb(fs.cover, sz)).attr then
 			send = fb_stream.stream_file(fs.thumb.fname)
-		elseif fs.cover.attr then
+		elseif fs.cover and fs.cover.attr then
+			send = fb_stream.stream_file(fs.cover.fname)
+		else
 			send = fb_stream.stream_albumart(track_file)
 		end
 	end
