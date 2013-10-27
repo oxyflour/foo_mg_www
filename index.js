@@ -471,16 +471,17 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.listParentPath = ls.path;
 		}
 
+		var path = $scope.listPath = ls.path;
 		var lpath = $scope.listLongestPath || '';
-		if (ls.path && lpath.indexOf(ls.path) != 0) {
+		if (path && lpath.indexOf(path) != 0) {
 			var p = [], d = {'':'root'};
-			$scope.listPathSplit = $.ieach(ls.path.split('\\'), function(i, v, d) {
+			$scope.listPathSplit = $.ieach(path.split('\\'), function(i, v, d) {
 				if (v) {
 					p.push(v);
 					d[p.join('\\')+'\\'] = v;
 				}
 			}, d);
-			$scope.listLongestPath = ls.path;
+			$scope.listLongestPath = path;
 		}
 /*		$('.list:not(.ng-hide)').editlist({
 			onDragBegin: function(li) {

@@ -194,7 +194,7 @@ body.list-mode>.img { display: none; }
 		<p class="no-wrap no-overflow full-width">
 			<span ng-repeat="(p, n) in listPathSplit">
 				<button class="no-overflow no-wrap text-ellipsis" style="max-width:120px"
-					ng-click="browser.browse(p);tool.autoHide()" ng-class="p==list.path&&'bold'">{{n}}</button>&gt;
+					ng-click="browser.browse(p);tool.autoHide()" ng-class="p==listPath&&'bold'">{{n}}</button>&gt;
 			</span>
 		</p>
 		<p><button ng-click="browser.open(playUrl);tool.autoHide()">[ playing ]</button></p>
@@ -284,7 +284,7 @@ body.list-mode>.img { display: none; }
 		<div class="info"><small>{{audio.info.album}} [{{audio.info.num}}]</small></div>
 	</div>
 	<big ng-hide="audio.id">Ready to play</big>
-	<a class="processbar" ng-show="audio.id"ng-mousemove="player.getHoverPosition($event)"
+	<a class="processbar" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
 		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec);play()">
 		<span class="text">{{player.hoverMmss}}</span>
 		<div class="bar" ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>
