@@ -8,19 +8,6 @@ app.filter('urlEncode', function() {
 		return encodeURIComponent(str);
 	}
 })
-app.filter('localStoreDict', function() {
-	return function(prefix) {
-		var ls = {};
-		for (var i = 0; i < localStorage.length; i ++) {
-			var k = localStorage.key(i);
-			if (k.search(prefix) == 0) {
-				var u = k.substr(prefix.length);
-				ls[u] = localStorage.getItem(k);
-			}
-		}
-		return ls;
-	}
-})
 app.directive('bwMain', function($compile) {
 	function open(elem, scope, url, reopen) {
 		var lists = elem.children('[bw-list]');
@@ -222,18 +209,12 @@ app.directive('localStore', function() {
 			v ? localStorage.setItem(k, v) :
 				localStorage.removeItem(k);
 		}
-		if (attrs.localStoreBind) scope.$watch(attrs.localStoreBind, function(k, k0) {
-			if (k === k0) return;
-			elem.attr('local-store', k);
-			get_val(k);
-		});
 		scope.$watch(attrs.ngModel, function(v, v0) {
 			if (v === v0) return;
 			set_val(elem.attr('local-store'), v);
 		});
 		if (!attrs.localStore) {
-			attrs.localStore = attrs.localStoreBind ?
-				scope.$eval(attrs.localStoreBind) : attrs.ngModel;
+			attrs.localStore = attrs.ngModel;
 			elem.attr('local-store', attrs.localStore);
 		}
 		if (attrs.localStoreInit)
@@ -284,8 +265,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			p.dict.tojson = 1;
 			p.dict.begin = parseInt(p.begin || '0') + (begin || 0);
 			p.dict.count = count;
-			// do not use setting.list_sort_field
-			p.dict.sort = localStorage.getItem('setting.sort@'+url) || p.dict.sort;
+			p.dict.sort = $scope.setting.list_sort[url] || p.dict.sort;
 			return get_full_url('browse.lua?' + $.url_concat(p.dict));
 		},
 		res_url: function(res, id, path, dict) {
@@ -299,6 +279,17 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			var dict = { id: id, support: $scope.setting.music_format_support || undefined};
 			return get_full_url('resource.lua?' + $.url_concat(dict));
 		},
+		local_store_dict: function(prefix) {
+			var ls = {};
+			for (var i = 0; i < localStorage.length; i ++) {
+				var k = localStorage.key(i);
+				if (k.search(prefix) == 0) {
+					var u = k.substr(prefix.length);
+					ls[u] = localStorage.getItem(k);
+				}
+			}
+			return ls;
+		}
 	}
 
 	// the bw-list elem may not load all items from listUrl at once, i.e. $scope.list.ls might be not complete
@@ -365,8 +356,8 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			});
 		},
 		reload: function() {
-			if (!scope.listUrl) return;
-			$scope.open(scope.listUrl, true);
+			if (!$scope.listUrl) return;
+			$scope.open($scope.listUrl, true);
 		},
 		// save (all items or current selection) as playlist
 		save: function() {

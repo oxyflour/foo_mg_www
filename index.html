@@ -120,7 +120,7 @@ body.list-mode>.img { display: none; }
 	<button class="tab" ng-show="tool.show=='res'" ng-click="tool.toggle('res')">*</button>
 	<button class="tab" ng-show="tool.show=='conf'" ng-click="tool.toggle('conf')">...</button>
 </div>
-<ul class="list ng-hide" ng-class="[list.groupCount>3&&'small-sep',onEdit&&'on-edit']" bw-list ng-non-bindable ng-show="url==listUrl">
+<ul class="list ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']" bw-list ng-non-bindable ng-show="url==listUrl">
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
 		<a ng-show="setting.res_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
 		<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
@@ -135,7 +135,7 @@ body.list-mode>.img { display: none; }
 		<div class="info">{{i.bracS}} {{i.bracR}}</div>
 	</li>
 	<li class="track {{i.id==audio.id&&audio.state}}" pl-id="{{i.id}}" ng-repeat-end
-		ng-if="i.typ=='track'" ng-click="list.onEdit ? select.toggle(i.id) : browser.playCurrent(i.id)">
+		ng-if="i.typ=='track'" ng-click="onEdit ? select.toggle(i.id) : browser.playCurrent(i.id)">
 		<span class="num">{{i.num}}</span>
 		<span class="duration" ng-click="select.toggle(i.id);$event.stopPropagation()">
 			<span class="current">{{audio.current.mmss}}/</span>{{i.length}}<br />
@@ -166,7 +166,7 @@ body.list-mode>.img { display: none; }
 				<button>[ AddTo ]</button>
 			</span>
 		</span>
-		<ul ng-init="playlists=('playlists@'|localStoreDict)">
+		<ul ng-init="playlists=conf.local_store_dict('playlists@')">
 			<!-- neither ng-class nor ng-show works with ng-repeat -->
 			<li ng-repeat="(u, n) in playlists" class="playlist {{u==listUrl&&'bold'}} {{u==playUrl&&'play'}}">
 				<form ng-show="n.length||f" action="javascript:$('button:first').focus()">
@@ -218,8 +218,8 @@ body.list-mode>.img { display: none; }
 	</div>
 	<div class="content" ng-show="tool.show=='conf'">
 		<h3>Folder Settings</h3>
-		<div class="field">sort current folder:
-			<select local-store local-store-bind="'setting.sort@'+listUrl" ng-model="setting.list_sort_field" ng-change="browser.reload()">
+		<div class="field" ng-init="setting.list_sort=conf.local_store_dict('setting.sort@')">sort current folder:
+			<select local-store="setting.sort@{{listUrl}}" ng-model="setting.list_sort[listUrl]" ng-change="browser.reload()">
 				<option value="">with none</option>
 				<option value="folder">by name</option>
 				<option value="folder_desc">by name reverse</option>
