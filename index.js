@@ -237,7 +237,7 @@ app.directive('autoSelect', function() {
 		elem.mousedown(function(e) {
 			if (!elem.is(':focus')) setTimeout(function() {
 				elem.select();
-			}, 100)
+			}, parseInt(attrs.autoSelect) || 100)
 		});
 	}
 })
