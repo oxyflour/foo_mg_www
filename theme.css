@@ -9,12 +9,15 @@ a { color: #333; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 .absolute { position: absolute; }
+.full-width { width: 100%; }
+.inline-block { display: inline-block; }
 .no-wrap { white-space: nowrap; }
 .no-overflow { overflow: hidden; }
 .no-opacity { opacity: 0; }
 .float-left { float: left; }
 .float-right { float: right; }
 .text-center { text-align: center; }
+.text-ellipsis { text-overflow: ellipsis; }
 .bold { font-weight: bold; }
 .gray { color: gray; }
 

@@ -41,9 +41,10 @@
 	.tool, .player { left: 540px; } 
 }
 
-.track.play, .track.pause, .track.ended { border-left: 12px #fff solid; margin-left: 0px; font-weight: bold; }
+.track.play, .track.pause, .track.ended { margin-left: 0px; font-weight: bold; }
 .track.play { border-left: 12px #aaa solid; }
 .track.pause { border-left: 12px #ccc solid; }
+.track.ended { border-left: 12px #fff solid; }
 @media only screen and (max-width: 620px) {
 	.track.play .current { display: inline; }
 }
@@ -103,11 +104,11 @@
 .playlist input { width: 0; padding: 5px 0; margin-left: -10px; border: 1px solid #ddd; border-left: 28px solid #ddd; }
 .playlist input:focus { width: 90%; }
 .playlist input:focus+a { display: none; }
-.playlist.active { font-weight: bold; }
 .playlist.play input { border-color: #999; }
 
 body.img-mode>.head, body.img-mode>.list, body.img-mode>.tool, body.img-mode>.player { display: none; }
 body.list-mode>.img { display: none; }
+
 </style>
 </head>
 <body ng-class="[tool.show&&'show-tool', setting.folder_view_class||'aa-block-view', location.path+'-mode']"
@@ -167,7 +168,7 @@ body.list-mode>.img { display: none; }
 		</span>
 		<ul ng-init="playlists=('playlists@'|localStoreDict)">
 			<!-- neither ng-class nor ng-show works with ng-repeat -->
-			<li ng-repeat="(u, n) in playlists" class="playlist {{u==listUrl&&'active'}} {{u==playUrl&&'play'}}">
+			<li ng-repeat="(u, n) in playlists" class="playlist {{u==listUrl&&'bold'}} {{u==playUrl&&'play'}}">
 				<form ng-show="n.length||f" action="javascript:$('button:first').focus()">
 					<input auto-select local-store="playlists@{{u}}" local-store-init="n"
 						pl-url="{{u}}" ng-focus='f=1' ng-blur='f=0' ng-model="playlists[u]" />
@@ -190,11 +191,17 @@ body.list-mode>.img { display: none; }
 			<input type="checkbox" ng-init="search.onpath=true" ng-model="search.onpath" />Search under current folder
 		</form>
 		<h3>Go To</h3>
-		<button ng-click="browser.browse();tool.autoHide()">[ root ]</button>
-		<button ng-click="browser.open(playUrl);tool.autoHide()">[ playing ]</button>
-		<br />
-		<button ng-click="browser.reload()">[ reload list ]</button>
-		<button onclick="location.reload()">[ reload page ]</button>
+		<p class="no-wrap no-overflow full-width">
+			<span ng-repeat="(p, n) in listPathSplit">
+				<button class="no-overflow no-wrap text-ellipsis" style="max-width:120px"
+					ng-click="browser.browse(p);tool.autoHide()" ng-class="p==list.path&&'bold'">{{n}}</button>&gt;
+			</span>
+		</p>
+		<p><button ng-click="browser.open(playUrl);tool.autoHide()">[ playing ]</button></p>
+		<p>
+			<button ng-click="browser.reload()">[ reload list ]</button>
+			<button onclick="location.reload()">[ reload page ]</button>
+		</p>
 	</div>
 	<div class="content" ng-show="tool.show=='res'">
 		<h3>Resource</h3>

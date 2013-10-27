@@ -470,6 +470,18 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.listName = "Search: '" + ls.word + "' in " + ls.name;
 			$scope.listParentPath = ls.path;
 		}
+
+		var lpath = $scope.listLongestPath || '';
+		if (ls.path && lpath.indexOf(ls.path) != 0) {
+			var p = [], d = {'':'root'};
+			$scope.listPathSplit = $.ieach(ls.path.split('\\'), function(i, v, d) {
+				if (v) {
+					p.push(v);
+					d[p.join('\\')+'\\'] = v;
+				}
+			}, d);
+			$scope.listLongestPath = ls.path;
+		}
 /*		$('.list:not(.ng-hide)').editlist({
 			onDragBegin: function(li) {
 				if (!$scope.list.onEdit) return true;
