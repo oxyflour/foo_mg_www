@@ -59,6 +59,7 @@
 .player .buttonbar { max-width: 720px; margin: 5px auto; white-space: nowrap;; }
 .player .buttonbar button { font-size: 120%; width: 30%; font-weight: bold; }
 .player .info { margin-top: 5px; }
+.player .analyser { display: block; width: 100%; height: 2.5em; position: absolute; bottom: 8px; }
 .player .processbar { display: block; text-decoration: none; width: 100%; height: 8px; background-color: #ddd; cursor: pointer;
 	-webkit-transition: height .4s ease; -moz-transition: height .4s ease;
 	-ms-transition: height .4s ease; transition: height .4s ease; }
@@ -68,26 +69,28 @@
 @media only screen and (max-width: 620px) {
 	.player { font-size: 85%; white-space: nowrap; }
 	.player .albumart { height: 80px; width: 80px; margin: 5px; }
-	.player .buttonbar { padding-left: 80px; }
+	.player .buttonbar { margin-left: 90px; }
+	.player .analyser { bottom: 3px; }
 	.player .processbar { position: fixed; bottom: 0; height: 3px; }
 	.player .processbar .bar { bottom: 0; }
 }
 @media only screen and (min-width: 621px) {
 	.player .buttonbar { margin: 20px; }
 	.player .albumart { height: 130px; width: 130px; margin: 15px; }
-	.player .buttonbar { padding-left: 140px; }
+	.player .buttonbar { margin-left: 150px; }
 	.player .processbar { position: absolute; bottom: 0; }
 }
 @media only screen and (min-width: 1080px) {
 	.tool { bottom: 200px; }
 	.player { height: 200px; }
 	.player .albumart { height: 170px; width: 170px; }
+	.player .buttonbar { margin-left: 200px; }
 }
 
 .head .tab { float: right; background-color: #eee;  }
 .head .tab.ng-hide { display: block !important; background-color: transparent; }
 .tool .close-tool { float: right; }
-.tool .content { margin: 10px 0; }
+.tool .content { margin: 10px 0; margin-right: 10px; }
 .content h3 { border-left: 12px solid #888; padding-left: 8px; }
 .content li { padding: 0.3em; margin: 0.2em; }
 .content .field { margin: 10px; }
@@ -124,7 +127,7 @@ body.list-mode>.img { display: none; }
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
 		<a ng-show="setting.res_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
 		<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
-		<div class="bg" ng-click="i.path ? browser.browse(i.path) : tool.toggle('res', 'res')">
+		<div class="bg" ng-click="i.path ? browser.browse(i.path) : tool.toggle('res')">
 			<big class="stress">{{i.album}}</big> ({{i.album_artist}})
 		</div>
 	</div>
@@ -284,6 +287,7 @@ body.list-mode>.img { display: none; }
 		<div class="info"><small>{{audio.info.album}} [{{audio.info.num}}]</small></div>
 	</div>
 	<big ng-hide="audio.id">Ready to play</big>
+	<canvas class="analyser" width="120" height="30" pl-analyser="audio[pl-audio]"></canvas>
 	<a class="processbar" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
 		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec);play()">
 		<span class="text">{{player.hoverMmss}}</span>

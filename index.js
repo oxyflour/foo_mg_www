@@ -196,6 +196,57 @@ app.directive('plAudio', function() {
 		});
 	}
 })
+app.directive('plAnalyser', function() {
+	return function (scope, elem, attrs, ctrl) {
+		var audio = $(attrs.plAnalyser);
+		var context = source = analyser = null;
+		if (audio.length && window.webkitAudioContext) {
+			// init objes
+			context = new webkitAudioContext();
+			source = context.createMediaElementSource(audio[0]);
+			analyser = context.createAnalyser();
+			// audio -> analyser -> destination
+			source.connect(analyser);
+			analyser.connect(context.destination);
+		}
+
+		var cv = elem,
+			dc = cv[0].getContext('2d');
+		dc.strokeStyle = attrs.plAnalyserStroke || '#aaa';
+		dc.lineWidth = parseInt(attrs.plAnalyserBarWidth) || 2;
+
+		var interval = 0;
+		var freqs = new Uint8Array(analyser.frequencyBinCount);
+		var update = function() {
+			if (!analyser || !cv.height()) return;
+			analyser.getByteFrequencyData(freqs);
+			var bs = 40, fs = freqs.length,
+				w = cv[0].width, h = cv[0].height;
+			dc.clearRect(0, 0, w, h);
+			dc.beginPath();
+			for (var i = 0; i < bs-1; i ++) {
+				var j = Math.floor(fs * i / bs),
+					y = freqs[j] * h / 256,
+					x = w * i / bs + dc.lineWidth;
+				dc.moveTo(x, h/2-y/2);
+				dc.lineTo(x, h/2+y/2);
+				dc.stroke();
+			}
+			dc.closePath();
+		}
+
+		audio.bind('play', function(e) {
+			if (elem.attr('pl-analyser-disabled')) {
+				if (interval > 0)
+					clearInterval(interval);
+				interval = 0;
+			}
+			else if (analyser && interval == 0) {
+				interval = setInterval(update, attrs.plAnalyserInterval || 100);
+			}
+		});
+	}
+});
 app.directive('localStore', function() {
 	return {
 		require: 'ngModel',
