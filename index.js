@@ -590,8 +590,10 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	// only use jquery dom event here
 	// $scope.$watch will not fire when a mobile browser goes to background
 	$(document).find('audio[pl-audio]').bind('ended', function(e) {
-		$scope.playnext($scope.setting.play_single_track ? 0 : 1,
-			$scope.setting.play_no_loop ? false : true);
+		var offset = $scope.setting.play_single_track ? 0 : 1,
+			loop = $scope.setting.play_no_loop ? false : true;
+		if (offset || loop)
+			$scope.playnext(offset, loop);
 	})
 	$(document).bind("scroll touchstart mousedown", function(e) {
 		if ($(e.target.childNodes[0] || e.target).parents(".list").length) {
