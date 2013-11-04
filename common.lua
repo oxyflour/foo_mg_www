@@ -3,12 +3,14 @@ CONF = {
 	def_albumart = fb_env.doc_root.."\\nocover.jpg",
 	-- albumart cache folder
 	albumart_cache = fb_env.doc_root.."\\tmp\\cache",
+	-- lyric search dir (saved as %artist% - %title%.lrc or %title%.lrc)
+	lyric_dir = fb_env.doc_root.."\\tmp\\lyric",
 	-- image magic convert.exe path
 	image_magic_exe = fb_env.doc_root.."\\tmp\\ImageMagic\\convert.exe",
 	-- extra lua script name
 	ext_fname = "mg.lua",
 	-- resource types
-	res_fmt = {"jpg", "bmp", "png", "txt"},
+	res_fmt = {"jpg", "bmp", "png", "txt", "lrc"},
 	-- also scan resource in these sub directorys
 	res_sub = {"scans", "bk"}
 }
