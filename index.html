@@ -89,7 +89,7 @@
 
 .head .tab { float: right; background-color: #eee;  }
 .head .tab.ng-hide { display: block !important; background-color: transparent; }
-.tool .close-tool { float: right; }
+.tool .close-tool { float: right; padding: 0.6em 1.2em; }
 .tool .content { margin: 10px 0; margin-right: 10px; }
 .content h3 { border-left: 12px solid #888; padding-left: 8px; }
 .content li { padding: 0.3em; margin: 0.2em; }
@@ -108,6 +108,10 @@
 .playlist input:focus { width: 90%; }
 .playlist input:focus+a { display: none; }
 .playlist.play input { border-color: #999; }
+
+.content .lyric { min-height: 150px; }
+.lyric-maker { position: fixed; right: 0; top: 0; background-color: #aaa; max-height: 100%; overflow: auto; min-width: 300px; width: 30%; }
+.lyric-content { background-color: white; }
 
 body.img-mode>.head, body.img-mode>.list, body.img-mode>.tool, body.img-mode>.player { display: none; }
 body.list-mode>.img { display: none; }
@@ -151,7 +155,7 @@ body.list-mode>.img { display: none; }
 	<div class="empty" ng-hide="total!=0">No thing here</div>
 </ul>
 <div class="tool">
-	<button class="close-tool" style="padding: 0.6em 1.2em;" ng-click="tool.toggle()">X</button>
+	<button class="close-tool" ng-click="tool.toggle()">X</button>
 	<div class="content" ng-show="!tool.show||tool.show=='play'">
 		<h3>Playlists</h3>
 		<button ng-hide="list.onEdit" ng-click="select.start();tool.autoHide()">[ Select ]</button>
@@ -179,6 +183,10 @@ body.list-mode>.img { display: none; }
 				</form>
 			</li>
 		</ul>
+		<div class="lyric" pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric"
+			pl-lyric-load="player.onLyricLoad(elem, info)" pl-lyric-update="player.onLyricUpdate(elem, info, content[i])">
+			<span class="gray" ng-hide="audio.lyric">No lyric for this track</span>
+		</div>
 	</div>
 	<div class="content" ng-show="tool.show=='nav'">
 		<h3>Search</h3>
@@ -264,6 +272,12 @@ body.list-mode>.img { display: none; }
 				<option value="yes">current window</option>
 			</select>
 		</div>
+		<div class="field" ng-show="setting.res_open_self">make image lyric:
+			<select local-store ng-model="setting.mk_img_lrc">
+				<option value="">no</option>
+				<option value="yes">yes</option>
+			</select>
+		</div>
 	</div>
 </div>
 <div class="player">
@@ -295,6 +309,11 @@ body.list-mode>.img { display: none; }
 	</a>
 </div>
 <div class="img">
+	<div class="lyric-maker" ng-show="setting.mk_img_lrc">
+		<button onclick="this.parentNode.style.right='auto';this.parentNode.style.left='0'">&lt;</button>
+		<button onclick="this.parentNode.style.right='0';this.parentNode.style.left='auto'">&gt;</button>
+		<div class="lyric-content"></div>
+	</div>
 	<img ng-src="{{imgUrl}}" />
 </div>
 <script src="jquery-1.8.0.min.js"></script>

@@ -1,6 +1,10 @@
-function sec2Mmss(sec) {
-	var m = Math.floor(sec / 60), s = Math.floor(sec) - m*60;
-	return m + ':' + (s > 9 ? s : '0'+s);
+function sec2Mmss(sec, n) {
+	var m = Math.floor(sec / 60), s = (sec - m*60).toFixed(n);
+	return m + ':' + (s >= 10 ? s : '0'+s);
+}
+function mmss2Sec(mmss) {
+	var p = mmss.split(':');
+	return parseFloat(p[0])*60 + parseFloat(p[1]);
 }
 var app = angular.module('app', []);
 app.filter('urlEncode', function() {
@@ -129,10 +133,14 @@ app.directive('plCtrl', function($http) {
 				ad.aaUrl = scope.conf.res_url('albumart', id);
 				ad.aaCssUrl = 'url('+ad.aaUrl.replace(/([\(\)'"])/g, '\\$1')+')';
 				a[0].src = scope.conf.track_url(id);
-				var url = scope.conf.list_url('?tlist='+id)
+				var url = scope.conf.list_url('?tlist='+id);
 				$http.get(url).success(function(data) {
 					ad.info = data.ls[0];
 					ad.length = data.ls[0].seconds;
+				});
+				var lrc = scope.conf.res_url('lyric', id);
+				$http.get(lrc).success(function(data) {
+					ad.lyric = data;
 				});
 			}
 		}
@@ -144,7 +152,7 @@ app.directive('plCtrl', function($http) {
 			var ls = scope.playlist.split(','), i = $.ieach(ls, function(i, v) {
 				return v == scope.audio.id ? i : undefined;
 			}, -1) + offset;
-			var j = loop ? (i % ls.length) : i, d = ls[j];
+			var j = loop ? ((i+ls.length) % ls.length) : i, d = ls[j];
 			if (d) scope.play(d);
 		}
 		scope.pause = function() {
@@ -246,7 +254,60 @@ app.directive('plAnalyser', function() {
 			}
 		});
 	}
-});
+})
+app.directive('plLyric', function($http) {
+	return function (scope, elem, attrs, ctrl) {
+		var audio = $(attrs.plLyric), timeout = 0,
+			content = [], info = {};
+		function parse(txt) {
+			content = [];
+			info = {};
+			var e = null, r = /\[([\d\.:]+)\](.*)/, k = /\[([^:]+):([^\]]+)\]/;
+			$.ieach(txt.split('\n'), function(i, v, d) {
+				if (e = r.exec(v)) d.push({
+					t: mmss2Sec(e[1]),
+					c: e[2]
+				})
+				else if (e = k.exec(v)) {
+					info[e[1].toLowerCase()] = e[2];
+				}
+			}, content)
+			if (attrs.plLyricLoad)
+				scope.$eval(attrs.plLyricLoad, {elem:elem, content:content, info:info});
+		}
+		function get(t) {
+			if (content[0] && content[0].t > t)
+				return -1;
+			return $.ieach(content, function(i, v) {
+				var n = content[i + 1];
+				if (v.t <= t && n && n.t > t)
+					return i;
+			}, content.length-1);
+		}
+		function update(start) {
+			if (start && timeout > 0)
+				clearTimeout(timeout);
+			var t = audio[0].currentTime, i = get(t);
+			if (i >= 0) {
+				var a = audio[0], v = content[i], n = content[i + 1];
+				if (attrs.plLyricUpdate)
+					scope.$eval(attrs.plLyricUpdate, {elem:elem, content:content, info:info, i:i});
+				if (n && !a.ended && !a.paused)
+					timeout = setTimeout(update, Math.max(1000, (n.t - t)*1000+50));
+				else
+					timeout = 0;
+			}
+		}
+		if (attrs.plLyricBind) scope.$watch(attrs.plLyricBind, function(t, t0) {
+			if (t == t0) return;
+			parse(t);
+			update(true);
+		})
+		audio.bind('play', function(e) {
+			update(true);
+		})
+	}
+})
 app.directive('localStore', function() {
 	return {
 		require: 'ngModel',
@@ -461,6 +522,31 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			var t = $(e.currentTarget), p = t.offset(), w = t.width(), x = e.pageX;
 			$scope.player.hoverSec = $scope.audio ? $scope.audio.length * (x - p.left) / w : 0;
 			$scope.player.hoverMmss = $scope.audio ? sec2Mmss($scope.player.hoverSec) : '';
+		},
+		onLyricLoad: function(e, i) {
+			e.attr('style', i.bkstyle || '');
+			var bkUrl = i.bkimg && $scope.conf.res_url(i.bkimg, $scope.audio.id),
+				bkCssUrl = bkUrl ? 'url('+bkUrl.replace(/([\(\)'"])/g, '\\$1')+')' : 'none';
+			e.css('background-image', bkCssUrl);
+		},
+		onLyricUpdate: function(e, i, v) {
+			if (v.c.substr(0, 1) == '{' && v.c.substr(-1) == '}') {
+				$.ieach(v.c.slice(1, -1).split(';'), function(ii, v, d) {
+					var st = v.trim().split(':'), k = st[0] && st[0].trim(), v = st[1] && st[1].trim();
+					if (k == 'pos' && v) {
+						var baseX = 0, baseY = 0;
+						if (i.bkalignx == 'center') baseX = e.width() / 2;
+						else if (i.bkalignx == 'right') baseX = e.width();
+						if (i.bkaligny == 'center') baseY = e.height() / 2;
+						else if (i.bkaligny == 'bottom') baseY = e.height();
+						st = v.split(' ');
+						if (st[0]) e.css('background-position-x', baseX-parseFloat(st[0])+'px');
+						if (st[1]) e.css('background-position-y', baseY-parseFloat(st[1])+'px');
+					}
+				});
+			}
+			else
+				e.html(v.c);
 		}
 	}
 
@@ -601,4 +687,24 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.$apply();
 		}
 	})
+	// to make lyric
+	$('img').mousedown(function(e) {
+		if (!$scope.setting || !$scope.setting.mk_img_lrc) return;
+		var a = $('audio')[0];
+		$('<div>['+sec2Mmss($('audio')[0].currentTime, 3)+']{pos:'+e.pageX+' '+e.pageY+'}</div>'+
+		(e.which == 1 ? '' : '<div>&nbsp;</div>')).click(function(e) {
+			a.currentTime = mmss2Sec(/\[([\d\.:]+)\]/.exec(this.innerHTML)[1]);
+			$(this).nextAll().remove();
+		}).appendTo('.lyric-content');
+	}).dblclick(function(e) {
+		if (!$scope.setting || !$scope.setting.mk_img_lrc) return;
+		var a = $('audio')[0];
+		$('.lyric-content').html('<div>[bkImg:'+$.url_parse($(this).attr('src')).dict.res+']</div>'+
+			'<div>[bkAlignX:left]</div>'+
+			'<div>[bkAlignY:center]</div>'+
+			'<div>[bkMinWidth:200]</div>'+
+			'<div>[bkMinHeight:30]</div>'+
+			'<div>&nbsp;</div>');
+		$scope.playnext(0);
+	});
 })
