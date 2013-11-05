@@ -702,8 +702,8 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		$('.lyric-content').html('<div>[bkImg:'+$.url_parse($(this).attr('src')).dict.res+']</div>'+
 			'<div>[bkAlignX:left]</div>'+
 			'<div>[bkAlignY:center]</div>'+
-			'<div>[bkMinWidth:200]</div>'+
-			'<div>[bkMinHeight:30]</div>'+
+			'<div>[bkLineWidth:200]</div>'+
+			'<div>[bkLineHeight:30]</div>'+
 			'<div>&nbsp;</div>');
 		$scope.playnext(0);
 	});
