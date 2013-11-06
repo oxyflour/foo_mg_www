@@ -139,7 +139,9 @@ app.directive('plCtrl', function($http) {
 					ad.length = data.ls[0].seconds;
 				});
 				var lrc = scope.conf.res_url('lyric', id);
-				$http.get(lrc).success(function(data) {
+				$http.get(lrc, {// do not transform lyric file
+					transformResponse: function(d) { return d }
+				}).success(function(data) {
 					ad.lyric = data;
 				});
 			}
@@ -197,10 +199,16 @@ app.directive('plAudio', function() {
 		elem.bind('play', function(e) {
 			audio.state = 'play';
 			update(true);
+			if (attrs.plAudioPlay)
+				scope.$eval(plAudioPlay);
 		}).bind('pause', function(e) {
 			audio.state = 'pause';
+			if (attrs.plAudioPause)
+				scope.$eval(plAudioPause);
 		}).bind('ended', function(e) {
 			audio.state = 'ended';
+			if (attrs.plAudioEnded)
+				scope.$eval(plAudioEnded);
 		});
 	}
 })
@@ -287,7 +295,8 @@ app.directive('plLyric', function($http) {
 		function update(start) {
 			if (start && timeout > 0)
 				clearTimeout(timeout);
-			var t = audio[0].currentTime, i = get(t);
+			var offset = parseFloat(info.offset || 0) + parseFloat(elem.attr('pl-lyric-offset') || 0);
+			var t = audio[0].currentTime + offset, i = get(t);
 			if (i >= 0) {
 				var a = audio[0], v = content[i], n = content[i + 1];
 				if (attrs.plLyricUpdate)
@@ -303,6 +312,11 @@ app.directive('plLyric', function($http) {
 			parse(t);
 			update(true);
 		})
+		scope.$watch(function() {
+			return elem.is(':visible');
+		}, function(v) {
+			if (v) update(true);
+		});
 		audio.bind('play', function(e) {
 			update(true);
 		})
@@ -518,32 +532,59 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	}
 
 	$scope.player = {
+		show: false,
 		getHoverPosition: function(e) {
 			var t = $(e.currentTarget), p = t.offset(), w = t.width(), x = e.pageX;
 			$scope.player.hoverSec = $scope.audio ? $scope.audio.length * (x - p.left) / w : 0;
 			$scope.player.hoverMmss = $scope.audio ? sec2Mmss($scope.player.hoverSec) : '';
 		},
 		onLyricLoad: function(e, i) {
+			/*
 			e.attr('style', i.bkstyle || '');
 			var bkUrl = i.bkimg && $scope.conf.res_url(i.bkimg, $scope.audio.id),
 				bkCssUrl = bkUrl ? 'url('+bkUrl.replace(/([\(\)'"])/g, '\\$1')+')' : 'none';
 			e.css('background-image', bkCssUrl);
+			// we have to reset offset for animation
+			i.offset = (i.offset ? parseFloat(i.offset) : 0) + 0.5;
+			*/
 		},
 		onLyricUpdate: function(e, i, v) {
-			if (v.c.substr(0, 1) == '{' && v.c.substr(-1) == '}') {
-				$.ieach(v.c.slice(1, -1).split(';'), function(ii, v, d) {
-					var st = v.trim().split(':'), k = st[0] && st[0].trim(), v = st[1] && st[1].trim();
-					if (k == 'pos' && v) {
-						var baseX = 0, baseY = 0;
-						if (i.bkalignx == 'center') baseX = e.width() / 2;
-						else if (i.bkalignx == 'right') baseX = e.width();
-						if (i.bkaligny == 'center') baseY = e.height() / 2;
-						else if (i.bkaligny == 'bottom') baseY = e.height();
-						st = v.split(' ');
-						if (st[0]) e.css('background-position-x', baseX-parseFloat(st[0])+'px');
-						if (st[1]) e.css('background-position-y', baseY-parseFloat(st[1])+'px');
-					}
+			function disp(e, i, p) {
+				if (!e.is(":visible")) return;
+				var img = e.find('img');
+				var alignx = p.alignx || i.bkalignx, aligny = p.aligny || i.bkaligny,
+					width = p.width || i.bklinewidth, height = p.height || i.bklineheight;
+				i.bkcw = e.width() || i.bkcw;
+				i.bkch = e.height() || i.bkch;
+
+				var baseX = 0, baseY = 0;
+				if (alignx == 'center') baseX = i.bkcw / 2;
+				else if (alignx == 'right') baseX = i.bkcw;
+				if (aligny == 'center') baseY = i.bkch / 2;
+				else if (aligny == 'bottom') baseY = i.bkch;
+
+				var zoomX = i.bkcw / width, zoomY = i.bkch / height;
+				i.bkzoom = Math.min(zoomX, zoomY, 1);
+
+				var trans = 'scale('+i.bkzoom+') translate3d('+
+					Math.floor(baseX/i.bkzoom-parseFloat(p['left']))+'px, '+
+					Math.floor(baseY/i.bkzoom-parseFloat(p['top']))+'px, 0'
+				img.css({
+					'-webkit-transform': trans,
+					'-moz-transform': trans,
+					'-ms-transform': trans,
+					'transform': trans,
 				});
+			}
+			if (v.c.substr(0, 1) == '{' && v.c.substr(-1) == '}') {
+				var para = {};
+				$.ieach(v.c.slice(1, -1).split(';'), function(ii, v, d) {
+					var st = v.trim().split(':'),
+						k = st[0] && st[0].trim(),
+						v = st[1] && st[1].trim();
+					if (k && v) para[k.toLowerCase()] = v;
+				});
+				disp(e, i, para);
 			}
 			else
 				e.html(v.c);
@@ -689,22 +730,32 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	})
 	// to make lyric
 	$('img').mousedown(function(e) {
-		if (!$scope.setting || !$scope.setting.mk_img_lrc) return;
-		var a = $('audio')[0];
-		$('<div>['+sec2Mmss($('audio')[0].currentTime, 3)+']{pos:'+e.pageX+' '+e.pageY+'}</div>'+
-		(e.which == 1 ? '' : '<div>&nbsp;</div>')).click(function(e) {
-			a.currentTime = mmss2Sec(/\[([\d\.:]+)\]/.exec(this.innerHTML)[1]);
+		var l = $('.lyric-content'), a = $('audio'), t = a[0].currentTime;
+		if (!l.is(":visible")) return;
+
+		var px = e.pageX, py = e.pageY;
+		if (e.shiftKey || e.ctrlKey) px = l.children('[px]').last().attr('px') || px;
+
+		var u = '['+sec2Mmss(t, 3)+']{left:'+px+';top:'+py+';}';
+		if (e.ctrlKey) u = '&nbsp;';
+
+		var d = $('<div>'+u+'</div>').click(function(e) {
+			a[0].currentTime = parseFloat($(this).attr('tk'));
 			$(this).nextAll().remove();
-		}).appendTo('.lyric-content');
+		}).attr('px', px).attr('tk', t)
+		l.append(d).parent().scrollTop(9999)
 	}).dblclick(function(e) {
-		if (!$scope.setting || !$scope.setting.mk_img_lrc) return;
-		var a = $('audio')[0];
-		$('.lyric-content').html('<div>[bkImg:'+$.url_parse($(this).attr('src')).dict.res+']</div>'+
+		var l = $('.lyric-content'), a = $('audio'), t = a[0].currentTime;
+		if (!l.is(":visible")) return;
+		l.html('<div>[bkImg:'+$.url_parse($(this).attr('src')).dict.res+']</div>'+
 			'<div>[bkAlignX:left]</div>'+
 			'<div>[bkAlignY:center]</div>'+
-			'<div>[bkLineWidth:200]</div>'+
-			'<div>[bkLineHeight:30]</div>'+
-			'<div>&nbsp;</div>');
+			'<div>[bkWidth:'+this.naturalWidth+']</div>'+
+			'<div>[bkHeight:'+this.naturalHeight+']</div>'+
+			'<div>[bkLineWidth:800]</div>'+
+			'<div>[bkLineHeight:50]</div>'+
+			'<div>&nbsp;</div>'+
+			'<div px="'+e.pageX+'">['+sec2Mmss(0, 3)+']{left:'+e.pageX+';top:'+e.pageY+';}</div>');
 		$scope.playnext(0);
 	});
 })
