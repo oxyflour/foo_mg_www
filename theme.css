@@ -18,6 +18,7 @@ a:hover { text-decoration: underline; }
 .float-right { float: right; }
 .text-center { text-align: center; }
 .text-ellipsis { text-overflow: ellipsis; }
+.cursor-hand { cursor: pointer; }
 .bold { font-weight: bold; }
 .gray { color: gray; }
 

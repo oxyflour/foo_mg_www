@@ -54,7 +54,7 @@
 .on-edit .track.selected .check { background-color: #aaa; }
 
 .player { text-align: center; }
-.player .albumart { float: left; cursor: pointer; background-image: url(nocover.jpg); background-size: cover; background-position: center; }
+.player .albumart { float: left; background-image: url(nocover.jpg); background-size: cover; background-position: center; }
 .player .albumart div { width: 100%; height: 100%; background-size: cover; background-position: center; }
 .player .buttonbar { max-width: 720px; margin: 5px auto; white-space: nowrap;; }
 .player .buttonbar button { font-size: 120%; width: 30%; font-weight: bold; }
@@ -65,7 +65,7 @@
 	-webkit-transform-origin: left top; -moz-transform-origin: left top;
 	-ms-transform-origin: left top; transform-origin: left top; }
 .player .analyser { display: block; width: 100%; height: 2.5em; position: absolute; bottom: 8px; }
-.player .processbar { display: block; text-decoration: none; width: 100%; height: 8px; background-color: #ddd; cursor: pointer;
+.player .processbar { display: block; text-decoration: none; width: 100%; height: 8px; background-color: #ddd;
 	-webkit-transition: height .4s ease; -moz-transition: height .4s ease;
 	-ms-transition: height .4s ease; transition: height .4s ease; }
 .player .processbar .text { float: right; margin-right: 10px; }
@@ -287,7 +287,7 @@ body.list-mode>.img { display: none; }
 </div>
 <div class="player">
 	<div class="ctrl" ng-hide="player.show">
-		<div class="albumart" ng-click="player.show='lrc'">
+		<div class="albumart cursor-hand" ng-click="player.show='lrc'">
 			<div ng-attr-style="background-image:{{audio.aaCssUrl}}"></div>
 		</div><br /><!-- fix align problem in chrome -->
 		<div class="buttonbar">
@@ -296,7 +296,7 @@ body.list-mode>.img { display: none; }
 			<button ng-click="pause()" ng-show="audio.state=='play'">[ || ]</button>
 			<button ng-click="playnext(1, true)">[ &raquo; ]</button>
 		</div>
-		<div ng-show="audio.id" ng-click="browser.open(playUrl);tool.autoHide()">
+		<div class="cursor-hand" ng-show="audio.id" ng-click="browser.open(playUrl);tool.autoHide()">
 			<big>{{audio.info.artist}} - {{audio.info.name}}</big>
 			<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
 			<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
@@ -305,7 +305,7 @@ body.list-mode>.img { display: none; }
 		<big ng-hide="audio.id">Ready to play</big>
 	</div>
 	<!-- set offset=0.5 for animation -->
-	<div class="lyric" ng-show="player.show=='lrc'" ng-click="player.show=''"
+	<div class="lyric cursor-hand" ng-show="player.show=='lrc'" ng-click="player.show=''"
 		pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric" pl-lyric-offset="0.5"
 		pl-lyric-load="lyric.load(info)" pl-lyric-update="lyric.update(info, content[i])">
 		<span class="gray" ng-hide="audio.lyric">No lyric for this track</span>
@@ -316,7 +316,7 @@ body.list-mode>.img { display: none; }
 	<input type="hidden" local-store ng-model="playUrl" />
 	<input type="hidden" local-store ng-model="playlist" />
 	<canvas class="analyser" width="120" height="30" pl-analyser="audio[pl-audio]"></canvas>
-	<a class="processbar" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
+	<a class="processbar cursor-hand" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
 		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec);play()">
 		<span class="text">{{player.hoverMmss}}</span>
 		<div class="bar" ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>
