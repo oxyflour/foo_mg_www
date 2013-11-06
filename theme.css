@@ -8,6 +8,7 @@ button { background-color: transparent; border: none; cursor: pointer; font-size
 a { color: #333; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+.hidden { display: none; }
 .absolute { position: absolute; }
 .full-width { width: 100%; }
 .inline-block { display: inline-block; }

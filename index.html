@@ -56,7 +56,7 @@
 .player { text-align: center; }
 .player .albumart { float: left; background-image: url(nocover.jpg); background-size: cover; background-position: center; }
 .player .albumart div { width: 100%; height: 100%; background-size: cover; background-position: center; }
-.player .buttonbar { max-width: 720px; margin: 5px auto; white-space: nowrap;; }
+.player .buttonbar { max-width: 720px; margin: 0 auto; padding: 5px 0; white-space: nowrap;; }
 .player .buttonbar button { font-size: 120%; width: 30%; font-weight: bold; }
 .player .info { margin-top: 5px; }
 .player .lyric { width: 100%; overflow: hidden; }
@@ -81,7 +81,7 @@
 	.player .processbar .bar { bottom: 0; }
 }
 @media only screen and (min-width: 621px) {
-	.player .buttonbar { margin: 20px; }
+	.player .buttonbar { padding: 20px 0; }
 	.player .albumart { height: 130px; width: 130px; margin: 15px; }
 	.player .buttonbar { margin-left: 150px; }
 	.player .lyric { height: 150px; }
@@ -289,7 +289,7 @@ body.list-mode>.img { display: none; }
 	<div class="ctrl" ng-hide="player.show">
 		<div class="albumart cursor-hand" ng-click="player.show='lrc'">
 			<div ng-attr-style="background-image:{{audio.aaCssUrl}}"></div>
-		</div><br /><!-- fix align problem in chrome -->
+		</div>
 		<div class="buttonbar">
 			<button ng-click="playnext(-1, true)">[ &laquo; ]</button>
 			<button ng-click="play()" ng-hide="audio.state=='play'">[ &gt; ]</button>
@@ -308,7 +308,7 @@ body.list-mode>.img { display: none; }
 	<div class="lyric cursor-hand" ng-show="player.show=='lrc'" ng-click="player.show=''"
 		pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric" pl-lyric-offset="0.5"
 		pl-lyric-load="lyric.load(info)" pl-lyric-update="lyric.update(info, content[i])">
-		<span class="gray" ng-hide="audio.lyric">No lyric for this track</span>
+		<p class="gray" ng-hide="audio.lyric"><br />No lyric for this track</p>
 		<img />
 	</div>
 	<audio pl-audio></audio>
