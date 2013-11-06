@@ -604,7 +604,8 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 
 	$scope.select = {
 		start: function() {
-			 $scope.list.onEdit = true;
+			$scope.list.onEdit = true;
+			$scope.tool.show = false;
 		},
 		length: function() {
 			var bwList = $('.list:not(.ng-hide)');
