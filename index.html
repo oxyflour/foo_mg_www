@@ -305,9 +305,9 @@ body.list-mode>.img { display: none; }
 	<!-- set offset=0.5 for animation -->
 	<div class="lyric" ng-show="player.show=='lrc'" ng-click="player.show=''"
 		pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric" pl-lyric-offset="0.5"
-		pl-lyric-load="player.lrcbk=info.bkimg" pl-lyric-update="player.onLyricUpdate(elem, info, content[i])">
-		<img ng-show="player.lrcbk" ng-src="{{player.lrcbk&&conf.res_url(player.lrcbk, audio.id)}}" />
+		pl-lyric-load="lyric.load(info)" pl-lyric-update="lyric.update(info, content[i])">
 		<span class="gray" ng-hide="audio.lyric">No lyric for this track</span>
+		<img />
 	</div>
 	<audio pl-audio></audio>
 	<input type="hidden" local-store ng-model="audio.id" />
@@ -324,7 +324,9 @@ body.list-mode>.img { display: none; }
 	<div class="lyric-maker" ng-show="setting.mk_img_lrc">
 		<button onclick="$(this).parent().css({right:'auto',left:0})">&lt;</button>
 		<button onclick="$(this).parent().css({left:'auto',right:0})">&gt;</button>
-		<span>{{audio.info.artist}} - {{audio.info.name}}.lrc</span>
+		<a href="data:text/plain;charset=utf-8,aabbccd" title="click to save" download="{{audio.info.artist}} - {{audio.info.name}}.lrc">
+			{{audio.info.artist}} - {{audio.info.name}}.lrc
+		</a>
 		<div class="lyric-content"></div>
 	</div>
 	<img ng-src="{{imgUrl}}" />

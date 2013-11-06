@@ -537,21 +537,21 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			var t = $(e.currentTarget), p = t.offset(), w = t.width(), x = e.pageX;
 			$scope.player.hoverSec = $scope.audio ? $scope.audio.length * (x - p.left) / w : 0;
 			$scope.player.hoverMmss = $scope.audio ? sec2Mmss($scope.player.hoverSec) : '';
+		}
+	}
+
+	$scope.lyric = {
+		load: function(i) {
+			var elem = $('[pl-lyric]'), img = elem.find('img');
+			if (i.bkimg)
+				img.attr('src', $scope.conf.res_url(i.bkimg, $scope.audio.id)).show();
+			else
+				img.attr('src', '').hide();
 		},
-		onLyricLoad: function(e, i) {
-			/*
-			e.attr('style', i.bkstyle || '');
-			var bkUrl = i.bkimg && $scope.conf.res_url(i.bkimg, $scope.audio.id),
-				bkCssUrl = bkUrl ? 'url('+bkUrl.replace(/([\(\)'"])/g, '\\$1')+')' : 'none';
-			e.css('background-image', bkCssUrl);
-			// we have to reset offset for animation
-			i.offset = (i.offset ? parseFloat(i.offset) : 0) + 0.5;
-			*/
-		},
-		onLyricUpdate: function(e, i, v) {
+		update: function(i, v) {
+			var elem = $('[pl-lyric]'), img = elem.find('img');
+			if (!elem.is(":visible")) return;
 			function disp(e, i, p) {
-				if (!e.is(":visible")) return;
-				var img = e.find('img');
 				var alignx = p.alignx || i.bkalignx, aligny = p.aligny || i.bkaligny,
 					width = p.width || i.bklinewidth, height = p.height || i.bklineheight;
 				i.bkcw = e.width() || i.bkcw;
@@ -584,7 +584,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 						v = st[1] && st[1].trim();
 					if (k && v) para[k.toLowerCase()] = v;
 				});
-				disp(e, i, para);
+				disp(elem, i, para);
 			}
 			else
 				e.html(v.c);
