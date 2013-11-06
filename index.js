@@ -7,9 +7,17 @@ function mmss2Sec(mmss) {
 	return parseFloat(p[0])*60 + parseFloat(p[1]);
 }
 var app = angular.module('app', []);
+app.config(function($compileProvider) {
+	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|data):/);
+})
 app.filter('urlEncode', function() {
 	return function(str) {
 		return encodeURIComponent(str);
+	}
+})
+app.filter('btoa', function() {
+	return function(str) {
+		return btoa(str);
 	}
 })
 app.directive('bwMain', function($compile) {
@@ -591,6 +599,64 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}
 	}
 
+	$scope.lrceditor = {
+		list: [],
+		text: '',
+		title: '',
+		reset: function(e) {
+			if (!$('.lyric-maker:visible').length) return;
+			var i = $('img.lyric-img');
+			$scope.lrceditor.title = $scope.audio.info.artist + ' - ' + $scope.audio.info.title
+			$scope.lrceditor.text = '';
+			$scope.lrceditor.list = [{
+				t: 0,
+				x: e.pageX,
+				y: e.pageY,
+				c: '[bkImg:'+$.url_parse(i.attr('src')).dict.res+']\n'+
+					'[bkAlignX:left]\n'+
+					'[bkAlignY:center]\n'+
+					'[bkWidth:'+i[0].naturalWidth+']\n'+
+					'[bkHeight:'+i[0].naturalHeight+']\n'+
+					'[bkLineWidth:800]\n'+
+					'[bkLineHeight:50]\n'+
+					'\n'+
+					'['+sec2Mmss(0, 3)+']{left:'+e.pageX+';top:'+e.pageY+';}'
+			}]
+			$scope.playnext(0);
+		},
+		append: function(e) {
+			if (!$('.lyric-maker:visible').length) return;
+			var t = $('audio[pl-audio]')[0].currentTime,
+				ls = $scope.lrceditor.list;
+
+			var px = e.pageX, py = e.pageY, last = ls.length;
+			if (e.shiftKey || e.ctrlKey) px = ls[last-1].x || px;
+
+			var u = '['+sec2Mmss(t, 3)+']{left:'+px+';top:'+py+';}';
+			if (e.ctrlKey) u = ' ';
+
+			ls.push({
+				t: t,
+				x: px,
+				y: py,
+				c: u
+			})
+
+			setTimeout(function() {
+				$('.lyric-maker').scrollTop(9999);
+			}, 100);
+		},
+		truncate: function(i) {
+			$('audio[pl-audio]')[0].currentTime = $scope.lrceditor.list[i].t;
+			$scope.lrceditor.list.length = i + 1;
+		},
+		finish: function() {
+			$scope.lrceditor.text = $.ieach($scope.lrceditor.list, function(i, v, d) {
+				d.push(v.c);
+			}, []).join('\n');
+		}
+	}
+
 	$scope.tool = {
 		show: false,
 		toggle: function(first, second) {
@@ -729,34 +795,4 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.$apply();
 		}
 	})
-	// to make lyric
-	$('img').mousedown(function(e) {
-		var l = $('.lyric-content'), a = $('audio'), t = a[0].currentTime;
-		if (!l.is(":visible")) return;
-
-		var px = e.pageX, py = e.pageY;
-		if (e.shiftKey || e.ctrlKey) px = l.children('[px]').last().attr('px') || px;
-
-		var u = '['+sec2Mmss(t, 3)+']{left:'+px+';top:'+py+';}';
-		if (e.ctrlKey) u = '&nbsp;';
-
-		var d = $('<div>'+u+'</div>').click(function(e) {
-			a[0].currentTime = parseFloat($(this).attr('tk'));
-			$(this).nextAll().remove();
-		}).attr('px', px).attr('tk', t)
-		l.append(d).parent().scrollTop(9999)
-	}).dblclick(function(e) {
-		var l = $('.lyric-content'), a = $('audio'), t = a[0].currentTime;
-		if (!l.is(":visible")) return;
-		l.html('<div>[bkImg:'+$.url_parse($(this).attr('src')).dict.res+']</div>'+
-			'<div>[bkAlignX:left]</div>'+
-			'<div>[bkAlignY:center]</div>'+
-			'<div>[bkWidth:'+this.naturalWidth+']</div>'+
-			'<div>[bkHeight:'+this.naturalHeight+']</div>'+
-			'<div>[bkLineWidth:800]</div>'+
-			'<div>[bkLineHeight:50]</div>'+
-			'<div>&nbsp;</div>'+
-			'<div px="'+e.pageX+'">['+sec2Mmss(0, 3)+']{left:'+e.pageX+';top:'+e.pageY+';}</div>');
-		$scope.playnext(0);
-	});
 })

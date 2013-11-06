@@ -118,7 +118,9 @@
 .playlist.play input { border-color: #999; }
 
 .lyric-maker { position: fixed; right: 0; top: 0; background-color: #aaa; max-height: 100%; overflow: auto; min-width: 300px; width: 30%; }
-.lyric-content { background-color: white; }
+.lyric-maker pre { margin: 0; }
+.lyric-content, .lyric-text { background-color: white; }
+.lyric-text textarea { width: 98%; min-height: 500px; }
 
 body.img-mode>.head, body.img-mode>.list, body.img-mode>.tool, body.img-mode>.player { display: none; }
 body.list-mode>.img { display: none; }
@@ -324,12 +326,20 @@ body.list-mode>.img { display: none; }
 	<div class="lyric-maker" ng-show="setting.mk_img_lrc">
 		<button onclick="$(this).parent().css({right:'auto',left:0})">&lt;</button>
 		<button onclick="$(this).parent().css({left:'auto',right:0})">&gt;</button>
-		<a href="data:text/plain;charset=utf-8,aabbccd" title="click to save" download="{{audio.info.artist}} - {{audio.info.name}}.lrc">
-			{{audio.info.artist}} - {{audio.info.name}}.lrc
-		</a>
-		<div class="lyric-content"></div>
+		<div>Playing: {{audio.info.artist}} - {{audio.info.name}}</div>
+		<div class="lyric-text" ng-show="lrceditor.text">
+			<a href="data:text/plain;charset=utf-8,{{lrceditor.text|urlEncode}}" title="click to save"
+				download="{{lrceditor.title}}.lrc">[ save ]</a>
+			<button ng-click="lrceditor.text=''">[ back ]</button>
+			<textarea ng-model="lrceditor.text"></textarea>
+		</div>
+		<div class="lyric-content" ng-hide="lrceditor.text">
+			<button ng-click="lrceditor.finish()">[ finish ]</button>
+			<span>double click image to start</span>
+			<pre ng-repeat="i in lrceditor.list" ng-click="lrceditor.truncate($index)">{{i.c}}</pre>
+		</div>
 	</div>
-	<img ng-src="{{imgUrl}}" />
+	<img class="lyric-img" ng-src="{{imgUrl}}" ng-click="lrceditor.append($event)" ng-dblclick="lrceditor.reset($event)" />
 </div>
 <script src="jquery-1.8.0.min.js"></script>
 <script src="jq.util.js"></script>
