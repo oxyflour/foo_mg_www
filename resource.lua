@@ -180,6 +180,7 @@ elseif res and browse_dir and browse_dir ~= '' and
 		local content = get_utf8_text(res_path)
 		print('HTTP/1.1 200 OK\r\n',
 			'Content-Type: text/plain;charset=utf-8\r\n',
+			'Content-Disposition: inline\r\n', -- always display in browser window
 			'Content-Length: ', content:len(), '\r\n',
 			'\r\n', content)
 	else
