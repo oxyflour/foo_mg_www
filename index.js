@@ -606,7 +606,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		reset: function(e) {
 			if (!$('.lyric-maker:visible').length) return;
 			var i = $('img.lyric-img');
-			$scope.lrceditor.title = $scope.audio.info.artist + ' - ' + $scope.audio.info.title
+			$scope.lrceditor.title = $scope.audio.info.artist + ' - ' + $scope.audio.info.name
 			$scope.lrceditor.text = '';
 			$scope.lrceditor.list = [{
 				t: 0,
