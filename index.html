@@ -60,10 +60,13 @@
 .player .buttonbar button { font-size: 120%; width: 30%; font-weight: bold; }
 .player .info { margin-top: 5px; }
 .player .lyric { width: 100%; overflow: hidden; }
-.player .lyric img { -webkit-transition: all 1s ease; -moz-transition: all 1s ease;
+.player .lyric img, .player .lyric .text { -webkit-transition: all 1s ease; -moz-transition: all 1s ease;
 	-ms-transition: all 1s ease; transition: all 1s ease;
 	-webkit-transform-origin: left top; -moz-transform-origin: left top;
 	-ms-transform-origin: left top; transform-origin: left top; }
+.player .line { margin: 0.15em; opacity: 0.5; -webkit-transition: opacity .4s ease; -moz-transition: opacity .4s ease;
+	-ms-transition: opacity .4s ease; transition: opacity .4s ease; }
+.player .line.active { opacity: 1; }
 .player .analyser { display: block; width: 100%; height: 2.5em; position: absolute; bottom: 8px; }
 .player .processbar { display: block; text-decoration: none; width: 100%; height: 8px; background-color: #ddd;
 	-webkit-transition: height .4s ease; -moz-transition: height .4s ease;
@@ -292,8 +295,8 @@ body.list-mode>.img { display: none; }
 		</div>
 		<div class="buttonbar">
 			<button ng-click="playnext(-1, true)">[ &laquo; ]</button>
-			<button ng-click="play()" ng-hide="audio.state=='play'">[ &gt; ]</button>
-			<button ng-click="pause()" ng-show="audio.state=='play'">[ || ]</button>
+			<button ng-click="play()" ng-dblclick="playnext(0)" ng-hide="audio.state=='play'">[ &gt; ]</button>
+			<button ng-click="pause()" ng-dblclick="playnext(0)" ng-show="audio.state=='play'">[ || ]</button>
 			<button ng-click="playnext(1, true)">[ &raquo; ]</button>
 		</div>
 		<div class="cursor-hand" ng-show="audio.id" ng-click="browser.open(playUrl);tool.autoHide()">
@@ -307,9 +310,14 @@ body.list-mode>.img { display: none; }
 	<!-- set offset=0.5 for animation -->
 	<div class="lyric cursor-hand" ng-show="player.show=='lrc'" ng-click="player.show=''"
 		pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric" pl-lyric-offset="0.5"
-		pl-lyric-load="lyric.load(info)" pl-lyric-update="lyric.update(info, content[i])">
+		pl-lyric-load="lyric.load(info, content)" pl-lyric-update="lyric.update(info, i, content[i])">
 		<p class="gray" ng-hide="audio.lyric"><br />No lyric for this track</p>
-		<img />
+		<img class="absolute" style="left:0" ng-show="lyric.info.bkimg"
+			ng-src="{{lyric.info.bkimg&&conf.res_url(lyric.info.bkimg, undefined, audio.info.path)}}" />
+		<div class="text absolute full-width">
+			<div class="line" lrc-id="{{$index}}" ng-class="$index==lyric.current.index&&'active'"
+				ng-repeat="i in lyric.content" ng-if="i.d.substr">{{i.d}}</div>
+		</div>
 	</div>
 	<audio pl-audio></audio>
 	<input type="hidden" local-store ng-model="audio.id" />
@@ -339,7 +347,9 @@ body.list-mode>.img { display: none; }
 			<pre ng-repeat="i in lrceditor.list" ng-click="lrceditor.truncate($index)">{{i.c}}</pre>
 		</div>
 	</div>
-	<img class="lyric-img" ng-src="{{imgUrl}}" ng-click="lrceditor.append($event)" ng-dblclick="lrceditor.reset($event)" />
+	<img class="lyric-img" tabindex="1" ng-src="{{imgUrl}}"
+		ng-keypress="lrceditor.append($event)" ng-mousemove="lrceditor.lastEvent=$event"
+		ng-click="lrceditor.append($event)" ng-dblclick="lrceditor.reset($event)" />
 </div>
 <script src="jquery-1.8.0.min.js"></script>
 <script src="jq.util.js"></script>

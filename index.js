@@ -275,6 +275,16 @@ app.directive('plLyric', function($http) {
 	return function (scope, elem, attrs, ctrl) {
 		var audio = $(attrs.plLyric), timeout = 0,
 			content = [], info = {};
+		function split(content) {
+			var para = {};
+			$.ieach(content.split(';'), function(ii, v, d) {
+				var st = v.trim().split(':'),
+					k = st[0] && st[0].trim(),
+					v = st[1] && st[1].trim();
+				if (k && v) para[k.toLowerCase()] = v;
+			});
+			return para;
+		}
 		function parse(txt) {
 			content = [];
 			info = {};
@@ -282,7 +292,9 @@ app.directive('plLyric', function($http) {
 			$.ieach(txt.split('\n'), function(i, v, d) {
 				if (e = r.exec(v)) d.push({
 					t: mmss2Sec(e[1]),
-					c: e[2]
+					d: e[2].substr(0, 1) == '{' && e[2].substr(-1) == '}' ?
+						split(e[2].slice(1, -1)) : e[2],
+					c: v
 				})
 				else if (e = k.exec(v)) {
 					info[e[1].toLowerCase()] = e[2];
@@ -321,7 +333,7 @@ app.directive('plLyric', function($http) {
 			update(true);
 		})
 		scope.$watch(function() {
-			return elem.is(':visible');
+			return elem.width() * elem.height();
 		}, function(v) {
 			if (v) update(true);
 		});
@@ -471,7 +483,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}, 100);
 	}
 
-	$scope.browser = {
+	var $browser = $scope.browser = {
 		open: function(url) {
 			$scope.listUrl = url;
 		},
@@ -501,7 +513,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 				var name = $scope.playlists[url] || $scope.playlists[$scope.listUrl] || $scope.list.name || 'new';
 				save_list(url, name);
 			});
-			$scope.select.finish();
+			$select.finish();
 		},
 		// add (all items or current selection) to another playlist (addToUrl).
 		// addToUrl will be removed,
@@ -526,7 +538,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			});
 			// reset select value
 			$scope.addToUrl = '';
-			$scope.select.finish();
+			$select.finish();
 		},
 		// play (every items) under current listUrl
 		playCurrent: function(id) {
@@ -539,27 +551,26 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}
 	}
 
-	$scope.player = {
+	var $player = $scope.player = {
 		show: false,
 		getHoverPosition: function(e) {
 			var t = $(e.currentTarget), p = t.offset(), w = t.width(), x = e.pageX;
-			$scope.player.hoverSec = $scope.audio ? $scope.audio.length * (x - p.left) / w : 0;
-			$scope.player.hoverMmss = $scope.audio ? sec2Mmss($scope.player.hoverSec) : '';
+			$player.hoverSec = $scope.audio ? $scope.audio.length * (x - p.left) / w : 0;
+			$player.hoverMmss = $scope.audio ? sec2Mmss($player.hoverSec) : '';
 		}
 	}
 
-	$scope.lyric = {
-		load: function(i) {
-			var elem = $('[pl-lyric]'), img = elem.find('img');
-			if (i.bkimg)
-				img.attr('src', $scope.conf.res_url(i.bkimg, $scope.audio.id)).show();
-			else
-				img.attr('src', '').hide();
+	var $lyric = $scope.lyric = {
+		load: function(i, c) {
+			$lyric.info = i;
+			$lyric.content = c;
+			$lyric.current = {};
 		},
-		update: function(i, v) {
-			var elem = $('[pl-lyric]'), img = elem.find('img');
+		update: function(i, n, v) {
+			$lyric.current.index = n;
+			var elem = $('[pl-lyric]'), img = elem.find('img'), txt = elem.find('.text');
 			if (!elem.is(":visible")) return;
-			function disp(e, i, p) {
+			function dispbk(e, i, p) {
 				var alignx = p.alignx || i.bkalignx, aligny = p.aligny || i.bkaligny,
 					width = p.width || i.bklinewidth, height = p.height || i.bklineheight;
 				i.bkcw = e.width() || i.bkcw;
@@ -584,34 +595,36 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 					'transform': trans,
 				});
 			}
-			if (v.c.substr(0, 1) == '{' && v.c.substr(-1) == '}') {
-				var para = {};
-				$.ieach(v.c.slice(1, -1).split(';'), function(ii, v, d) {
-					var st = v.trim().split(':'),
-						k = st[0] && st[0].trim(),
-						v = st[1] && st[1].trim();
-					if (k && v) para[k.toLowerCase()] = v;
+			function disptxt(e, i, n) {
+				var baseY = e.height() / 2, pos = txt.find('.line[lrc-id='+n+']').position();
+				var trans = 'translate3d(0, '+
+					Math.floor(baseY-(pos ? pos.top : 0))+'px, 0'
+				txt.css({
+					'-webkit-transform': trans,
+					'-moz-transform': trans,
+					'-ms-transform': trans,
+					'transform': trans,
 				});
-				disp(elem, i, para);
 			}
+			if (typeof(v.d) == typeof({}))
+				dispbk(elem, i, v.d);
 			else
-				e.html(v.c);
+				disptxt(elem, i, n);
 		}
 	}
 
-	$scope.lrceditor = {
+	var $lrceditor = $scope.lrceditor = {
 		list: [],
 		text: '',
 		title: '',
 		reset: function(e) {
 			if (!$('.lyric-maker:visible').length) return;
 			var i = $('img.lyric-img');
-			$scope.lrceditor.title = $scope.audio.info.artist + ' - ' + $scope.audio.info.name
-			$scope.lrceditor.text = '';
-			$scope.lrceditor.list = [{
+			$lrceditor.title = $scope.audio.info.artist + ' - ' + $scope.audio.info.name
+			$lrceditor.text = '';
+			$lrceditor.list = [{
 				t: 0,
-				x: e.pageX,
-				y: e.pageY,
+				d: {left:e.pageX, top:e.pageY},
 				c: '[bkImg:'+$.url_parse(i.attr('src')).dict.res+']\n'+
 					'[bkAlignX:left]\n'+
 					'[bkAlignY:center]\n'+
@@ -627,19 +640,19 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		append: function(e) {
 			if (!$('.lyric-maker:visible').length) return;
 			var t = $('audio[pl-audio]')[0].currentTime,
-				ls = $scope.lrceditor.list;
+				ls = $lrceditor.list;
 
-			var px = e.pageX, py = e.pageY, last = ls.length;
-			if (e.shiftKey || e.ctrlKey) px = ls[last-1].x || px;
-
-			var u = '['+sec2Mmss(t, 3)+']{left:'+px+';top:'+py+';}';
-			if (e.ctrlKey) u = ' ';
+			var px = e.pageX || $lrceditor.lastEvent.pageX,
+				py = e.pageY || $lrceditor.lastEvent.pageY,
+				last = ls.length;
+			if (e.charCode == 'a'.charCodeAt(0)) $.ieach(ls, function(i, v) {
+				if (v.d && v.d.left) px = v.d.left;
+			})
 
 			ls.push({
 				t: t,
-				x: px,
-				y: py,
-				c: u
+				d: {left:px, top:py},
+				c: '['+sec2Mmss(t, 3)+']{left:'+px+';top:'+py+';}'
 			})
 
 			setTimeout(function() {
@@ -647,31 +660,32 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			}, 100);
 		},
 		truncate: function(i) {
-			$('audio[pl-audio]')[0].currentTime = $scope.lrceditor.list[i].t;
-			$scope.lrceditor.list.length = i + 1;
+			$('audio[pl-audio]')[0].currentTime = $lrceditor.list[i].t;
+			$lrceditor.list.length = i + 1;
+			$('img.lyric-img').focus();
 		},
 		finish: function() {
-			$scope.lrceditor.text = $.ieach($scope.lrceditor.list, function(i, v, d) {
+			$lrceditor.text = $.ieach($lrceditor.list, function(i, v, d) {
 				d.push(v.c);
 			}, []).join('\n');
 		}
 	}
 
-	$scope.tool = {
+	var $tool = $scope.tool = {
 		show: false,
 		toggle: function(first, second) {
-			$scope.tool.show = $scope.tool.show != first ? first : second;
+			$tool.show = $tool.show != first ? first : second;
 		},
 		autoHide: function() {
 			if (parseInt($('.tool').css('left'))==0)
-				$scope.tool.show = false;
+				$tool.show = false;
 		}
 	}
 
-	$scope.select = {
+	var $select = $scope.select = {
 		start: function() {
 			$scope.list.onEdit = true;
-			$scope.tool.show = false;
+			$tool.show = false;
 		},
 		length: function() {
 			var bwList = $('.list:not(.ng-hide)');
@@ -684,10 +698,10 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		toggle: function(id) {
 			var bwList = $('.list:not(.ng-hide)');
 			bwList.children(id ? 'li[pl-id='+id+']' : 'li').toggleClass('selected');
-			bwList.children('.selected').length ? $scope.select.start() : $scope.select.finish();
+			bwList.children('.selected').length ? $select.start() : $select.finish();
 		},
 		finish: function() {
-			$scope.select.clear();
+			$select.clear();
 			$scope.list.onEdit = false;
 		}
 	}
@@ -695,7 +709,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	$scope.$watch('list.url+list.total', function(v) {
 		var ls = $scope.list, pl = $scope.playlists
 		if (!v || !ls || ls.total === undefined) return;
-		$scope.tool.autoHide();
+		$tool.autoHide();
 
 		$scope.listName = (ls.parent ? '< ' : '') + ls.name;
 		$scope.listParentPath = ls.parent && ls.parent.path;
@@ -719,21 +733,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			}, d);
 			$scope.listLongestPath = path;
 		}
-/*		$('.list:not(.ng-hide)').editlist({
-			onDragBegin: function(li) {
-				if (!$scope.list.onEdit) return true;
-				if (!li.hasClass('selected')) return true;
-			},
-			onMoveBegin: function(li) {
-				this.children('.selected').addClass('dragging');
-			},
-			onDropDown: function(li, dr) {
-				if (dr.parent().length)
-					this.children('.selected').removeClass('dragging')
-						.remove().insertAfter(dr);
-			}
-		})
-*/	})
+	})
 	$scope.$watch('listUrl', function(url, url0) {
 		if (url === url0) return;
 		$location.path('/list').search({url: url});
@@ -791,7 +791,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	})
 	$(document).bind("scroll touchstart mousedown", function(e) {
 		if ($(e.target.childNodes[0] || e.target).parents(".list").length) {
-			$scope.tool.autoHide();
+			$tool.autoHide();
 			$scope.$apply();
 		}
 	})
