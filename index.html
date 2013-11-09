@@ -291,7 +291,9 @@ body.list-mode>.img { display: none; }
 <div class="player">
 	<div class="ctrl" ng-hide="player.show">
 		<div class="albumart cursor-hand" ng-click="player.show='lrc'">
-			<div ng-attr-style="background-image:{{audio.aaCssUrl}}"></div>
+			<div ng-attr-style="background-image:{{audio.aaCssUrl}}">
+				<button class="float-right gray" ng-show="audio.lyric">lrc</button>
+			</div>
 		</div>
 		<div class="buttonbar">
 			<button ng-click="playnext(-1, true)">[ &laquo; ]</button>
