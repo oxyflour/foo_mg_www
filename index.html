@@ -350,7 +350,7 @@ body.list-mode>.img { display: none; }
 		</div>
 	</div>
 	<img class="lyric-img" tabindex="1" ng-src="{{imgUrl}}"
-		ng-keypress="lrceditor.append($event)" ng-mousemove="lrceditor.lastEvent=$event"
+		ng-keydown="lrceditor.currentKey=$event.which" ng-keyup="lrceditor.currentKey=0"
 		ng-click="lrceditor.append($event)" ng-dblclick="lrceditor.reset($event)" />
 </div>
 <script src="jquery-1.8.0.min.js"></script>

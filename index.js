@@ -617,6 +617,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		list: [],
 		text: '',
 		title: '',
+		currentKey: 0,
 		reset: function(e) {
 			if (!$('.lyric-maker:visible').length) return;
 			var i = $('img.lyric-img');
@@ -642,10 +643,8 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			var t = $('audio[pl-audio]')[0].currentTime,
 				ls = $lrceditor.list;
 
-			var px = e.pageX || $lrceditor.lastEvent.pageX,
-				py = e.pageY || $lrceditor.lastEvent.pageY,
-				last = ls.length;
-			if (e.charCode == 'a'.charCodeAt(0)) $.ieach(ls, function(i, v) {
+			var px = e.pageX, py = e.pageY, last = ls.length;
+			if ($lrceditor.currentKey == 'A'.charCodeAt(0)) $.ieach(ls, function(i, v) {
 				if (v.d && v.d.left) px = v.d.left;
 			})
 
