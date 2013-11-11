@@ -667,6 +667,10 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$lrceditor.text = $.ieach($lrceditor.list, function(i, v, d) {
 				d.push(v.c);
 			}, []).join('\n');
+			setTimeout(function() {
+				var e = $('.lyric-edit');
+				e.height($(window).height()-e.offset().top-10);
+			}, 100)
 		}
 	}
 

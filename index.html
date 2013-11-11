@@ -341,7 +341,7 @@ body.list-mode>.img { display: none; }
 			<a href="data:text/plain;charset=utf-8,{{lrceditor.text|urlEncode}}" title="click to save"
 				download="{{lrceditor.title}}.lrc">[ save ]</a>
 			<button ng-click="lrceditor.text=''">[ back ]</button>
-			<textarea ng-model="lrceditor.text"></textarea>
+			<textarea class="lyric-edit" ng-model="lrceditor.text"></textarea>
 		</div>
 		<div class="lyric-content" ng-hide="lrceditor.text">
 			<button ng-click="lrceditor.finish()">[ finish ]</button>
