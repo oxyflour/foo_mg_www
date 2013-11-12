@@ -94,6 +94,8 @@ app.directive('bwList', function($http) {
 						v.aaCssUrl = 'url('+v.aaUrlNfb.replace(/([\(\)'"])/g, '\\$1')+')';
 					}
 					if (v.typ == "folder") {
+						// extract date time from folder name
+						v.name = v.name.replace(/\d\d\d\d\.\d\d\.\d\d/, '($&)');
 						var b = get_brackets(v.name);
 						v.shortName = b[0];
 						v.bracR = b[1].join(' ') || '';
