@@ -176,7 +176,7 @@ elseif res and browse_dir and browse_dir ~= '' and
 		table.index(CONF.res_fmt, file_ext:lower()) and
 		table.set(_G, 'res_path', fb_util.path_canonical(browse_dir..res)) and
 		fb_util.file_stat(res_path) then
-	if file_ext == 'txt' or file_ext == 'lrc' then
+	if file_ext == 'txt' or file_ext == 'log' then
 		local content = get_utf8_text(res_path)
 		print('HTTP/1.1 200 OK\r\n',
 			'Content-Type: text/plain;charset=utf-8\r\n',

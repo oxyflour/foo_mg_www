@@ -10,7 +10,7 @@ CONF = {
 	-- extra lua script name
 	ext_fname = "mg.lua",
 	-- resource types
-	res_fmt = {"jpg", "bmp", "png", "txt", "lrc"},
+	res_fmt = {"jpg", "bmp", "png", "txt", "log"},
 	-- also scan resource in these sub directorys
 	res_sub = {"scans", "bk"}
 }
