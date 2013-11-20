@@ -9,7 +9,7 @@
 </head>
 <body ng-class="[tool.show&&'show-tool', setting.folder_view_class||'aa-block-view', location.path+'-mode']"
 	bw-main pl-ctrl ng-controller="main">
-<div class="head">
+<div class="head anim-all">
 	<button class="return" ng-click="browser.browse(listParentPath)">{{listName}}</button>
 	<button class="tab" ng-show="!tool.show||tool.show=='play'" ng-click="tool.toggle('play')">+</button>
 	<button class="tab" ng-show="tool.show=='nav'" ng-click="tool.toggle('nav')">#</button>
@@ -40,10 +40,10 @@
 		{{i.name}}
 		<div class="info">&lt;{{i.artist}}&gt;</div>
 	</li>
-	<div class="loading" show-delay="500" ng-hide="ls.length==total">loading ({{ls.length}}/{{total||'?'}})</div>
+	<div class="loading anim-all anim-in-1s" show-delay="500" ng-hide="ls.length==total">loading ({{ls.length}}/{{total||'?'}})</div>
 	<div class="empty" ng-hide="total!=0">No thing here</div>
 </ul>
-<div class="tool">
+<div class="tool anim-all">
 	<button class="close-tool" ng-click="tool.toggle()">X</button>
 	<div class="content" ng-show="!tool.show||tool.show=='play'">
 		<h3>Playlists</h3>
@@ -165,7 +165,7 @@
 		</div>
 	</div>
 </div>
-<div class="player">
+<div class="player anim-all">
 	<div class="ctrl" ng-hide="player.show">
 		<div class="albumart cursor-hand" ng-click="player.show='lrc'">
 			<div ng-attr-style="background-image:{{audio.aaCssUrl}}">
@@ -191,10 +191,10 @@
 		pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric" pl-lyric-offset="0.5"
 		pl-lyric-load="lyric.load(info, content)" pl-lyric-update="lyric.update(info, i, content[i])">
 		<p class="gray" ng-hide="audio.lyric"><br />No lyric for this track</p>
-		<img class="absolute" style="left:0" ng-show="lyric.info.bkimg"
+		<img class="absolute anim-all anim-in-1s" style="left:0" ng-show="lyric.info.bkimg"
 			ng-src="{{lyric.info.bkimg&&conf.res_url(lyric.info.bkimg, undefined, audio.info.path)}}" />
-		<div class="text absolute full-width">
-			<div class="line" lrc-id="{{$index}}" ng-class="$index==lyric.current.index&&'active'"
+		<div class="text absolute anim-all anim-in-1s full-width">
+			<div class="line anim-all" lrc-id="{{$index}}" ng-class="$index==lyric.current.index&&'active'"
 				ng-repeat="i in lyric.content" ng-if="i.d.substr">{{i.d}}</div>
 		</div>
 	</div>
@@ -203,7 +203,7 @@
 	<input type="hidden" local-store ng-model="playUrl" />
 	<input type="hidden" local-store ng-model="playlist" />
 	<canvas class="analyser" width="120" height="30" pl-analyser="audio[pl-audio]"></canvas>
-	<a class="processbar cursor-hand" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
+	<a class="processbar cursor-hand anim-all" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
 		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec);play()">
 		<span class="text">{{player.hoverMmss}}</span>
 		<div class="bar" ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>

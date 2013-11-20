@@ -1,6 +1,3 @@
-.list .loading { -webkit-transition: opacity 1s ease; -moz-transition: opacity 2s ease;
-	-ms-transition: opacity 1s ease; transition: opacity 1s ease; }
-
 .head .return { position: absolute; padding-left: 0; left: 0; right: 120px; text-align: left; background-color: #fff; }
 .show-tool .head .return { right: 240px; }
 @media only screen and (min-width: 620px) {
@@ -52,17 +49,13 @@
 .player .buttonbar button { font-size: 120%; width: 30%; font-weight: bold; }
 .player .info { margin-top: 5px; }
 .player .lyric { width: 100%; overflow: hidden; }
-.player .lyric img, .player .lyric .text { -webkit-transition: all 1s ease; -moz-transition: all 1s ease;
-	-ms-transition: all 1s ease; transition: all 1s ease;
+.player .lyric img, .player .lyric .text {
 	-webkit-transform-origin: left top; -moz-transform-origin: left top;
 	-ms-transform-origin: left top; transform-origin: left top; }
-.player .line { margin: 0.15em; opacity: 0.5; -webkit-transition: opacity .4s ease; -moz-transition: opacity .4s ease;
-	-ms-transition: opacity .4s ease; transition: opacity .4s ease; }
+.player .line { margin: 0.15em; opacity: 0.5; }
 .player .line.active { opacity: 1; }
 .player .analyser { display: block; width: 100%; height: 2.5em; position: absolute; bottom: 8px; }
-.player .processbar { display: block; text-decoration: none; width: 100%; height: 8px; background-color: #ddd;
-	-webkit-transition: height .4s ease; -moz-transition: height .4s ease;
-	-ms-transition: height .4s ease; transition: height .4s ease; }
+.player .processbar { display: block; text-decoration: none; width: 100%; height: 8px; background-color: #ddd; }
 .player .processbar .text { float: right; margin-right: 10px; }
 .player .processbar .bar { background-color: #999; width: 0; height: 100%; }
 .player .processbar:hover { height: 1.2em; }
