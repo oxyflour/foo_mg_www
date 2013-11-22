@@ -41,18 +41,19 @@ a:hover { text-decoration: underline; }
 	left: 0; right: 0; top: 0; height: 44px; line-height: 44px; }
 .list { position: absolute; z-index: 1; overflow-x: hidden; overflow-y: auto;
 	left: 0; right: 0; top: 45px; bottom: 0; }
-.tool { position: absolute; z-index: 3; overflow: auto;
+.tool { position: absolute; z-index: 3; overflow: hidden;
 	left: 0; right: 0; top: 0; height: 0; /*-- initial hidden --*/ }
 .player { position: absolute; z-index: 2; overflow: hidden;
 	left: 0; right: 0; bottom: 0; height: 0; /*-- initial hidden --*/ }
 
 @media only screen and (max-width: 620px) {
 .show-tool .head { top: 320px; border-top: 1px solid #ccc; }
-.show-tool .tool { height: 320px; }
+.show-tool .tool { overflow: auto; height: 320px; }
 .show-tool .player { height: 90px; }
 }
 @media only screen and (min-width: 621px) {
 .list { width: 50%; right: auto; }
+.tool { overflow: auto; }
 .tool, .player { height: auto; left: 50%; bottom: 0; }
 .tool { top: 45px; bottom: 160px; }
 .player { height: 160px; }
