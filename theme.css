@@ -1,34 +1,87 @@
-* { -webkit-tap-highlight-color: rgba(128, 128, 128, 0.5);
-	font-family: 'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', 'Microsoft Yahei Mono', 'Microsoft Yahei', sans-serif; }
-html { height: 100%; }
-body, ul { margin: 0; padding: 0 }
+* {
+	-webkit-tap-highlight-color: rgba(128, 128, 128, 0.5);
+	font-family: 'WenQuanYi Micro Hei Mono', 'WenQuanYi Micro Hei', 'Microsoft Yahei Mono', 'Microsoft Yahei', sans-serif;
+}
+html {
+	height: 100%;
+}
+body, ul {
+	margin: 0;
+	padding: 0;
+}
 
-ul { list-style: none; }
-button { background-color: transparent; border: none; cursor: pointer; font-size: 100%; }
-a { color: #333; text-decoration: none; }
-a:hover { text-decoration: underline; }
+ul {
+	list-style: none;
+}
+button {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	font-size: 100%;
+}
+a {
+	color: #333;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
 
-.hidden { display: none; }
-.absolute { position: absolute; }
-.full-width { width: 100%; }
-.inline-block { display: inline-block; }
-.no-wrap { white-space: nowrap; }
-.no-overflow { overflow: hidden; }
-.no-opacity { opacity: 0; }
-.float-left { float: left; }
-.float-right { float: right; }
-.text-center { text-align: center; }
-.text-ellipsis { text-overflow: ellipsis; }
-.cursor-hand { cursor: pointer; }
-.bold { font-weight: bold; }
-.gray { color: gray; }
+.hidden {
+	display: none;
+}
+.absolute {
+	position: absolute;
+}
+.full-width {
+	width: 100%;
+}
+.inline-block {
+	display: inline-block;
+}
+.no-wrap {
+	white-space: nowrap;
+}
+.no-overflow {
+	overflow: hidden;
+}
+.no-opacity {
+	opacity: 0;
+}
+.float-left {
+	float: left;
+}
+.float-right {
+	float: right;
+}
+.text-center {
+	text-align: center;
+}
+.text-ellipsis {
+	text-overflow: ellipsis;
+}
+.cursor-hand {
+	cursor: pointer;
+}
+.bold {
+	font-weight: bold;
+}
+.gray {
+	color: gray;
+}
 
 .anim-all {
-	-webkit-transition: all .4s ease; -moz-transition: all .4s ease;
-	-ms-transition: all .4s ease; transition: all .4s ease; }
+	-webkit-transition: all .4s ease;
+	-moz-transition: all .4s ease;
+	-ms-transition: all .4s ease;
+	transition: all .4s ease;
+}
 .anim-in-1s {
-	-webkit-transition-duration: 1s; -moz-transition-duration: 1s;
-	-ms-transition-duration: 1s; transition-duration: 1s; }
+	-webkit-transition-duration: 1s;
+	-moz-transition-duration: 1s;
+	-ms-transition-duration: 1s;
+	transition-duration: 1s;
+}
 
 @-ms-viewport {
 	width: device-width;
@@ -37,51 +90,144 @@ a:hover { text-decoration: underline; }
 /*
  * layout
  */
-.head { position: absolute; z-index: 3;
-	left: 0; right: 0; top: 0; height: 44px; line-height: 44px; }
-.list { position: absolute; z-index: 1; overflow-x: hidden; overflow-y: auto;
-	left: 0; right: 0; top: 45px; bottom: 0; }
-.tool { position: absolute; z-index: 3; overflow: hidden;
-	left: 0; right: 0; top: 0; height: 0; /*-- initial hidden --*/ }
-.player { position: absolute; z-index: 2; overflow: hidden;
-	left: 0; right: 0; bottom: 0; height: 0; /*-- initial hidden --*/ }
+.head {
+	position: absolute;
+	z-index: 3;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 44px;
+	line-height: 44px;
+}
+.list {
+	position: absolute;
+	z-index: 1;
+	overflow-x: hidden;
+	overflow-y: auto;
+	left: 0;
+	right: 0;
+	top: 45px;
+	bottom: 0;
+}
+.tool {
+	position: absolute;
+	z-index: 3;
+	overflow: hidden;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 0; /*-- initial hidden --*/
+}
+.player {
+	position: absolute;
+	z-index: 2;
+	overflow: hidden;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 0;
+	/*-- initial hidden --*/
+}
 
 @media only screen and (max-width: 620px) {
-.show-tool .head { top: 320px; border-top: 1px solid #ccc; }
-.show-tool .tool { overflow: auto; height: 320px; }
-.show-tool .player { height: 90px; }
+.show-tool .head {
+	top: 320px;
+	border-top: 1px solid #ccc;
+}
+.show-tool .tool {
+	overflow: auto;
+	height: 320px;
+}
+.show-tool .player {
+	height: 90px;
+}
 }
 @media only screen and (min-width: 621px) {
-.list { width: 50%; right: auto; }
-.tool { overflow: auto; }
-.tool, .player { height: auto; left: 50%; bottom: 0; }
-.tool { top: 45px; bottom: 160px; }
-.player { height: 160px; }
+.list {
+	width: 50%;
+	right: auto;
+}
+.tool {
+	overflow: auto;
+}
+.tool, .player {
+	height: auto;
+	left: 50%;
+	bottom: 0;
+}
+.tool {
+	top: 45px;
+	bottom: 160px;
+}
+.player {
+	height: 160px;
+}
 }
 
 /*
  * border & color
  */
-body { color: #333; background-color: #aaa; }
-.head, .player, .list, .tool { background-color: #fff; }
-@media only screen and (max-width: 620px) {
-.show-tool .tool { border-bottom: 1px solid #ccc; }
-/*.show-tool .list { opacity: 0.8; }*/
-.show-tool .player { border-top: 1px solid #ccc; }
+body {
+	color: #333;
+	background-color: #aaa;
 }
-.head { border-bottom: 1px solid #ccc; }
+.head, .player, .list, .tool {
+	background-color: #fff;
+}
+@media only screen and (max-width: 620px) {
+.show-tool .tool {
+	border-bottom: 1px solid #ccc;
+}
+/*.show-tool .list {
+	opacity: 0.8;
+}*/
+.show-tool .player {
+	border-top: 1px solid #ccc;
+}
+}
+.head {
+	border-bottom: 1px solid #ccc;
+}
 
 /*
  * margin & font
  */
-.head button, .foot button { line-height: 44px; margin: 0; padding: 0 1.4em; font-weight: bold; font-size: 105%; }
-.head { white-space: nowrap; }
+.head button, .foot button {
+	line-height: 44px;
+	margin: 0;
+	padding: 0 1.4em;
+	font-weight: bold;
+	font-size: 105%;
+}
+.head {
+	white-space: nowrap;
+}
 
 /*
  * section list
  */
-.list { -ms-user-select: none; -webkit-user-select: none; }
-.list li { border-bottom: 1px solid #ddd; padding: 0.6em 0.2em; margin: 0 12px; cursor: pointer; }
-.list .sep { margin: 0; padding: 0; color: #fff; background-color: #bbb; text-shadow: #555 1px 1px 2px;
-	background-position: 0 20%; background-size: cover; }
-.list .loading, .list .empty { color: #999; margin-top: 1em; margin-bottom: 1em; text-align: center; }
+.list {
+	-ms-user-select: none;
+	-webkit-user-select: none;
+}
+.list li {
+	border-bottom: 1px solid #ddd;
+	padding: 0.6em 0.2em;
+	margin: 0 12px;
+	cursor: pointer;
+}
+.list .sep {
+	margin: 0;
+	padding: 0;
+	color: #fff;
+	background-color: #bbb;
+	text-shadow: #555 1px 1px 2px;
+	background-position: 0 20%;
+	background-size: cover;
+}
+.list .loading, .list .empty {
+	color: #999;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	text-align: center;
+}
