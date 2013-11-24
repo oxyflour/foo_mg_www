@@ -322,7 +322,7 @@ app.directive('plLyric', function($http) {
 				if (attrs.plLyricUpdate)
 					scope.$eval(attrs.plLyricUpdate, {elem:elem, content:content, info:info, i:i});
 				if (n && !a.ended && !a.paused)
-					timeout = setTimeout(update, Math.max(1000, (n.t - t)*1000+50));
+					timeout = setTimeout(update, Math.max(200, (n.t - t)*1000+50));
 				else
 					timeout = 0;
 			}
