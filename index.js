@@ -11,14 +11,10 @@ app.config(function($compileProvider) {
 	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|data):/);
 })
 app.filter('urlEncode', function() {
-	return function(str) {
-		return encodeURIComponent(str);
-	}
+	return encodeURIComponent;
 })
 app.filter('btoa', function() {
-	return function(str) {
-		return btoa(str);
-	}
+	return btoa;
 })
 app.directive('bwMain', function($compile) {
 	function open(elem, scope, url, reopen) {
