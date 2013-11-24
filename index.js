@@ -643,15 +643,21 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			var t = $('audio[pl-audio]')[0].currentTime,
 				ls = $lrceditor.list;
 
-			var px = e.pageX, py = e.pageY, last = ls.length;
-			if ($lrceditor.currentKey == 'A'.charCodeAt(0)) $.ieach(ls, function(i, v) {
+			var px = e.pageX || $lrceditor.currentPos.x,
+				py = e.pageY || $lrceditor.currentPos.y;
+			if (e.which == 'A'.charCodeAt(0)) $.ieach(ls, function(i, v) {
 				if (v.d && v.d.left) px = v.d.left;
 			})
 
+			var c = '['+sec2Mmss(t, 3)+']{left:'+px+';top:'+py+';}';
+			if (e.which == 'S'.charCodeAt(0))
+				c = '['+sec2Mmss(t, 3)+']';
+			else if (e.which == 'D'.charCodeAt(0))
+				c = ' ';
 			ls.push({
 				t: t,
 				d: {left:px, top:py},
-				c: '['+sec2Mmss(t, 3)+']{left:'+px+';top:'+py+';}'
+				c: c
 			})
 
 			setTimeout(function() {
