@@ -202,7 +202,7 @@
 	<input type="hidden" local-store ng-model="audio.id" />
 	<input type="hidden" local-store ng-model="playUrl" />
 	<input type="hidden" local-store ng-model="playlist" />
-	<canvas class="analyser" width="120" height="30" pl-analyser="audio[pl-audio]"></canvas>
+	<!--canvas class="analyser" width="120" height="30" pl-analyser="audio[pl-audio]"></canvas-->
 	<a class="processbar cursor-hand anim-all" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
 		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec);play()">
 		<span class="text">{{player.hoverMmss}}</span>

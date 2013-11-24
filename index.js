@@ -218,6 +218,7 @@ app.directive('plAudio', function() {
 		});
 	}
 })
+/*
 app.directive('plAnalyser', function() {
 	return function (scope, elem, attrs, ctrl) {
 		var audio = $(attrs.plAnalyser);
@@ -269,6 +270,7 @@ app.directive('plAnalyser', function() {
 		});
 	}
 })
+*/
 app.directive('plLyric', function($http) {
 	return function (scope, elem, attrs, ctrl) {
 		var audio = $(attrs.plLyric), timeout = 0,
