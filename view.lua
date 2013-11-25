@@ -22,7 +22,7 @@ print("<html><head><title>", inf.name, "</title><style>",
 		"li.playing .num{color:#777;}",
 	"</style></head><body>")
 
-print("<form style='float:right' action='search.lua' method='GET'>",
+print("<form style='float:right' action='browse.lua' method='GET'>",
 		"<input name='word' value='", inf.word, "' /><input type='submit' value='Search' /></form>",
 	"<h3>", inf.url and "<a href='"..inf.url.."'>"..
 		"&lt;&lt; "..inf.name.."</a>" or inf.name, "</h3>",
@@ -47,7 +47,7 @@ for i, obj in ipairs(inf.ls) do
 		if lastid and lastid == playid then pnext = obj.url end
 		lastid = obj.id
 		if current_album ~= obj.album then
-			print("<p><a href='browse2.lua?path=", (obj.path or inf.path):url_encode(), "'>", obj.album,
+			print("<p><a href='browse.lua?path=", (obj.path or inf.path):url_encode(), "'>", obj.album,
 				"</a> (", obj.album_artist, ")</p>")
 			current_album = obj.album
 		end
@@ -62,20 +62,20 @@ print("</ul>")
 
 print("<div style='float:left;width:0;margin-top:30px;'>")
 if playid then
-	print("<img width='320px' src='resource2.lua?id=", playid, "'></img>",
+	print("<img width='320px' src='resource.lua?res=albumart&id=", playid, "'></img>",
 		"<br /><br />",
-		"<audio style='width:320px' autoplay controls src='track.lua?id=", playid, "' onended='goto_next()'>",
+		"<audio style='width:320px' autoplay controls src='resource.lua?id=", playid, "' onended='goto_next()'>",
 			"your browser too old?</audio>")
 elseif inf.res then
 	local cover = table.each(inf.res, function(i, v) return v:lower():find("cover%.jpg$") and v end)
 	if cover then
-		print("<img width='320px' src='resource2.lua?path=", inf.path:url_encode(), "&res=", cover:url_encode(), "'></img>")
+		print("<img width='320px' src='resource.lua?path=", inf.path:url_encode(), "&res=", cover:url_encode(), "'></img>")
 	end
 end
 if inf.res then
 	print("<div style='width:320px;margin-top:10px'>")
 	for i, v in ipairs(inf.res) do
-		print("[<a href='resource2.lua?path=", inf.path:url_encode(), "&res=", v:url_encode(), "' target='_blank'>", v, "</a>] ")
+		print("[<a href='resource.lua?path=", inf.path:url_encode(), "&res=", v:url_encode(), "' target='_blank'>", v, "</a>] ")
 	end
 	print("</div>")
 end

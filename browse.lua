@@ -234,7 +234,7 @@ if get_var("tojson") then
 -- display
 else
 	if inf.parent then
-		inf.parent.url = request_info.uri..(inf.parent.id and "?id="..inf.parent.id or '')
+		inf.parent.url = request_info.uri..(inf.parent.path and "?path="..inf.parent.path:url_encode() or '')
 		inf.url = inf.parent.url
 	end
 	for i, o in ipairs(inf.ls) do
