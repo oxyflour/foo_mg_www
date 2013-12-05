@@ -18,8 +18,13 @@
 </div>
 <ul class="list ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']" bw-list ng-non-bindable ng-show="url==listUrl">
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
-		<a ng-show="setting.res_open_self" ng-href="mklrc.html#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
-		<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
+		<a ng-show="setting.img_open_self=='mklrc'" ng-href="mklrc.html#/img?url={{i.aaUrl|urlEncode}}">
+			<small class="link">&raquo;</small>
+		</a>
+		<a ng-show="setting.img_open_self=='yes'" ng-href="#/img?url={{i.aaUrl|urlEncode}}">
+			<small class="link">&raquo;</small>
+		</a>
+		<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
 		<div class="bg" ng-click="i.path ? browser.browse(i.path) : tool.toggle('res')">
 			<big class="stress">{{i.album}}</big> ({{i.album_artist}})
 		</div>
@@ -105,12 +110,13 @@
 		<ul>
 			<li ng-repeat="i in list.resList" ng-switch on="i.typ">
 				<div ng-switch-when="img">
-					<a ng-show="setting.res_open_self" ng-href="#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
-					<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
+					<a ng-show="setting.img_open_self=='mklrc'" ng-href="mklrc.html#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
+					<a ng-show="setting.img_open_self=='yes'" ng-href="#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
+					<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 				</div>
 				<div ng-switch-when="txt">
-					<a ng-show="setting.res_open_self" href="javascript:void(null)" ng-click="tool.showTxt(i.name, i.url)">{{i.name}}</a>
-					<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
+					<a ng-show="setting.txt_open_self" href="javascript:void(null)" ng-click="tool.showTxt(i.name, i.url)">{{i.name}}</a>
+					<a ng-hide="setting.txt_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 				</div>
 				<a ng-switch-default target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 			</li>
@@ -159,8 +165,15 @@
 				<option value="">big albumart</option>
 			</select>
 		</div>
-		<div class="field">open resource in:
-			<select local-store ng-model="setting.res_open_self">
+		<div class="field">show images in:
+			<select local-store ng-model="setting.img_open_self">
+				<option value="">a new window</option>
+				<option value="yes">current window</option>
+				<option value="mklrc">..mklrc..</option>
+			</select>
+		</div>
+		<div class="field">show text in:
+			<select local-store ng-model="setting.txt_open_self">
 				<option value="">a new window</option>
 				<option value="yes">current window</option>
 			</select>
