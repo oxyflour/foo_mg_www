@@ -18,7 +18,7 @@
 </div>
 <ul class="list ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']" bw-list ng-non-bindable ng-show="url==listUrl">
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
-		<a ng-show="setting.res_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
+		<a ng-show="setting.res_open_self" ng-href="mklrc.html#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
 		<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
 		<div class="bg" ng-click="i.path ? browser.browse(i.path) : tool.toggle('res')">
 			<big class="stress">{{i.album}}</big> ({{i.album_artist}})
@@ -157,12 +157,6 @@
 				<option value="yes">current window</option>
 			</select>
 		</div>
-		<div class="field" ng-show="setting.res_open_self">make image lyric:
-			<select local-store ng-model="setting.mk_img_lrc">
-				<option value="">no</option>
-				<option value="yes">yes</option>
-			</select>
-		</div>
 	</div>
 </div>
 <div class="player anim-all">
@@ -186,9 +180,9 @@
 		</div>
 		<big ng-hide="audio.id">Ready to play</big>
 	</div>
-	<!-- set offset=0.5 for animation -->
+	<!-- set offset for animation -->
 	<div class="lyric cursor-hand" ng-show="player.show=='lrc'" ng-click="player.show=''"
-		pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric" pl-lyric-offset="0.5"
+		pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric" pl-lyric-offset="0.8"
 		pl-lyric-load="lyric.load(info, content)" pl-lyric-update="lyric.update(info, i, content[i])">
 		<p class="gray" ng-hide="audio.lyric"><br />No lyric for this track</p>
 		<img class="absolute anim-all anim-in-1s" style="left:0" ng-show="lyric.info.bkimg"
@@ -210,25 +204,7 @@
 	</a>
 </div>
 <div class="img">
-	<div class="lyric-maker" ng-show="setting.mk_img_lrc">
-		<button onclick="$(this).parent().css({right:'auto',left:0})">&lt;</button>
-		<button onclick="$(this).parent().css({left:'auto',right:0})">&gt;</button>
-		<div>Playing: {{audio.info.artist}} - {{audio.info.name}}</div>
-		<div class="lyric-text" ng-show="lrceditor.text">
-			<a href="data:text/plain;charset=utf-8,{{lrceditor.text|urlEncode}}" title="click to save"
-				download="{{lrceditor.title}}.lrc">[ save ]</a>
-			<button ng-click="lrceditor.text=''">[ back ]</button>
-			<textarea class="lyric-edit" ng-model="lrceditor.text"></textarea>
-		</div>
-		<div class="lyric-content" ng-hide="lrceditor.text">
-			<button ng-click="lrceditor.finish()">[ finish ]</button>
-			<span>double click image to start</span>
-			<pre ng-repeat="i in lrceditor.list" ng-click="lrceditor.truncate($index)">{{i.c}}</pre>
-		</div>
-	</div>
-	<img class="lyric-img" tabindex="1" ng-src="{{imgUrl}}"
-		ng-keydown="lrceditor.append($event)" ng-mousemove="lrceditor.currentPos={x:$event.pageX, y:$event.pageY}"
-		ng-click="lrceditor.append($event)" ng-dblclick="lrceditor.reset($event)" />
+	<img ng-src="{{imgUrl}}" />
 </div>
 <script src="jquery-1.8.0.min.js"></script>
 <script src="jq.util.js"></script>

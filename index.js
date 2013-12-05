@@ -404,6 +404,8 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}, []);
 	}
 
+	$scope.setting = { }
+
 	$scope.conf = {
 		list_url: function(url, begin, count) {
 			var p = $.url_parse(url);
@@ -411,7 +413,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			p.dict.tojson = 1;
 			p.dict.begin = parseInt(p.begin || '0') + (begin || 0);
 			p.dict.count = count;
-			p.dict.sort = $scope.setting.list_sort[url] || p.dict.sort;
+			p.dict.sort = $scope.setting.list_sort && $scope.setting.list_sort[url] || p.dict.sort;
 			return get_full_url('browse.lua?' + $.url_concat(p.dict));
 		},
 		res_url: function(res, id, path, dict) {
@@ -613,73 +615,6 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}
 	}
 
-	var $lrceditor = $scope.lrceditor = {
-		list: [],
-		text: '',
-		title: '',
-		currentKey: 0,
-		reset: function(e) {
-			if (!$('.lyric-maker:visible').length) return;
-			var i = $('img.lyric-img');
-			$lrceditor.title = $scope.audio.info.artist + ' - ' + $scope.audio.info.name
-			$lrceditor.text = '';
-			$lrceditor.list = [{
-				t: 0,
-				d: {left:e.pageX, top:e.pageY},
-				c: '[bkImg:'+$.url_parse(i.attr('src')).dict.res+']\n'+
-					'[bkAlignX:left]\n'+
-					'[bkAlignY:center]\n'+
-					'[bkWidth:'+i[0].naturalWidth+']\n'+
-					'[bkHeight:'+i[0].naturalHeight+']\n'+
-					'[bkLineWidth:800]\n'+
-					'[bkLineHeight:50]\n'+
-					'\n'+
-					'['+sec2Mmss(0, 3)+']{left:'+e.pageX+';top:'+e.pageY+';}'
-			}]
-			$scope.playnext(0);
-		},
-		append: function(e) {
-			if (!$('.lyric-maker:visible').length) return;
-			var t = $('audio[pl-audio]')[0].currentTime,
-				ls = $lrceditor.list;
-
-			var px = e.pageX || $lrceditor.currentPos.x,
-				py = e.pageY || $lrceditor.currentPos.y;
-			if (e.which == 'A'.charCodeAt(0)) $.ieach(ls, function(i, v) {
-				if (v.d && v.d.left) px = v.d.left;
-			})
-
-			var c = '['+sec2Mmss(t, 3)+']{left:'+px+';top:'+py+';}';
-			if (e.which == 'S'.charCodeAt(0))
-				c = '['+sec2Mmss(t, 3)+']';
-			else if (e.which == 'D'.charCodeAt(0))
-				c = ' ';
-			ls.push({
-				t: t,
-				d: {left:px, top:py},
-				c: c
-			})
-
-			setTimeout(function() {
-				$('.lyric-maker').scrollTop(9999);
-			}, 100);
-		},
-		truncate: function(i) {
-			$('audio[pl-audio]')[0].currentTime = $lrceditor.list[i].t;
-			$lrceditor.list.length = i + 1;
-			$('img.lyric-img').focus();
-		},
-		finish: function() {
-			$lrceditor.text = $.ieach($lrceditor.list, function(i, v, d) {
-				d.push(v.c);
-			}, []).join('\n');
-			setTimeout(function() {
-				var e = $('.lyric-edit');
-				e.height($(window).height()-e.offset().top-10);
-			}, 100)
-		}
-	}
-
 	var $tool = $scope.tool = {
 		show: false,
 		toggle: function(first, second) {
@@ -747,7 +682,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		if (url === url0) return;
 		$location.path('/list').search({url: url});
 		// call bwMain method to open
-		$scope.open(url);
+		$scope.open && $scope.open(url);
 	})
 	$scope.$watch('imgUrl', function(url, url0) {
 		if (url === url0) return;

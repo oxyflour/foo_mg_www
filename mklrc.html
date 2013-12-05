@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+<meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<link type="text/css" href="theme.css" rel="stylesheet" />
+<link type="text/css" href="index.css" rel="stylesheet" />
+<style>
+.lyric-maker {
+	position: fixed;
+	right: 0;
+	top: 0;
+	background-color: #aaa;
+	max-height: 100%;
+	overflow: auto;
+	min-width: 300px;
+	width: 30%;
+}
+.lyric-maker pre {
+	margin: 0;
+}
+.lyric-content, .lyric-text {
+	background-color: white;
+}
+.lyric-text textarea {
+	width: 98%;
+	min-height: 500px;
+}
+</style>
+</head>
+<body ng-controller="main" pl-ctrl lrc-make>
+<div class="img">
+	<div class="lyric-maker">
+		<audio pl-audio controls></audio>
+		<input type="hidden" local-store ng-model="audio.id" />
+		<button onclick="$(this).parent().css({right:'auto',left:0})">&lt;</button>
+		<button onclick="$(this).parent().css({left:'auto',right:0})">&gt;</button>
+		<div>Playing: {{audio.info.artist}} - {{audio.info.name}}</div>
+		<div class="lyric-text" ng-show="lrceditor.text">
+			<a href="data:text/plain;charset=utf-8,{{lrceditor.text|urlEncode}}" title="click to save"
+				download="{{lrceditor.title}}.lrc">[ save ]</a>
+			<button ng-click="lrceditor.text=''">[ back ]</button>
+			<button ng-click="lrceditor.txtlist=lrceditor.text.split('\n');lrceditor.text=''">[ display ]</button>
+			<textarea class="lyric-edit" ng-model="lrceditor.text"></textarea>
+		</div>
+		<div class="lyric-content" ng-hide="lrceditor.text">
+			<button ng-click="lrceditor.finish()">[ edit ]</button>
+			<span>double click image to start</span>
+			<pre ng-repeat="i in lrceditor.list" ng-click="lrceditor.truncate($index)">{{i.c}}</pre>
+		</div>
+	</div>
+	<div class="absolute" style="background:white">
+		<div class="cursor-hand" ng-repeat="t in lrceditor.txtlist track by $index"
+			ng-click="lrceditor.append($event, t)">&nbsp;{{t}} </div>
+	</div>
+	<img class="lyric-img" tabindex="1" ng-src="{{imgUrl}}"
+		ng-keydown="lrceditor.append($event)" ng-mousemove="lrceditor.currentPos={x:$event.pageX, y:$event.pageY}"
+		ng-click="lrceditor.append($event)" ng-dblclick="lrceditor.reset($event)" />
+</div>
+<script src="jquery-1.8.0.min.js"></script>
+<script src="jq.util.js"></script>
+<script src="angular.min.js"></script>
+<script src="index.js"></script>
+<script>
+app.directive('lrcMake', function() {
+return function(scope) {
+	var $lrceditor = scope.lrceditor = {
+		list: [],
+		text: '',
+		title: '',
+		currentKey: 0,
+		reset: function(e) {
+			if (!$('.lyric-maker:visible').length) return;
+			var i = $('img.lyric-img');
+			$lrceditor.title = scope.audio.info.artist + ' - ' + scope.audio.info.name
+			$lrceditor.text = '';
+			$lrceditor.list = [{
+				t: 0,
+				d: {left:e.pageX, top:e.pageY},
+				c: '[bkImg:'+$.url_parse(i.attr('src')).dict.res+']\n'+
+					'[bkAlignX:left]\n'+
+					'[bkAlignY:center]\n'+
+					'[bkWidth:'+i[0].naturalWidth+']\n'+
+					'[bkHeight:'+i[0].naturalHeight+']\n'+
+					'[bkLineWidth:800]\n'+
+					'[bkLineHeight:50]\n'+
+					'\n'+
+					'['+sec2Mmss(0, 3)+']{left:'+e.pageX+';top:'+e.pageY+';}'
+			}]
+			scope.playpause();
+		},
+		append: function(e, v) {
+			if (!$('.lyric-maker:visible').length) return;
+			var t = $('audio[pl-audio]')[0].currentTime,
+				ls = $lrceditor.list;
+
+			var px = e.pageX || $lrceditor.currentPos.x,
+				py = e.pageY || $lrceditor.currentPos.y;
+			if (e.which == 'A'.charCodeAt(0)) $.ieach(ls, function(i, v) {
+				if (v.d && v.d.left) px = v.d.left;
+			})
+
+			var c = '['+sec2Mmss(t, 3)+']' + (v.replace ? v.replace(/\[[\d\.:]+\]/, '') : '{left:'+px+';top:'+py+';}');
+			if (e.which == 'S'.charCodeAt(0))
+				c = '['+sec2Mmss(t, 3)+']';
+			else if (e.which == 'D'.charCodeAt(0))
+				c = ' ';
+			ls.push({
+				t: t,
+				d: {left:px, top:py},
+				c: c
+			})
+
+			setTimeout(function() {
+				$('.lyric-maker').scrollTop(9999);
+			}, 100);
+		},
+		truncate: function(i) {
+			$('audio[pl-audio]')[0].currentTime = $lrceditor.list[i].t;
+			$lrceditor.list.length = i + 1;
+			$('img.lyric-img').focus();
+		},
+		finish: function() {
+			$lrceditor.text = $.ieach($lrceditor.list, function(i, v, d) {
+				d.push(v.c);
+			}, []).join('\n') || '\n';
+			setTimeout(function() {
+				var e = $('.lyric-edit');
+				e.height($(window).height()-e.offset().top-10);
+			}, 100)
+		}
+	}
+}
+})
+</script>
+</body>
+</html>

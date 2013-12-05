@@ -362,27 +362,6 @@
 	border-color: #999;
 }
 
-.lyric-maker {
-	position: fixed;
-	right: 0;
-	top: 0;
-	background-color: #aaa;
-	max-height: 100%;
-	overflow: auto;
-	min-width: 300px;
-	width: 30%;
-}
-.lyric-maker pre {
-	margin: 0;
-}
-.lyric-content, .lyric-text {
-	background-color: white;
-}
-.lyric-text textarea {
-	width: 98%;
-	min-height: 500px;
-}
-
 body.img-mode>.head, body.img-mode>.list, body.img-mode>.tool, body.img-mode>.player {
 	display: none;
 }
