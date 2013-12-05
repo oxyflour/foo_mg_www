@@ -108,7 +108,7 @@ app.directive('bwList', function($http) {
 					d.push({
 						name: v.split('\\').pop(),
 						url: scope.conf.res_url(v, undefined, data.path),
-						typ: {jpg:'img',png:'img',bmp:'img'}[v.split('.').pop().toLowerCase()]
+						typ: {jpg:'img',png:'img',bmp:'img',txt:'txt',log:'txt'}[v.split('.').pop().toLowerCase()]
 					});
 				}, []);
 			});
@@ -145,7 +145,7 @@ app.directive('plCtrl', function($http) {
 					ad.length = data.ls[0].seconds;
 				});
 				var lrc = scope.conf.res_url('lyric', id);
-				$http.get(lrc, {// do not transform lyric file
+				$http.get(lrc, {// do not transform txt
 					transformResponse: function(d) { return d }
 				}).success(function(data) {
 					ad.lyric = data;
@@ -623,6 +623,24 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		autoHide: function() {
 			if (parseInt($('.tool').css('left'))==0)
 				$tool.show = false;
+		},
+		showTxt: function(title, url) {
+			$tool.show = 'txt';
+			$tool.showTxt.title = title;
+			$tool.showTxt.loading = true;
+			$http.get(url, {// do not transform txt
+				transformResponse: function(d) { return d }
+			}).success(function(data) {
+				$tool.showTxt.text = data;
+				$tool.showTxt.loading = false;
+			}).error(function() {
+				$tool.showTxt.text = 'load failed';
+				$tool.showTxt.loading = false;
+			})
+			$timeout(function() {
+				if ($tool.showTxt.loading)
+					$tool.showTxt.text = 'loading...';
+			}, 500)
 		}
 	}
 

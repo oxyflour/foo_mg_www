@@ -108,9 +108,17 @@
 					<a ng-show="setting.res_open_self" ng-href="#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
 					<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 				</div>
+				<div ng-switch-when="txt">
+					<a ng-show="setting.res_open_self" href="javascript:void(null)" ng-click="tool.showTxt(i.name, i.url)">{{i.name}}</a>
+					<a ng-hide="setting.res_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
+				</div>
 				<a ng-switch-default target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 			</li>
 		</ul>
+	</div>
+	<div class="content" ng-show="tool.show=='txt'">
+		<h3><a href="javascript:void(null)" ng-click="tool.show='res'">{{tool.showTxt.title}}</a></h3>
+		<pre>{{tool.showTxt.text}}</pre>
 	</div>
 	<div class="content" ng-show="tool.show=='conf'">
 		<h3>Folder Settings</h3>
