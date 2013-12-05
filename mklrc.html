@@ -100,7 +100,7 @@ return function(scope) {
 				if (v.d && v.d.left) px = v.d.left;
 			})
 
-			var c = '['+sec2Mmss(t, 3)+']' + (v.replace ? v.replace(/\[[\d\.:]+\]/, '') : '{left:'+px+';top:'+py+';}');
+			var c = '['+sec2Mmss(t, 3)+']' + (v && v.replace ? v.replace(/\[[\d\.:]+\]/, '') : '{left:'+px+';top:'+py+';}');
 			if (e.which == 'S'.charCodeAt(0))
 				c = '['+sec2Mmss(t, 3)+']';
 			else if (e.which == 'D'.charCodeAt(0))
