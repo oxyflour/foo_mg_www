@@ -39,7 +39,7 @@ function get_cover(browse_dir, track_file)
 	cover = get_file(CONF.albumart_cache..'\\'..hash, hash)
 	if cover.attr then return cover end
 
-	local ftmp = CONF.albumart_cache..os.tmpname()
+	local ftmp = CONF.albumart_cache..os.tmpname()..fb_util.random()
 	if fb_stream.extract_albumart(track_file, ftmp) > 0 then
 		fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, cover.fname))
 	end
@@ -50,7 +50,7 @@ function get_thumb(cover, sz)
 		CONF.albumart_cache, cover.hash, cover.attr.size, sz.size) or cover.fname)
 	if thumb.attr then return thumb end
 
-	local ftmp = CONF.albumart_cache..os.tmpname()
+	local ftmp = CONF.albumart_cache..os.tmpname()..fb_util.random()
 	if fb_util.exec(CONF.image_magic_exe, 
 			string.format('"%s" -thumbnail "%dx%d^" "%s"', cover.fname, sz.width, sz.width, ftmp)) == 0 then
 		fb_util.exec('cmd', string.format('/C move /Y "%s" "%s"', ftmp, thumb.fname))
