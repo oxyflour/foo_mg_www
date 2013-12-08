@@ -18,10 +18,7 @@
 </div>
 <ul class="list ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']" bw-list ng-non-bindable ng-show="url==listUrl">
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
-		<a ng-show="setting.img_open_self=='mklrc'" ng-href="mklrc.html#/img?url={{i.aaUrl|urlEncode}}">
-			<small class="link">&raquo;</small>
-		</a>
-		<a ng-show="setting.img_open_self=='yes'" ng-href="#/img?url={{i.aaUrl|urlEncode}}">
+		<a ng-show="setting.img_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}">
 			<small class="link">&raquo;</small>
 		</a>
 		<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
@@ -110,8 +107,7 @@
 		<ul>
 			<li ng-repeat="i in list.resList" ng-switch on="i.typ">
 				<div ng-switch-when="img">
-					<a ng-show="setting.img_open_self=='mklrc'" ng-href="mklrc.html#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
-					<a ng-show="setting.img_open_self=='yes'" ng-href="#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
+					<a ng-show="setting.img_open_self" ng-href="#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
 					<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 				</div>
 				<div ng-switch-when="txt">
@@ -169,7 +165,6 @@
 			<select local-store ng-model="setting.img_open_self">
 				<option value="">a new window</option>
 				<option value="yes">current window</option>
-				<option value="mklrc">..mklrc..</option>
 			</select>
 		</div>
 		<div class="field">show text in:
@@ -225,6 +220,7 @@
 	</a>
 </div>
 <div class="img">
+	<a class="absolute gray" ng-href="mklrc.html#/img?url={{imgUrl|urlEncode}}">mklrc</a>
 	<img ng-src="{{imgUrl}}" />
 </div>
 <script src="jquery-1.8.0.min.js"></script>
