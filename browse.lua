@@ -194,9 +194,10 @@ else -- browse
 		local fname = dir.."\\"..CONF.ext_fname
 		local extra = fb_util.file_stat(fname) and {} or nil
 		if extra then
-			(loadfile(fname:utf8_to_ansi(), 't', extra) or function()
-				fb_util.log("load extra failed, file: \n", fname)
-			end)()
+--			local date = os.date('%Y-%m-%d %H:%M:%S', attr.modified)
+--			(loadfile(fname:utf8_to_ansi(), 't', extra) or function()
+--				fb_util.log("load extra failed, file: \n", fname)
+--			end)()
 		end
 		local sql = string.format([[SELECT id, title, tracknumber, artist, album, album_artist, length, length_seconds
 			FROM %s WHERE pid=%d ORDER BY album, tracknumber]], fb_env.db_track_table, pid)
