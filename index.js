@@ -647,7 +647,6 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	var $select = $scope.select = {
 		start: function() {
 			$scope.list.onEdit = true;
-			$tool.show = false;
 		},
 		length: function() {
 			return $('body').children('.list').not('.ng-hide').children('li.selected').length;

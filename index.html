@@ -61,7 +61,7 @@
 	</h3>
 	<div class="content" ng-show="!tool.show||tool.show=='play'">
 		<p>
-			<button ng-hide="list.onEdit" ng-click="select.start()">[ Select ]</button>
+			<button ng-hide="list.onEdit" ng-click="select.start();tool.show=false">[ Select ]</button>
 			<span class="edit-list" ng-show="list.onEdit">
 				<button ng-click="select.finish();tool.autoHide()">[ Done ]</button>
 				<button ng-click="select.toggle()">[ Toggle ]</button>
