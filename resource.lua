@@ -61,10 +61,12 @@ function get_utf8_text(fname)
 	local file = io.open(fname:utf8_to_ansi(), 'r')
 	local content = file:read('*all')
 	file:close()
-	if not content:is_utf8() then
-		content = content:ansi_to_utf8()
-	end
-	return content
+	local encodings = {string.ansi_to_utf8, string.utf16_to_utf8}
+	return table.each(encodings, function(i, v)
+		if v(content):sub(1, 50):is_utf8() then
+			return content
+		end
+	end, content)
 end
 
 local id = tonumber(get_var("id") or '0')

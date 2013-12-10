@@ -27,6 +27,9 @@ end
 string.ansi_to_utf8 = function(s)
 	return fb_util.string_encode(s, 0, 65001)
 end
+string.utf16_to_utf8 = function(s)
+	return fb_util.string_encode(s, 1200, 65001)
+end
 
 table.set = function(ls, key, val)
 	ls[key] = val
