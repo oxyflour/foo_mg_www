@@ -650,15 +650,13 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$tool.show = false;
 		},
 		length: function() {
-			var bwList = $('.list:not(.ng-hide)');
-			return bwList.children('li.selected').length;
+			return $('body').children('.list').not('.ng-hide').children('li.selected').length;
 		},
 		clear: function() {
-			var bwList = $('.list:not(.ng-hide)');
-			bwList.children('li').removeClass('selected');
+			$('body').children('.list').not('.ng-hide').children('li').removeClass('selected');
 		},
 		toggle: function(id) {
-			var bwList = $('.list:not(.ng-hide)');
+			var bwList = $('body').children('.list').not('.ng-hide');
 			bwList.children(id ? 'li[pl-id='+id+']' : 'li').toggleClass('selected');
 			bwList.children('.selected').length ? $select.start() : $select.finish();
 		},
