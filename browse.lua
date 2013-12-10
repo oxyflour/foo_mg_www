@@ -23,17 +23,18 @@ function scan_res(ls, path, sub)
 		ls = ls or {}
 		for i, x in pairs(l) do
 			local v, f, a = x[1], x[1]:lower(), x[2]
+			local s = sub and sub..'\\'..v or v
 			if bit32.band(a, 32) ~= 0 and		-- is a file
 					bit32.band(a, 2) == 0 then	-- not hidden
 				local e = f:match(".*%.(.*)")
 				if e and e ~= '' and table.index(CONF.res_fmt, e) then
-					table.insert(ls, sub and sub..'\\'..v or v)
+					table.insert(ls, s)
 				end
 			end
 			if bit32.band(a, 16) ~= 0 and		-- is a folder
 					bit32.band(a, 2) == 0 and	-- not hidden
 					table.index(CONF.res_sub, f) then	-- should scan inside
-				scan_res(ls, path, v)
+				scan_res(ls, path, s)
 			end
 		end
 	end
