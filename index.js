@@ -132,7 +132,8 @@ app.directive('bwList', function($http) {
 app.directive('plCtrl', function($http) {
 	return function (scope, elem, attrs, ctrl) {
 		var a = angular.element('[pl-audio]');
-		scope.load = function(id) {
+		var player = $scope.player = ($scope.player || {});
+		player.load = function(id) {
 			var ad = scope.audio;
 			if (id > 0 && ad) {
 				ad.id = id;
@@ -152,34 +153,34 @@ app.directive('plCtrl', function($http) {
 				});
 			}
 		}
-		scope.play = function(id) {
-			scope.load(id);
+		player.play = function(id) {
+			player.load(id);
 			a[0].play();
 		}
-		scope.playnext = function(offset, loop) {
-			var ls = scope.playlist.split(','), i = $.ieach(ls, function(i, v) {
+		player.playnext = function(offset, loop) {
+			var ls = player.playlist.split(','), i = $.ieach(ls, function(i, v) {
 				return v == scope.audio.id ? i : undefined;
 			}, -1) + offset;
 			var j = loop ? ((i+ls.length) % ls.length) : i, d = ls[j];
-			if (d) scope.play(d);
+			if (d) player.play(d);
 		}
-		scope.pause = function() {
+		player.pause = function() {
 			a[0].pause();
 		}
-		scope.playpause = function(id) {
+		player.playpause = function(id) {
 			if (id && id != scope.audio.id)
-				scope.play(id);
+				player.play(id);
 			else
 				a[0].paused ? a[0].play() : a[0].pause();
 		}
-		scope.seek = function(time) {
+		player.seek = function(time) {
 			a[0].currentTime = time;
 		}
 
 		// try to restore play state
-		scope.playlist = scope.playlist || '';
+		player.playlist = player.playlist || '';
 		if(scope.audio && scope.audio.id)
-			scope.load(scope.audio.id);
+			player.load(scope.audio.id);
 
 		// only use jquery dom event here
 		// $scope.$watch will not fire when a mobile browser goes to background
@@ -187,7 +188,7 @@ app.directive('plCtrl', function($http) {
 			var offset = elem.attr('pl-ctrl-next') ? 1 : 0,
 				loop = elem.attr('pl-ctr-no-loop') ? true : false;
 			if (offset || loop)
-				scope.playnext(offset, loop);
+				player.playnext(offset, loop);
 		})
 	}
 })

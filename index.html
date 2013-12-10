@@ -200,10 +200,10 @@
 			</div>
 		</div>
 		<div class="buttonbar">
-			<button ng-click="playnext(-1, true)">[ &laquo; ]</button>
-			<button ng-click="play()" ng-dblclick="playnext(0)" ng-hide="audio.state=='play'">[ &gt; ]</button>
-			<button ng-click="pause()" ng-dblclick="playnext(0)" ng-show="audio.state=='play'">[ || ]</button>
-			<button ng-click="playnext(1, true)">[ &raquo; ]</button>
+			<button ng-click="player.playnext(-1, true)">[ &laquo; ]</button>
+			<button ng-click="player.play()" ng-dblclick="player.playnext(0)" ng-hide="audio.state=='play'">[ &gt; ]</button>
+			<button ng-click="player.pause()" ng-dblclick="playnext(0)" ng-show="audio.state=='play'">[ || ]</button>
+			<button ng-click="player.playnext(1, true)">[ &raquo; ]</button>
 		</div>
 		<div class="cursor-hand" ng-show="audio.id" ng-click="browser.open(playUrl)">
 			<big>{{audio.info.artist}} - {{audio.info.name}}</big>
@@ -231,7 +231,7 @@
 	<input type="hidden" local-store ng-model="playlist" />
 	<!--canvas class="analyser" width="120" height="30" pl-analyser="audio[pl-audio]"></canvas-->
 	<a class="processbar cursor-hand anim-all" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
-		ng-mouseout="player.hoverMmss=''" ng-click="seek(player.hoverSec);play()">
+		ng-mouseout="player.hoverMmss=''" ng-click="player.seek(player.hoverSec);player.play()">
 		<span class="text">{{player.hoverMmss}}</span>
 		<div class="bar" ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>
 	</a>

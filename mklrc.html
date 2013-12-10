@@ -87,7 +87,7 @@ return function(scope) {
 					'\n'+
 					'['+sec2Mmss(0, 3)+']{left:'+e.pageX+';top:'+e.pageY+';}'
 			}]
-			scope.playpause();
+			scope.player.playpause();
 		},
 		append: function(e, v) {
 			if (!$('.lyric-maker:visible').length) return;
