@@ -8,7 +8,9 @@
 <link type="text/css" href="index.css" rel="stylesheet" />
 </head>
 <body ng-class="[tool.show&&'show-tool', setting.folder_view_class||'aa-block-view', location.path+'-mode']"
-	bw-main pl-ctrl ng-controller="main">
+	bw-main
+	pl-ctrl pl-ctrl-no-next="{{setting.play_single_track}}"  pl-ctrl-no-loop="{{setting.play_no_loop}}"
+	ng-controller="main">
 <div class="head anim-all">
 	<button class="return" ng-click="browser.browse(listParentPath)">{{listName}}</button>
 	<div class="return no-overflow hide-too-narrow">

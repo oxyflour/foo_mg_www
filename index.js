@@ -180,6 +180,15 @@ app.directive('plCtrl', function($http) {
 		scope.playlist = scope.playlist || '';
 		if(scope.audio && scope.audio.id)
 			scope.load(scope.audio.id);
+
+		// only use jquery dom event here
+		// $scope.$watch will not fire when a mobile browser goes to background
+		a.bind('ended', function(e) {
+			var offset = elem.attr('pl-ctrl-no-next') ? 0 : 1,
+				loop = elem.attr('pl-ctrl-no-loop') ? false : true;
+			if (offset || loop)
+				scope.playnext(offset, loop);
+		})
 	}
 })
 app.directive('plAudio', function() {
@@ -740,14 +749,6 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.listUrl = '/'
 	})
 
-	// only use jquery dom event here
-	// $scope.$watch will not fire when a mobile browser goes to background
-	$(document).find('audio[pl-audio]').bind('ended', function(e) {
-		var offset = $scope.setting.play_single_track ? 0 : 1,
-			loop = $scope.setting.play_no_loop ? false : true;
-		if (offset || loop)
-			$scope.playnext(offset, loop);
-	})
 	$(document).bind("scroll touchstart mousedown", function(e) {
 		if ($(e.target.childNodes[0] || e.target).parents(".list").length) {
 			$tool.autoHide();
