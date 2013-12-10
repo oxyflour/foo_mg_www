@@ -186,7 +186,7 @@ app.directive('plCtrl', function($http) {
 		// $scope.$watch will not fire when a mobile browser goes to background
 		a.bind('ended', function(e) {
 			var offset = elem.attr('pl-ctrl-next') ? 1 : 0,
-				loop = elem.attr('pl-ctr-no-loop') ? true : false;
+				loop = elem.attr('pl-ctrl-loop') ? true : false;
 			if (offset || loop)
 				player.playnext(offset, loop);
 		})
@@ -554,11 +554,11 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		},
 		// play (every items) under current listUrl
 		playCurrent: function(id) {
-			$player.playpause(id);
+			$scope.player.playpause(id);
 			$scope.playUrl = $scope.listUrl;
 			get_full_list(function(list) {
 				var dataList = get_tracks_from_data(list);
-				$scope.playlist = dataList.join(',');
+				$scope.player.playlist = dataList.join(',');
 			});
 		}
 	}
