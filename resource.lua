@@ -61,9 +61,10 @@ function get_utf8_text(fname)
 	local file = io.open(fname:utf8_to_ansi(), 'r')
 	local content = file:read('*all')
 	file:close()
-	local encodings = {string.ansi_to_utf8, string.utf16_to_utf8}
+	local encodings = {nil, string.ansi_to_utf8, string.utf16_to_utf8}
 	return table.each(encodings, function(i, v)
-		if v(content):sub(1, 50):is_utf8() then
+		local t = v and v(content) or content
+		if t:sub(1, 50):is_utf8() then
 			return content
 		end
 	end, content)
@@ -175,7 +176,8 @@ elseif res == 'albumart' and track_file and track_file ~= '' then
 	end
 elseif res and browse_dir and browse_dir ~= '' and
 		table.set(_G, 'file_ext', res:match(".*%.(.*)")) and 
-		table.index(CONF.res_fmt, file_ext:lower()) and
+		table.set(_G, 'file_ext', file_ext:lower()) and 
+		table.index(CONF.res_fmt, file_ext) and
 		table.set(_G, 'res_path', fb_util.path_canonical(browse_dir..res)) and
 		fb_util.file_stat(res_path) then
 	if file_ext == 'txt' or file_ext == 'log' then
