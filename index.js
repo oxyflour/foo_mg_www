@@ -30,7 +30,7 @@ app.directive('bwMain', function($compile) {
 				d.time = t;
 			}
 		}, {});
-		if (lists.length > 4 && find.oldest) {
+		if (!(lists.length <= parseInt(elem.attr('bw-main-cache'))) && find.oldest) {
 			find.oldest.scope().$destroy();
 			find.oldest.remove();
 		}
