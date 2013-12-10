@@ -14,7 +14,7 @@
 	<div class="return no-overflow hide-too-narrow">
 		<span ng-repeat="(p, n) in listPathSplit">
 			<button class="no-overflow no-wrap text-ellipsis"
-				ng-click="browser.browse(p);tool.autoHide()" ng-class="p!=listPath&&'gray'">{{n}}</button>
+				ng-click="browser.browse(p)" ng-class="p!=listPath&&'gray'">{{n}}</button>
 			<span class="gray">&gt;</span>
 		</span>
 	</div>
@@ -49,19 +49,19 @@
 	<div class="empty" ng-hide="total!=0">No thing here</div>
 </ul>
 <div class="tool anim-all">
-	<h3 class="no-wrap">
-		<button class="bold" ng-class="(!tool.show||tool.show=='play')||'gray'"
+	<h3 class="title no-wrap no-overflow">
+		<button ng-class="(!tool.show||tool.show=='play')||'gray'"
 			ng-click="tool.toggle('play')">Playlists</button>
-		<button class="bold" ng-class="tool.show=='nav'||'gray'"
+		<button ng-class="tool.show=='nav'||'gray'"
 			ng-click="tool.toggle('nav')">Search</button>
-		<button class="bold" ng-class="tool.show=='res'||'gray'"
+		<button ng-class="tool.show=='res'||'gray'"
 			ng-click="tool.toggle('res')">Resource</button>
-		<button class="bold" ng-class="tool.show=='conf'||'gray'"
+		<button ng-class="tool.show=='conf'||'gray'"
 			ng-click="tool.toggle('conf')">Settings</button>
 	</h3>
 	<div class="content" ng-show="!tool.show||tool.show=='play'">
 		<p>
-			<button ng-hide="list.onEdit" ng-click="select.start();tool.autoHide()">[ Select ]</button>
+			<button ng-hide="list.onEdit" ng-click="select.start()">[ Select ]</button>
 			<span class="edit-list" ng-show="list.onEdit">
 				<button ng-click="select.finish();tool.autoHide()">[ Done ]</button>
 				<button ng-click="select.toggle()">[ Toggle ]</button>
@@ -101,7 +101,10 @@
 			<input type="checkbox" ng-init="search.onpath=true" ng-model="search.onpath" />Search under current folder
 		</form>
 		<h4>Go to</h4>
-		<p><button ng-click="browser.open(playUrl);tool.autoHide()">[ playing ]</button></p>
+		<p>
+			<button ng-click="browser.browse(listParentPath)">[ parent ]</button>
+			<button ng-click="browser.open(playUrl)">[ playing ]</button>
+		</p>
 		<p>
 			<button ng-click="browser.reload()">[ reload list ]</button>
 			<button onclick="location.reload()">[ reload page ]</button>
@@ -193,7 +196,7 @@
 			<button ng-click="pause()" ng-dblclick="playnext(0)" ng-show="audio.state=='play'">[ || ]</button>
 			<button ng-click="playnext(1, true)">[ &raquo; ]</button>
 		</div>
-		<div class="cursor-hand" ng-show="audio.id" ng-click="browser.open(playUrl);tool.autoHide()">
+		<div class="cursor-hand" ng-show="audio.id" ng-click="browser.open(playUrl)">
 			<big>{{audio.info.artist}} - {{audio.info.name}}</big>
 			<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
 			<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>

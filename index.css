@@ -107,11 +107,11 @@
 	height: 150px;
 }
 @media only screen and (min-width: 1080px) {
-	.list {
+.list {
 	right: auto;
 	width: 540px;
 } 
-	.tool, .player {
+.tool, .player {
 	left: 540px;
 } 
 }
@@ -286,9 +286,6 @@
 }
 }
 
-.tool .content {
-	margin-right: 10px;
-}
 .tool h3 {
 	border-left: 12px solid #888;
 	padding-left: 8px;
@@ -317,6 +314,9 @@
 @media only screen and (min-width: 621px) {
 .tool .content {
 	margin: 20px;
+}
+.tool .title {
+	margin-left: 10px;
 }
 }
 
