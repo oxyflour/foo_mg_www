@@ -48,6 +48,9 @@ a:hover {
 .no-opacity {
 	opacity: 0;
 }
+.half-opacity {
+	opacity: 0.5;
+}
 .float-left {
 	float: left;
 }
@@ -141,6 +144,9 @@ a:hover {
 .show-tool .player {
 	height: 90px;
 }
+.hide-too-narrow {
+	display: none;
+}
 }
 @media only screen and (min-width: 621px) {
 .list {
@@ -161,6 +167,9 @@ a:hover {
 }
 .player {
 	height: 160px;
+}
+.hide-too-wide {
+	display: none;
 }
 }
 

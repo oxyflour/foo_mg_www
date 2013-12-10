@@ -11,6 +11,13 @@
 	bw-main pl-ctrl ng-controller="main">
 <div class="head anim-all">
 	<button class="return" ng-click="browser.browse(listParentPath)">{{listName}}</button>
+	<div class="return no-overflow hide-too-narrow">
+		<span ng-repeat="(p, n) in listPathSplit">
+			<button class="no-overflow no-wrap text-ellipsis" style="padding:0 0.2em"
+				ng-click="browser.browse(p);tool.autoHide()" ng-class="p!=listPath&&'half-opacity'">{{n}}</button>
+			<span class="half-opacity">&gt;</span>
+		</span>
+	</div>
 	<button class="tab" ng-show="!tool.show||tool.show=='play'" ng-click="tool.toggle('play')">+</button>
 	<button class="tab" ng-show="tool.show=='nav'" ng-click="tool.toggle('nav')">#</button>
 	<button class="tab" ng-show="tool.show=='res'" ng-click="tool.toggle('res')">*</button>
