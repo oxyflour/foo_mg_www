@@ -184,8 +184,8 @@ app.directive('plCtrl', function($http) {
 		// only use jquery dom event here
 		// $scope.$watch will not fire when a mobile browser goes to background
 		a.bind('ended', function(e) {
-			var offset = elem.attr('pl-ctrl-no-next') ? 0 : 1,
-				loop = elem.attr('pl-ctrl-no-loop') ? false : true;
+			var offset = elem.attr('pl-ctrl-next') ? 1 : 0,
+				loop = elem.attr('pl-ctr-no-loop') ? true : false;
 			if (offset || loop)
 				scope.playnext(offset, loop);
 		})

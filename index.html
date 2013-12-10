@@ -8,8 +8,8 @@
 <link type="text/css" href="index.css" rel="stylesheet" />
 </head>
 <body ng-class="[tool.show&&'show-tool', setting.folder_view_class||'aa-block-view', location.path+'-mode']"
-	bw-main bw-main-cache="{{setting.pages_in_cache||4}}"
-	pl-ctrl pl-ctrl-no-next="{{setting.play_single_track}}"  pl-ctrl-no-loop="{{setting.play_no_loop}}"
+	bw-main bw-main-cache="{{setting.lists_in_cache||4}}"
+	pl-ctrl pl-ctrl-next="{{setting.play_single_track?'':1}}"  pl-ctrl-loop="{{setting.play_no_loop?'':1}}"
 	ng-controller="main">
 <div class="head anim-all">
 	<button class="return" ng-click="browser.browse(listParentPath)">{{listName}}</button>
@@ -164,8 +164,8 @@
 			</select>
 		</div>
 		<h4>Global Setting</h4>
-		<div class="field">display folders with:
-			<select local-store ng-model="setting.pages_in_cache">
+		<div class="field">number of cached lists:
+			<select local-store ng-model="setting.lists_in_cache">
 				<option value="2">2</option>
 				<option value="">4</option>
 				<option value="8">8</option>
