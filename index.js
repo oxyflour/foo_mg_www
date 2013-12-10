@@ -132,7 +132,7 @@ app.directive('bwList', function($http) {
 app.directive('plCtrl', function($http) {
 	return function (scope, elem, attrs, ctrl) {
 		var a = angular.element('[pl-audio]');
-		var player = $scope.player = ($scope.player || {});
+		var player = scope.player = (scope.player || {});
 		player.load = function(id) {
 			var ad = scope.audio;
 			if (id > 0 && ad) {
@@ -554,7 +554,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		},
 		// play (every items) under current listUrl
 		playCurrent: function(id) {
-			$scope.playpause(id);
+			$player.playpause(id);
 			$scope.playUrl = $scope.listUrl;
 			get_full_list(function(list) {
 				var dataList = get_tracks_from_data(list);

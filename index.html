@@ -202,7 +202,7 @@
 		<div class="buttonbar">
 			<button ng-click="player.playnext(-1, true)">[ &laquo; ]</button>
 			<button ng-click="player.play()" ng-dblclick="player.playnext(0)" ng-hide="audio.state=='play'">[ &gt; ]</button>
-			<button ng-click="player.pause()" ng-dblclick="playnext(0)" ng-show="audio.state=='play'">[ || ]</button>
+			<button ng-click="player.pause()" ng-dblclick="player.playnext(0)" ng-show="audio.state=='play'">[ || ]</button>
 			<button ng-click="player.playnext(1, true)">[ &raquo; ]</button>
 		</div>
 		<div class="cursor-hand" ng-show="audio.id" ng-click="browser.open(playUrl)">
