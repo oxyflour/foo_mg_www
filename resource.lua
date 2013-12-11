@@ -57,17 +57,31 @@ function get_thumb(cover, sz)
 	end
 	return get_file(thumb.fname)
 end
-function get_utf8_text(fname)
+function get_text_charset(fname)
 	local file = io.open(fname:utf8_to_ansi(), 'r')
 	local content = file:read('*all')
 	file:close()
-	local encodings = {nil, string.ansi_to_utf8, string.utf16_to_utf8}
-	return table.each(encodings, function(i, v)
-		local t = v and v(content) or content
-		if t:sub(1, 50):is_utf8() then
-			return content
+
+	local bom = table.each({1,2,3,4}, function(i, v, d)
+		d[v] = string.byte(content, v)
+	end, {})
+
+	if bom[1] == 0xef and bom[2] == 0xbb and bom[3] == 0xbf then
+		return content, 'utf-8'
+	elseif bom[1] == 0xfe and bom[2] == 0xff then
+		return content, 'utf-16be'
+	elseif bom[1] == 0xff and bom[2] == 0xfe then
+		return content, 'utf-16le'
+	elseif bom[1] == 0x00 and bom[2] == 0x00 and bom[3] == 0xfe and bom[4] == 0xff then
+		return content, 'utf-32be'
+	elseif bom[1] == 0xff and bom[2] == 0xfe and bom[3] == 0x00 and bom[4] == 0x00 then
+		return content, 'utf-32le'
+	else
+		if not content:is_utf8() then
+			content = content:ansi_to_utf8()
 		end
-	end, content)
+		return content, 'utf-8'
+	end
 end
 
 local id = tonumber(get_var("id") or '0')
@@ -139,19 +153,19 @@ if not res and id > 0 and track_file and track_file ~= '' and track_sub >= 0 the
 		print("HTTP/1.0 500 OK\r\n\r\n")
 	end
 elseif res == 'lyric' and id > 0 and track_file and track_file ~= '' then
-	local content = ''
+	local content, charset = '', 'utf-8'
 	if table.set(_G, 'track_dir', track_file:match("(.*\\).*")) and
 			table.set(_G, 'lyric_path', track_dir..track_title..'.lrc') and
 			fb_util.file_stat(lyric_path) then
-		content = get_utf8_text(lyric_path)
+		content, charset = get_text_charset(lyric_path)
 	end
 	if content == '' and CONF.lyric_dir and
 			table.set(_G, 'lyric_path', CONF.lyric_dir..'\\'..track_artist..' - '..track_title..'.lrc') and
 			fb_util.file_stat(lyric_path) then
-		content = get_utf8_text(lyric_path)
+		content, charset = get_text_charset(lyric_path)
 	end
 	print('HTTP/1.1 200 OK\r\n',
-		'Content-Type: text/plain;charset=utf-8\r\n',
+		'Content-Type: text/plain;charset=', charset, '\r\n',
 		'Content-Length: ', content:len(), '\r\n',
 		'\r\n', content)
 elseif res == 'albumart' and track_file and track_file ~= '' then
@@ -181,9 +195,9 @@ elseif res and browse_dir and browse_dir ~= '' and
 		table.set(_G, 'res_path', fb_util.path_canonical(browse_dir..res)) and
 		fb_util.file_stat(res_path) then
 	if file_ext == 'txt' or file_ext == 'log' then
-		local content = get_utf8_text(res_path)
+		local content, charset = get_text_charset(res_path)
 		print('HTTP/1.1 200 OK\r\n',
-			'Content-Type: text/plain;charset=utf-8\r\n',
+			'Content-Type: text/plain;charset=', charset, '\r\n',
 			'Content-Disposition: inline\r\n', -- always display in browser window
 			'Content-Length: ', content:len(), '\r\n',
 			'\r\n', content)
