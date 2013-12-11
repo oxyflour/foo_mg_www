@@ -11,6 +11,7 @@
 	bw-main bw-main-cache="{{setting.lists_in_cache||4}}"
 	pl-ctrl pl-ctrl-next="{{setting.play_single_track?'':1}}"  pl-ctrl-loop="{{setting.play_no_loop?'':1}}"
 	ng-controller="main">
+<div class="overlay"></div>
 <div class="head anim-all">
 	<button class="return" ng-click="browser.browse(listParentPath)">{{listName}}</button>
 	<div class="return no-overflow hide-too-narrow">

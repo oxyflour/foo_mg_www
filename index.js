@@ -750,10 +750,8 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.listUrl = '/'
 	})
 
-	$(document).bind("scroll touchstart mousedown", function(e) {
-		if ($(e.target.childNodes[0] || e.target).parents(".list").length) {
-			$tool.autoHide();
-			$scope.$apply();
-		}
+	$('body').children('.overlay').bind("scroll touchstart mousedown", function(e) {
+		$tool.autoHide();
+		$scope.$apply();
 	})
 })
