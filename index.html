@@ -96,12 +96,17 @@
 			<div class="search">
 				<input type="text" name="word" ng-model="search.word" /><input type="submit" value="Search" /><br />
 			</div>
-			<input type="checkbox" ng-model="search.fields.folder" />Folder
-			<input type="checkbox" ng-model="search.fields.album" />Album
-			<input type="checkbox" ng-model="search.fields.artist" />Artist
-			<input type="checkbox" ng-model="search.fields.title" />Title
+			<input  id="sf_fo" type="checkbox" ng-model="search.fields.folder" />
+			<label for="sf_fo">Folder</label>
+			<input  id="sf_al" type="checkbox" ng-model="search.fields.album" />
+			<label for="sf_al">Album</label>
+			<input  id="sf_ar" type="checkbox" ng-model="search.fields.artist" />
+			<label for="sf_ar">Artist</label>
+			<input  id="sf_ti" type="checkbox" ng-model="search.fields.title" />
+			<label for="sf_ti">Title</label>
 			<br />
-			<input type="checkbox" ng-model="search.onpath" />Search under current folder
+			<input  id="sf_op" type="checkbox" ng-model="search.onpath" />
+			<label for="sf_op">Search under current folder</label>
 		</form>
 		<h4>Go to</h4>
 		<p>
