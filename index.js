@@ -754,4 +754,8 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		$tool.autoHide();
 		$scope.$apply();
 	})
+	$(window).bind('beforeunload', function(e) {
+		if ($scope.audio.state == 'play')
+			return 'Are you leaving?'
+	})
 })
