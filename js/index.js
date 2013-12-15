@@ -424,18 +424,18 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			p.dict.begin = parseInt(p.begin || '0') + (begin || 0);
 			p.dict.count = count;
 			p.dict.sort = $scope.setting.list_sort && $scope.setting.list_sort[url] || p.dict.sort;
-			return get_full_url('browse.lua?' + $.url_concat(p.dict));
+			return get_full_url('lua/browse.lua?' + $.url_concat(p.dict));
 		},
 		res_url: function(res, id, path, dict) {
 			dict = dict || {};
 			dict.res = res;
 			dict.id = id;
 			dict.path = path;
-			return get_full_url('resource.lua?' + $.url_concat(dict));
+			return get_full_url('lua/resource.lua?' + $.url_concat(dict));
 		},
 		track_url: function(id) {
 			var dict = { id: id, support: $scope.setting.music_format_support || undefined};
-			return get_full_url('resource.lua?' + $.url_concat(dict));
+			return get_full_url('lua/resource.lua?' + $.url_concat(dict));
 		},
 		local_store_dict: function(prefix) {
 			var ls = {};
