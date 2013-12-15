@@ -95,7 +95,7 @@
 	height: 150px;
 }
 @media only screen and (min-width: 1080px) {
-.list {
+.list, .foot {
 	right: auto;
 	width: 540px;
 } 

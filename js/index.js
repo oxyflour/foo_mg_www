@@ -696,7 +696,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 
 		var path = $scope.listPath = ls.path;
 		var lpath = $scope.listLongestPath || '';
-		if (!lpath || (path && lpath.indexOf(path) != 0)) {
+		if (path && lpath.indexOf(path) != 0) {
 			var p = [], d = {'':'root'};
 			$scope.listPathSplit = $.ieach(path.split('\\'), function(i, v, d) {
 				if (v) {

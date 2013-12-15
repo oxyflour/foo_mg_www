@@ -17,9 +17,9 @@
 	ng-controller="main">
 <div class="overlay show-list-mode"></div>
 <div class="head show-list-mode no-wrap no-overflow anim-all">
-	<div class="hide-too-wide absolute absolute-left full-width bold big cursor-hand"
+	<div class="absolute absolute-left full-width bold big cursor-hand"
 		ng-click="browser.browse(listParentPath)">{{listName}}</div>
-	<div class="hide-too-narrow absolute absolute-left no-overflow">
+	<div class="hide-too-narrow absolute absolute-left no-overflow bg-white" ng-show="listPath">
 		<span ng-repeat="(p, n) in listPathSplit">
 			<button class="bold big no-overflow no-wrap no-margin text-ellipsis"
 				ng-click="browser.browse(p)" ng-class="p!=listPath&&'gray'">{{n}}</button>
