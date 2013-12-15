@@ -48,6 +48,9 @@ a:hover {
 .no-opacity {
 	opacity: 0;
 }
+.no-margin {
+	margin: 0;
+}
 .half-opacity {
 	opacity: 0.5;
 }
@@ -56,6 +59,12 @@ a:hover {
 }
 .float-right {
 	float: right;
+}
+.absolute-left {
+	left: 0;
+}
+.absolute-right {
+	right: 0;
 }
 .text-center {
 	text-align: center;
@@ -69,8 +78,17 @@ a:hover {
 .bold {
 	font-weight: bold;
 }
+.big {
+	font-size: 105%;
+}
 .gray {
 	color: #aaa;
+}
+.bg-white {
+	background-color: white;
+}
+.bg-gray {
+	background-color: #eee;
 }
 
 .anim-all {
@@ -187,29 +205,12 @@ body {
 .show-tool .tool {
 	border-bottom: 1px solid #ccc;
 }
-/*.show-tool .list {
-	opacity: 0.8;
-}*/
 .show-tool .player {
 	border-top: 1px solid #ccc;
 }
 }
 .head {
 	border-bottom: 1px solid #ccc;
-}
-
-/*
- * margin & font
- */
-.head button, .foot button {
-	line-height: 44px;
-	margin: 0;
-	padding: 0 1.4em;
-	font-weight: bold;
-	font-size: 105%;
-}
-.head {
-	white-space: nowrap;
 }
 
 /*

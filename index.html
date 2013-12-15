@@ -12,17 +12,24 @@
 	pl-ctrl pl-ctrl-next="{{setting.play_single_track?'':1}}"  pl-ctrl-loop="{{setting.play_no_loop?'':1}}"
 	ng-controller="main">
 <div class="overlay"></div>
-<div class="head anim-all">
-	<button class="return" ng-click="browser.browse(listParentPath)">{{listName}}</button>
-	<div class="return no-overflow hide-too-narrow">
+<div class="head no-wrap no-overflow anim-all">
+	<div class="hide-too-wide absolute absolute-left full-width bold big cursor-hand"
+		ng-click="browser.browse(listParentPath)">{{listName}}</div>
+	<div class="hide-too-narrow absolute absolute-left no-overflow">
 		<span ng-repeat="(p, n) in listPathSplit">
-			<button class="no-overflow no-wrap text-ellipsis"
+			<button class="bold big no-overflow no-wrap no-margin text-ellipsis"
 				ng-click="browser.browse(p)" ng-class="p!=listPath&&'gray'">{{n}}</button>
 			<span class="gray">&gt;</span>
 		</span>
 	</div>
-	<button class="tab float-right" ng-click="tool.toggle('play')">+</button>
-	<button class="tab float-right" ng-click="tool.toggle('nav')">#</button>
+	<div class="absolute absolute-right bg-white">
+		<button class="no-margin" ng-class="tool.show=='nav'&&'bg-gray'" ng-click="tool.toggle('nav')">
+			<img height="38px" src="img/ic_action_search.png" />
+		</button>
+		<button class="no-margin" ng-class="tool.show=='play'&&'bg-gray'" ng-click="tool.toggle('play')">
+			<img height="38px" src="img/ic_action_overflow.png" />
+		</button>
+	</div>
 </div>
 <ul class="list ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']" bw-list ng-non-bindable ng-show="url==listUrl">
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
