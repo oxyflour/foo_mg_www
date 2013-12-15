@@ -130,6 +130,16 @@ a:hover {
 	top: 45px;
 	bottom: 0;
 }
+.foot {
+	position: absolute;
+	z-index: 1;
+	overflow: hidden;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	line-height: 44px;
+	height: 0; /*-- initial hidden --*/
+}
 .tool {
 	position: absolute;
 	z-index: 3;
@@ -146,8 +156,7 @@ a:hover {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	height: 0;
-	/*-- initial hidden --*/
+	height: 0; /*-- initial hidden --*/
 }
 
 @media only screen and (max-width: 620px) {
@@ -191,6 +200,13 @@ a:hover {
 }
 }
 
+.show-foot .list {
+	bottom: 45px;
+}
+.show-foot .foot {
+	height: 44px;
+}
+
 /*
  * border & color
  */
@@ -198,7 +214,7 @@ body {
 	color: #333;
 	background-color: #ccc;
 }
-.head, .player, .list, .tool {
+.head, .player, .foot, .list, .tool {
 	background-color: #fff;
 }
 

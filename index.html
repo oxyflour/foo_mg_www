@@ -7,12 +7,16 @@
 <link type="text/css" href="css/theme.css" rel="stylesheet" />
 <link type="text/css" href="css/index.css" rel="stylesheet" />
 </head>
-<body ng-class="[tool.show&&'show-tool', setting.folder_view_class||'aa-block-view', location.path+'-mode']"
+<body ng-class="[
+		tool.show&&'show-tool',
+		list.onEdit&&'show-foot',
+		setting.folder_view_class||'aa-block-view',
+		location.path+'-mode']"
 	bw-main bw-main-cache="{{setting.lists_in_cache||4}}"
 	pl-ctrl pl-ctrl-next="{{setting.play_single_track?'':1}}"  pl-ctrl-loop="{{setting.play_no_loop?'':1}}"
 	ng-controller="main">
-<div class="overlay"></div>
-<div class="head no-wrap no-overflow anim-all">
+<div class="overlay show-list-mode"></div>
+<div class="head show-list-mode no-wrap no-overflow anim-all">
 	<div class="hide-too-wide absolute absolute-left full-width bold big cursor-hand"
 		ng-click="browser.browse(listParentPath)">{{listName}}</div>
 	<div class="hide-too-narrow absolute absolute-left no-overflow">
@@ -31,7 +35,8 @@
 		</button>
 	</div>
 </div>
-<ul class="list ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']" bw-list ng-non-bindable ng-show="url==listUrl">
+<ul class="list show-list-mode anim-all" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']"
+	bw-list ng-non-bindable ng-show="url==listUrl">
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
 		<a ng-show="setting.img_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
 		<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
@@ -58,7 +63,14 @@
 	<div class="loading anim-all anim-in-1s" show-delay="500" ng-hide="ls.length==total">loading ({{ls.length}}/{{total||'?'}})</div>
 	<div class="empty" ng-hide="total!=0">No thing here</div>
 </ul>
-<div class="tool anim-all">
+<div class="foot show-list-mode anim-all no-wrap no-overflow">
+	<button ng-click="tool.toggle('play')"><img height="36px" src="img/ic_action_accept.png" /></button>
+	<button ng-click="select.all()"><img height="36px" src="img/ic_action_select_all.png" /></button>
+	<button ng-click="select.toggle()"><img height="36px" src="img/ic_action_refresh.png" /></button>
+	<button ng-click="select.clear()"><img height="36px" src="img/ic_action_view_as_grid.png" /></button>
+	<button class="float-right" ng-click="select.finish()"><img height="36px" src="img/ic_action_cancel.png" /></button>
+</div>
+<div class="tool show-list-mode anim-all">
 	<h3 class="title no-wrap no-overflow">
 		<button ng-class="(!tool.show||tool.show=='play')||'gray'"
 			ng-click="tool.toggle('play')">Playlists</button>
@@ -72,10 +84,7 @@
 	<div class="content" ng-show="!tool.show||tool.show=='play'">
 		<p>
 			<button ng-hide="list.onEdit" ng-click="select.start();tool.show=false">[ Select ]</button>
-			<span class="edit-list" ng-show="list.onEdit">
-				<button ng-click="select.finish();tool.autoHide()">[ Done ]</button>
-				<button ng-click="select.toggle()">[ Toggle ]</button>
-			</span>
+			<button ng-show="list.onEdit" ng-click="select.finish();tool.autoHide()">[ Cancel ]</button>
 			<span ng-hide="list.onEdit&&!select.length()">
 				<button ng-click="browser.save()">[ Save ]</button>
 				<span class="no-overflow no-wrap">
@@ -205,7 +214,7 @@
 		</div>
 	</div>
 </div>
-<div class="player anim-all">
+<div class="player show-list-mode anim-all">
 	<div class="ctrl" ng-hide="player.show">
 		<div class="albumart cursor-hand" ng-click="player.show='lrc'">
 			<div ng-attr-style="background-image:{{audio.aaCssUrl}}">
@@ -249,7 +258,7 @@
 		<div class="bar" ng-style="{width:audio.current.sec/audio.length*100+'%'}"></div>
 	</a>
 </div>
-<div class="img">
+<div class="img show-img-mode">
 	<a class="absolute gray" ng-href="mklrc.html#/img?url={{imgUrl|urlEncode}}">mklrc</a>
 	<img ng-src="{{imgUrl}}" />
 </div>

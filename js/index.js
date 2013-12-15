@@ -657,12 +657,16 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	var $select = $scope.select = {
 		start: function() {
 			$scope.list.onEdit = true;
+			$scope.tool.select = false;
 		},
 		length: function() {
 			return $('body').children('.list').not('.ng-hide').children('li.selected').length;
 		},
 		clear: function() {
 			$('body').children('.list').not('.ng-hide').children('li').removeClass('selected');
+		},
+		all: function() {
+			$('body').children('.list').not('.ng-hide').children('li').addClass('selected');
 		},
 		toggle: function(id) {
 			var bwList = $('body').children('.list').not('.ng-hide');

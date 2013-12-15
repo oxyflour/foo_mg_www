@@ -123,7 +123,7 @@
 }
 }
 .on-edit .track .check {
-	border-color: #888;
+	border-color: #aaa;
 }
 .on-edit .track.dragging {
 	opacity: 0.6;
@@ -133,7 +133,7 @@
 	background-color: #eee;
 }
 .on-edit .track.selected .check {
-	background-color: #aaa;
+	background-color: #ccc;
 }
 
 .player {
@@ -333,13 +333,13 @@
 	border-color: #999;
 }
 
-body.img-mode>.overlay,
-body.img-mode>.head,
-body.img-mode>.list,
-body.img-mode>.tool,
-body.img-mode>.player {
+body>.show-list-mode,
+body>.show-img-mode,
+body.list-mode>.hide-list-mode,
+body.img-mode>.hide-img-mode {
 	display: none;
 }
-body.list-mode>.img {
-	display: none;
+body.list-mode>.show-list-mode,
+body.img-mode>.show-img-mode {
+	display: block;
 }
