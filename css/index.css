@@ -1,3 +1,10 @@
+.list .tip {
+	background: #aaa;
+	color: #fff;
+	padding: 0.2em 0;
+	left: 0;
+	top: 45px;
+}
 .list .info {
 	font-size: 85%;
 	color: #999;

@@ -33,6 +33,9 @@ a:hover {
 .absolute {
 	position: absolute;
 }
+.fixed {
+	position: fixed;
+}
 .full-width {
 	width: 100%;
 }

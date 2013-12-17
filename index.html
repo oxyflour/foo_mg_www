@@ -17,9 +17,9 @@
 	ng-controller="main">
 <div class="overlay show-list-mode"></div>
 <div class="head show-list-mode no-wrap no-overflow anim-all">
-	<div class="absolute absolute-left full-width bold big cursor-hand"
+	<div class="hide-too-wide absolute absolute-left full-width bold big cursor-hand"
 		ng-click="browser.browse(listParentPath)">{{listName}}</div>
-	<div class="hide-too-narrow absolute absolute-left no-overflow bg-white" ng-show="listPath">
+	<div class="hide-too-narrow absolute absolute-left no-overflow bg-white">
 		<span ng-repeat="(p, n) in listPathSplit">
 			<button class="bold big no-overflow no-wrap no-margin text-ellipsis"
 				ng-click="browser.browse(p)" ng-class="p!=listPath&&'gray'">{{n}}</button>
@@ -37,6 +37,10 @@
 </div>
 <ul class="list show-list-mode anim-all" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']"
 	bw-list ng-non-bindable ng-show="url==listUrl">
+	<div ng-if="word" ng-click="browser.browse(path)">
+		<div class="tip cursor-hand fixed full-width">Searching '{{word}}'</div>
+		<div class="tip">Searching '{{word}}'</div>
+	</div>
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
 		<a ng-show="setting.img_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
 		<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>

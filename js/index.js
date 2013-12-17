@@ -684,19 +684,13 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		if (!v || !ls || ls.total === undefined) return;
 		$tool.autoHide();
 
+		// use these list* varables rather than list.* to avoid flash
 		$scope.listName = (ls.parent ? '< ' : '') + ls.name;
 		$scope.listParentPath = ls.parent && ls.parent.path;
-		if (pl[ls.url]) {
-			$scope.listName = "Playlist: " + pl[ls.url];
-		}
-		else if (ls.word) {
-			$scope.listName = "Search: '" + ls.word + "' in " + ls.name;
-			$scope.listParentPath = ls.path;
-		}
 
 		var path = $scope.listPath = ls.path;
 		var lpath = $scope.listLongestPath || '';
-		if (path && lpath.indexOf(path) != 0) {
+		if (!lpath || (path && lpath.indexOf(path)) != 0) {
 			var p = [], d = {'':'root'};
 			$scope.listPathSplit = $.ieach(path.split('\\'), function(i, v, d) {
 				if (v) {
