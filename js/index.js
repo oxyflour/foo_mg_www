@@ -120,7 +120,7 @@ app.directive('bwList', function($http) {
 			elem.attr('bw-scroll', elem.scrollTop());
 		});
 		scope.$watch(function() {
-			return elem.height();
+			return elem[0].offsetHeight;
 		}, function(v) {
 			if (v) elem.scrollTop(parseInt(elem.attr('bw-scroll')));
 		});
@@ -343,7 +343,7 @@ app.directive('plLyric', function($http) {
 			update(true);
 		})
 		scope.$watch(function() {
-			return elem.width() * elem.height();
+			return elem[0].offsetWidth * elem[0].offsetHeight;
 		}, function(v) {
 			if (v) update(true);
 		});
