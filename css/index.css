@@ -66,7 +66,7 @@
 	margin-right: 10px;
 }
 .aa-list-view .folder {
-	min-height: 92px;
+	min-height: 96px;
 }
 .aa-list-view .folder .albumart {
 	display: block;
@@ -75,13 +75,11 @@
 	width: 96px;
 }
 .aa-block-view .list>* {
-	float: left;
-	width: 100%;
-}
-.aa-block-view .track {
-	width: 92%;
+	clear: both;
 }
 .aa-block-view .folder {
+	clear: none;
+	float: left;
 	width: 42%;
 	max-width: 150px;
 	margin-left: 16px;
