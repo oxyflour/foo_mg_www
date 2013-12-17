@@ -93,6 +93,7 @@ local sql = id > 0 and
 string.format([[SELECT
 	artist,
 	title,
+	codec,
 	filename_ext,
 	directory_path||'\',
 	directory_path||'\',
@@ -104,6 +105,7 @@ WHERE tt.id=%d ORDER BY add_date DESC LIMIT 0,1]], fb_env.db_path_table, fb_env.
 string.format([[SELECT
 	artist,
 	title,
+	codec,
 	filename_ext,
 	d,
 	SUBSTR(d, 1, b+1) AS s,
@@ -118,10 +120,11 @@ LEFT JOIN %s
 	ON pid=i
 WHERE SUBSTR(d, r, %d)='%s' ORDER BY add_date DESC LIMIT 0,1]],
 	n*3-2, fb_env.db_path_table, fb_env.db_track_table, path:utf8_len(), path:gsub('\'', '\'\''))
-for artist, title, file, dir, path, subsong in db:urows(sql) do
+for artist, title, codec, file, dir, path, subsong in db:urows(sql) do
 	browse_dir = path
 	track_artist = artist
 	track_title = title
+	track_codec = codec:lower()
 	track_file = dir..file
 	track_sub = subsong
 end
@@ -139,8 +142,7 @@ if not res and id > 0 and track_file and track_file ~= '' and track_sub >= 0 the
 		end
 	end)(ua or "")
 
-	local file_ext = track_file:match(".*%.(.*)")
-	if file_ext and track_sub == 0 and opt_find(support, file_ext, ',') and
+	if track_codec and track_sub == 0 and opt_find(support, track_codec, ',') and
 			not opt_find(support, 'force', ',') then
 		send = fb_stream.stream_file(track_file)					-- no decoding
 	elseif  opt_find(support, "wav", ',') then
