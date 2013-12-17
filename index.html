@@ -7,11 +7,8 @@
 <link type="text/css" href="css/theme.css" rel="stylesheet" />
 <link type="text/css" href="css/index.css" rel="stylesheet" />
 </head>
-<body ng-class="[
-		tool.show&&'show-tool',
-		list.onEdit&&'show-foot',
-		setting.folder_view_class||'aa-block-view',
-		location.path+'-mode']"
+<body ng-class="[ tool.show&&'show-tool', list.onEdit&&'show-foot',
+		setting.folder_view_class||'aa-block-view', location.path+'-mode']"
 	bw-main bw-main-cache="{{setting.lists_in_cache||4}}"
 	pl-ctrl pl-ctrl-next="{{setting.play_single_track?'':1}}"  pl-ctrl-loop="{{setting.play_no_loop?'':1}}"
 	ng-controller="main">
@@ -103,7 +100,7 @@
 		<ul ng-init="playlists=conf.local_store_dict('playlists@')">
 			<!-- Note: neither ng-class nor ng-show works with ng-repeat -->
 			<li ng-repeat="(u, n) in playlists" class="playlist {{u==listUrl&&'bold'}} {{u==playUrl&&'play'}}">
-				<form ng-show="n.length||f" action="javascript:$('button:first').focus()">
+				<form ng-show="n.length||f" action="javascript:void(null)" onsubmit="$('button').focus()">
 					<input auto-select local-store="playlists@{{u}}" local-store-init="n"
 						pl-url="{{u}}" ng-focus='f=1' ng-blur='f=0' ng-model="playlists[u]" />
 					<a ng-href="#list?url={{u|urlEncode}}">{{n}}</a>
