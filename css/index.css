@@ -1,3 +1,31 @@
+.list {
+	-ms-user-select: none;
+	-webkit-user-select: none;
+}
+.list>* {
+	clear: both;
+}
+.list li {
+	border-bottom: 1px solid #ddd;
+	padding: 0.6em 0.2em;
+	margin: 0 12px;
+	cursor: pointer;
+}
+.list .sep {
+	margin: 0;
+	padding: 0;
+	color: #fff;
+	background-color: #bbb;
+	text-shadow: #555 1px 1px 2px;
+	background-position: 0 20%;
+	background-size: cover;
+}
+.list .loading, .list .empty {
+	color: #999;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	text-align: center;
+}
 .list .tip {
 	background: #aaa;
 	color: #fff;
@@ -73,9 +101,6 @@
 	height: 96px;
 	width: 96px;
 }
-.aa-block-view .list>* {
-	clear: both;
-}
 .aa-block-view .folder {
 	clear: none;
 	float: left;
@@ -99,7 +124,7 @@
 	height: 150px;
 }
 @media only screen and (min-width: 1080px) {
-.list, .foot {
+.main, .foot {
 	right: auto;
 	width: 540px;
 } 
