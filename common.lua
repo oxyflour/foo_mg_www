@@ -19,16 +19,11 @@ string.md5 = fb_util.md5
 string.url_encode = fb_util.url_encode
 string.is_utf8 = fb_util.is_utf8
 string.utf8_len = fb_util.utf8_len
--- see http://msdn.microsoft.com/en-us/library/windows/desktop/dd317756(v=vs.85).aspx
-string.ENCS = {
-	ansi = 0,
-	utf8 = 65001,
-}
 string.utf8_to_ansi = function(s)
-	return fb_util.string_encode(s, string.ENCS.utf8, string.ENCS.ansi)
+	return fb_util.utf8_to_codepage(s, 0)
 end
 string.ansi_to_utf8 = function(s)
-	return fb_util.string_encode(s, string.ENCS.ansi, string.ENCS.utf8)
+	return fb_util.codepage_to_utf8(s, 0)
 end
 
 table.set = function(ls, key, val)
