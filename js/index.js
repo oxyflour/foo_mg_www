@@ -508,10 +508,11 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 				if (k && v) d.push(k);
 			}, []).join(',');
 			var path = (s.onpath && $scope.list.path) ? $scope.list.path.replace(/\\/g, '/') : '/';
-			$scope.listUrl = path + '?' + $.url_concat({
-				fields: fields,
-				word: s.word
+			var query = $.url_concat({
+				fields: fields || undefined,
+				word: s.word || undefined
 			});
+			$scope.listUrl = path + (query ? '?'+query : '');
 		},
 		reload: function() {
 			if (!$scope.listUrl) return;
