@@ -14,22 +14,22 @@
 	ng-controller="main">
 <div class="overlay show-list-mode"></div>
 <div class="head show-list-mode no-wrap no-overflow anim-all">
-	<div class="hide-too-wide absolute absolute-left full-width bold big cursor-hand"
-		ng-click="browser.browse(listParentPath)">{{listName}}</div>
-	<div class="hide-too-narrow absolute absolute-left no-overflow bg-white">
-		<span ng-repeat="(p, n) in listPathSplit">
-			<button class="bold big no-overflow no-wrap no-margin text-ellipsis"
-				ng-click="browser.browse(p)" ng-class="p!=listPath&&'gray'">{{n}}</button>
-			<span class="gray">&gt;</span>
-		</span>
-	</div>
-	<div class="absolute absolute-right bg-white">
+	<div class="float-right">
 		<button class="no-margin" ng-class="tool.show=='nav'&&'bg-gray'" ng-click="tool.toggle('nav')">
 			<img height="38px" src="img/ic_action_search.png" />
 		</button>
 		<button class="no-margin" ng-class="tool.show=='play'&&'bg-gray'" ng-click="tool.toggle('play')">
 			<img height="38px" src="img/ic_action_overflow.png" />
 		</button>
+	</div>
+	<div class="hide-too-wide no-overflow bold big cursor-hand text-ellipsis"
+		ng-click="browser.browse(listParentPath)">{{listName}}</div>
+	<div class="hide-too-narrow no-overflow bg-white">
+		<span ng-repeat="(p, n) in listPathSplit">
+			<button class="no-overflow no-wrap no-margin bold big text-ellipsis"
+				ng-click="browser.browse(p)" ng-class="p!=listPath&&'gray'">{{n}}</button>
+			<span class="gray">&gt;</span>
+		</span>
 	</div>
 </div>
 <ul class="list show-list-mode anim-all ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']"
