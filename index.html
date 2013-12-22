@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html ng-app="app" ng-controller="main">
 <head>
 <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<title>foo_mg_www</title>
+<title>{{audio.info.name||'ready'}} - {{audio.info.artist||'foo_mg_www'}}</title>
 <link type="text/css" href="css/theme.css" rel="stylesheet" />
 <link type="text/css" href="css/index.css" rel="stylesheet" />
 </head>
 <body ng-class="[ tool.show&&'show-tool', list.onEdit&&'show-foot',
 		setting.folder_view_class||'aa-block-view', location.path+'-mode']"
 	bw-main bw-main-cache="{{setting.lists_in_cache||4}}"
-	pl-ctrl pl-ctrl-next="{{setting.play_single_track?'':1}}"  pl-ctrl-loop="{{setting.play_no_loop?'':1}}"
-	ng-controller="main">
+	pl-ctrl pl-ctrl-next="{{setting.play_single_track?'':1}}"  pl-ctrl-loop="{{setting.play_no_loop?'':1}}">
 <div class="overlay show-list-mode"></div>
 <div class="head show-list-mode no-wrap no-overflow anim-all">
 	<div class="float-right">
