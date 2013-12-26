@@ -494,6 +494,12 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			})
 		}, 100);
 	}
+	function url_from_items(p, s) {
+		return newUrl = (p || '') + '?'+$.url_concat({
+			tlist: s.join(','),
+			sort: 'tlist,flist',
+		});
+	}
 
 	var $browser = $scope.browser = {
 		open: function(url) {
@@ -519,14 +525,23 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.open($scope.listUrl, true);
 		},
 		// save (all items or current selection) as playlist
-		save: function() {
+		save: function(cb) {
 			get_selected_list(function(selected, total) {
 				var url = selected.join(',') == total.join(',') ?
-					$scope.listUrl : '?tlist='+selected.join(',')+'&sort=tlist,flist';
+						$scope.listUrl : url_from_items($scope.listPath, selected);
 				var name = $scope.playlists[url] || $scope.playlists[$scope.listUrl] || $scope.list.name || 'new';
 				save_list(url, name);
+				if (cb && cb.apply) cb();
 			});
 			$select.finish();
+		},
+		replace: function() {
+			var u = $scope.replaceUrl;
+			if (u) $browser.save(function() {
+				$scope.playlists[u] = '';
+			})
+			// reset select value
+			$scope.replaceUrl = '';
 		},
 		// add (all items or current selection) to another playlist (addToUrl).
 		// addToUrl will be removed,
@@ -540,10 +555,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 					selected = dataList.concat(selected);
 					if (selected.length) {
 						var newName = $scope.playlists[u] || data.name || 'new',
-							newUrl = '?'+$.url_concat({
-								tlist: selected.join(','),
-								sort: 'tlist,flist'
-							});
+							newUrl = url_from_items($scope.listPath, selected);
 						$scope.playlists[u] = '';
 						save_list(newUrl, newName);
 					}

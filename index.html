@@ -90,6 +90,13 @@
 			<span ng-hide="list.onEdit&&!select.length()">
 				<button ng-click="browser.save()">[ Save ]</button>
 				<span class="no-overflow no-wrap">
+					<select class="absolute no-opacity" style="max-width:90px;" ng-model="replaceUrl" ng-change="browser.replace()">
+						<option></option>
+						<option ng-repeat="(u, n) in playlists" ng-value="u" ng-if="n">{{n}}</option>
+					</select>
+					<button>[ Replace ]</button>
+				</span>
+				<span class="no-overflow no-wrap">
 					<select class="absolute no-opacity" style="max-width:90px;" ng-model="addToUrl" ng-change="browser.addTo()">
 						<option></option>
 						<option ng-repeat="(u, n) in playlists" ng-value="u" ng-if="n">{{n}}</option>
