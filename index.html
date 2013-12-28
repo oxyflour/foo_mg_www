@@ -236,7 +236,7 @@
 			<button ng-click="player.pause()" ng-dblclick="player.playnext(0)" ng-show="audio.state=='play'">[ || ]</button>
 			<button ng-click="player.playnext(1, true)">[ &raquo; ]</button>
 		</div>
-		<div class="cursor-hand" ng-show="audio.id" ng-click="browser.open(playUrl)">
+		<div class="cursor-hand" ng-show="audio.info" ng-click="browser.open(playUrl)">
 			<big>{{audio.info.artist}} - {{audio.info.name}}</big>
 			<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
 			<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
