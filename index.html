@@ -19,10 +19,10 @@
 		</button>
 		<span class="no-overflow no-wrap">
 			<select class="absolute no-opacity" style="-webkit-appearance:none;width:45px;height:45px"
-				ng-model="headActions" ng-change="tool.show=headActions; headActions=''">
-				<option value="play">Playlists</option>
-				<option value="res">Resource</option>
-				<option value="conf">Settings</option>
+				ng-model="headActions" ng-change="$eval(headActions);headActions=''">
+				<option value="tool.show='play'">Playlists</option>
+				<option value="tool.show='res'">Resource</option>
+				<option value="tool.show='conf'">Settings</option>
 				<option value="">Cancel</option>
 			</select>
 			<button class="no-margin">
