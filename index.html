@@ -14,12 +14,21 @@
 <div class="overlay show-list-mode"></div>
 <div class="head show-list-mode no-wrap no-overflow anim-all">
 	<div class="float-right">
-		<button class="no-margin" ng-class="tool.show=='nav'&&'bg-gray'" ng-click="tool.toggle('nav')">
+		<button class="no-margin" ng-click="tool.toggle('nav')">
 			<img height="38px" src="img/ic_action_search.png" />
 		</button>
-		<button class="no-margin" ng-class="tool.show=='play'&&'bg-gray'" ng-click="tool.toggle('play')">
-			<img height="38px" src="img/ic_action_overflow.png" />
-		</button>
+		<span class="no-overflow no-wrap">
+			<select class="absolute no-opacity" style="-webkit-appearance:none;width:45px;height:45px"
+				ng-model="headActions" ng-change="tool.show=headActions; headActions=''">
+				<option value="play">Playlists</option>
+				<option value="res">Resource</option>
+				<option value="conf">Settings</option>
+				<option value="">Cancel</option>
+			</select>
+			<button class="no-margin">
+				<img height="38px" src="img/ic_action_overflow.png" />
+			</button>
+		</span>
 	</div>
 	<div class="hide-too-wide no-overflow bold big cursor-hand text-ellipsis"
 		ng-click="browser.browse(listParentPath)">{{listName}}</div>
@@ -66,7 +75,9 @@
 	<div class="empty" ng-hide="total!=0">No thing here</div>
 </ul>
 <div class="foot show-list-mode anim-all no-wrap no-overflow">
-	<button ng-click="tool.toggle('play')"><img height="36px" src="img/ic_action_accept.png" /></button>
+	<button ng-click="tool.show=='play'?browser.save():tool.toggle('play')">
+		<img height="36px" src="img/ic_action_accept.png" />
+	</button>
 	<button ng-click="select.all()"><img height="36px" src="img/ic_action_select_all.png" /></button>
 	<button ng-click="select.toggle()"><img height="36px" src="img/ic_action_refresh.png" /></button>
 	<button ng-click="select.clear()"><img height="36px" src="img/ic_action_view_as_grid.png" /></button>
@@ -74,18 +85,18 @@
 </div>
 <div class="tool show-list-mode anim-all">
 	<h3 class="title no-wrap no-overflow">
-		<button ng-class="(!tool.show||tool.show=='play')||'gray'"
-			ng-click="tool.toggle('play')">Playlists</button>
-		<button ng-class="tool.show=='nav'||'gray'"
+		<button ng-class="(!tool.show||tool.show=='nav')||'gray'"
 			ng-click="tool.toggle('nav')">Search</button>
+		<button ng-class="tool.show=='play'||'gray'"
+			ng-click="tool.toggle('play')">Playlists</button>
 		<button ng-class="tool.show=='res'||'gray'"
 			ng-click="tool.toggle('res')">Resource</button>
 		<button ng-class="tool.show=='conf'||'gray'"
 			ng-click="tool.toggle('conf')">Settings</button>
 	</h3>
-	<div class="content" ng-show="!tool.show||tool.show=='play'">
+	<div class="content" ng-show="tool.show=='play'">
 		<p>
-			<button ng-hide="list.onEdit" ng-click="select.start();tool.show=false">[ Select ]</button>
+			<button ng-hide="list.onEdit" ng-click="select.start();tool.autoHide()">[ Select ]</button>
 			<button ng-show="list.onEdit" ng-click="select.finish();tool.autoHide()">[ Cancel ]</button>
 			<span ng-hide="list.onEdit&&!select.length()">
 				<button ng-click="browser.save()">[ Save ]</button>
@@ -116,7 +127,7 @@
 			</li>
 		</ul>
 	</div>
-	<div class="content" ng-show="tool.show=='nav'">
+	<div class="content" ng-show="!tool.show||tool.show=='nav'">
 		<form action="javascript:void(null)" ng-submit="browser.search()">
 			<div class="search">
 				<input type="text" name="word" ng-model="search.word" /><input type="submit" value="Search" /><br />

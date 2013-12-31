@@ -527,6 +527,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		// save (all items or current selection) as playlist
 		save: function(cb) {
 			get_selected_list(function(selected, total) {
+				if (!selected.length) return;
 				var url = selected.join(',') == total.join(',') ?
 						$scope.listUrl : url_from_items($scope.listPath, selected);
 				var name = $scope.playlists[url] || $scope.playlists[$scope.listUrl] || $scope.list.name || 'new';
@@ -762,7 +763,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	})
 
 	$('body').children('.overlay').bind("scroll touchstart mousedown", function(e) {
-		$tool.autoHide();
+		$tool.show = false;
 		$scope.$apply();
 	})
 	$(window).bind('beforeunload', function(e) {
