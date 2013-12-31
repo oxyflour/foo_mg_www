@@ -35,7 +35,11 @@ function get_cover(browse_dir, track_file)
 	local cover = get_file(browse_dir..'cover.jpg', browse_dir:md5())
 	if cover.attr then return cover end
 
-	local hash = track_file:match('(.*)\\.*'):md5()
+	local track_dir = track_file:match('(.*\\).*')
+	local hash = track_dir:md5()
+	local cover = get_file(track_dir..'cover.jpg', hash)
+	if cover.attr then return cover end
+
 	cover = get_file(CONF.albumart_cache..'\\'..hash, hash)
 	if cover.attr then return cover end
 
