@@ -142,7 +142,7 @@ if not res and id > 0 and track_file and track_file ~= '' and track_sub >= 0 the
 		if ua:find("MSIE") then
 			return "mp3"
 		else
-			return "mp3,wav"
+			return "mp3,wav,pcm"
 		end
 	end)(ua or "")
 
