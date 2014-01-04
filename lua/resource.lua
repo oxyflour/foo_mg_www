@@ -90,6 +90,7 @@ end
 
 local id = tonumber(get_var("id") or '0')
 local path, n = get_path(get_var("path"))
+local spath = path:sub(2) -- path without splash at the begining
 local res = get_var("res")
 
 local db = sqlite3.open(fb_env.db_file_name)
@@ -99,9 +100,9 @@ string.format([[SELECT
 	title,
 	codec,
 	filename_ext,
-	directory_path||'\',
-	directory_path||'\',
-	subsong
+	subsong,
+	directory_path,
+	directory_path
 FROM %s AS tp
 LEFT JOIN %s AS tt
 	ON pid=tp.id
@@ -111,21 +112,25 @@ string.format([[SELECT
 	title,
 	codec,
 	filename_ext,
+	subsong,
 	d,
-	SUBSTR(d, 1, b+1) AS s,
-	subsong
-FROM (SELECT *,
-		id AS i,
-		directory_path||'\' AS d,
-		CAST(SUBSTR(path_index, 1, 3) AS INTEGER) AS r,
-		CAST(SUBSTR(path_index, %d, 3) AS INTEGER) AS b
-	FROM %s)
+	SUBSTR(d, 1, r)
+FROM (SELECT id AS i,
+		directory_path AS d,
+		CAST(SUBSTR(path_index, 1, 3) AS INTEGER) AS r
+	FROM %s
+	WHERE SUBSTR(relative_path, 1, %d)='%s'
+	ORDER BY add_date DESC LIMIT 0,1)
 LEFT JOIN %s
 	ON pid=i
-WHERE SUBSTR(d, r, %d)='%s' ORDER BY add_date DESC LIMIT 0,1]],
-	n*3-2, fb_env.db_path_table, fb_env.db_track_table, path:utf8_len(), path:gsub('\'', '\'\''))
-for artist, title, codec, file, dir, path, subsong in db:urows(sql) do
-	browse_dir = path
+LIMIT 0,1]],
+	fb_env.db_path_table, spath:utf8_len(), spath:gsub("'", "''"), fb_env.db_track_table)
+for artist, title, codec, file, subsong, dir, root in db:urows(sql) do
+	browse_dir = root..spath
+	-- browse_dir should be a sub directory
+	if dir:sub(1, browse_dir:len()) ~= browse_dir then
+		browse_dir = dir
+	end
 	track_artist = artist
 	track_title = title
 	track_codec = codec:lower()

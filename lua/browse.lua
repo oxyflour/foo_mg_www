@@ -63,7 +63,7 @@ function parse_search(avail_fields, fields, word, path)
 		end
 	end
 	if s and path then
-		s = string.format([[(%s) AND relative_path||'\' LIKE '%s%%' ESCAPE '%s']], s, like_escape(path, c), c)
+		s = string.format([[(%s) AND relative_path LIKE '%s%%' ESCAPE '%s']], s, like_escape(path, c), c)
 	end
 	return s
 end
@@ -116,7 +116,7 @@ if inf.flist or inf.tlist or inf.word then -- search
 	inf.flist = ''
 	if cond then
 		local ls = {}
-		local sql = string.format([[SELECT id, relative_path||'\' FROM %s WHERE %s %s]],
+		local sql = string.format([[SELECT id, relative_path FROM %s WHERE %s %s]],
 			fb_env.db_path_table, cond, parse_sort(sort, folder_sort_fields))
 		for id, dir in db:urows(sql) do
 			table.insert(ls, id)
@@ -140,7 +140,7 @@ if inf.flist or inf.tlist or inf.word then -- search
 	if cond then
 		local ls = {}
 		local sql = string.format([[SELECT t.id, pid, title, tracknumber, artist, album, album_artist,
-				length, length_seconds, relative_path||'\'
+				length, length_seconds, relative_path
 			FROM %s as t
 			LEFT JOIN %s as p ON p.id=t.pid
 			WHERE %s %s]], fb_env.db_track_table, fb_env.db_path_table, cond,
@@ -166,33 +166,33 @@ else -- browse
 	local tls = { }
 	local sql = string.format([[SELECT
 		i,
-		SUBSTR(d, 1, e) AS s,
-		SUBSTR(d, r, e-r+1) AS p,
-		LENGTH(d)
+		d,
+		SUBSTR(b, 1, e-r) AS p
 	FROM (SELECT *,
 			id AS i,
-			directory_path||'\' AS d,
+			relative_path AS b,
+			directory_path AS d,
 			CAST(SUBSTR(path_index, 1, 3) AS INTEGER) AS r,
 			MAX(CAST(SUBSTR(path_index, %d, 3) AS INTEGER),
 				CAST(SUBSTR(path_index, %d, 3) AS INTEGER))+1 AS e
-		FROM %s)
-	WHERE SUBSTR(d, r, %d)='%s' GROUP BY p %s]],
-		n*3-2, n*3+1, fb_env.db_path_table, path:utf8_len(), path:gsub('\'', '\'\''), parse_sort(sort, folder_sort_fields))
-	for id, dir, sub, len in db:urows(sql) do
-		if sub == path then
+		FROM %s
+		WHERE SUBSTR(relative_path, 1, %d)='%s')
+	GROUP BY p %s]],
+		n*3-2, n*3+1, fb_env.db_path_table, inf.path:utf8_len(), inf.path:gsub("'", "''"), parse_sort(sort, folder_sort_fields))
+	for id, dir, sub in db:urows(sql) do
+		if sub == inf.path then
 			inf['id'], tls[id] = id, dir
 		else
 			inf.total = table.inspart(inf.ls, {
 				typ = "folder",
-				name = sub:match('.*\\([^\\]+)\\'),
-				path = sub:sub(2),
-				id = dir:utf8_len() == len and id or nil
+				name = ('\\'..sub):match('.*\\([^\\]+)'),
+				path = sub,
 			}, inf.total, begin, count)
 		end
 	end
 
 	for pid, dir in pairs(tls) do
-		local fname = dir.."\\"..CONF.ext_fname
+		local fname = dir..CONF.ext_fname
 		local extra = fb_util.file_stat(fname) and {} or nil
 		if extra then
 --			local date = os.date('%Y-%m-%d %H:%M:%S', attr.modified)
