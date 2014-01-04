@@ -1,4 +1,4 @@
-dofile(fb_env.doc_root.."\\common.lua")
+dofile(fb_env.script_path:match("(.*\\).*")..'common.lua')
 function get_path(path)
 	if not path or path == '' then path = '\\' end
 	if path:sub(1, 1) ~= '\\' then path = '\\'..path end
@@ -246,5 +246,5 @@ else
 			o.url = request_info.uri.."?path="..inf.path:url_encode().."&play="..o.id
 		end
 	end
-	(assert(loadfile(fb_env.doc_root.."\\view.lua")))(inf)
+	(assert(loadfile(fb_env.script_path:match("(.*\\).*")..'view.lua')))(inf)
 end

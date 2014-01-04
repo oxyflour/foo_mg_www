@@ -1,4 +1,4 @@
-dofile(fb_env.doc_root.."\\common.lua")
+dofile(fb_env.script_path:match("(.*\\).*")..'common.lua')
 function opt_find(opts, item, sep)
 	return (sep..opts..sep):find(sep..item..sep)
 end
