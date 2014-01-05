@@ -81,7 +81,7 @@
 	border: 2px solid transparent;
 }
 @media only screen and (min-width: 1080px) {
-	.sep .bg {
+.sep .bg {
 	height: 120px;
 }
 }
@@ -368,6 +368,28 @@
 }
 .playlist.play input {
 	border-color: #999;
+}
+
+@media only screen and (min-width: 1281px) {
+.main, .foot {
+	right: auto;
+	width: 600px;
+} 
+.tool, .player {
+	left: 600px;
+} 
+.aa-block-view .folder {
+	margin-left: 20px;
+	margin-top: 12px;
+	max-width: 160px;
+}
+.aa-block-view .folder .albumart {
+	width: 160px;
+	height: 160px;
+}
+.sep .bg {
+	height: 140px;
+}
 }
 
 body>.show-list-mode,
