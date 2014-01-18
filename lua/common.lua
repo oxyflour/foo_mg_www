@@ -1,6 +1,8 @@
 CONF = {
 	-- default albumart file
 	def_albumart = fb_env.doc_root.."\\img\\nocover.jpg",
+	-- albumart folder (saved as %album%.jpg)
+	albumart_folder = fb_env.doc_root.."\\tmp\\albumart",
 	-- albumart cache folder
 	albumart_cache = fb_env.doc_root.."\\tmp\\cache",
 	-- lyric search dir (saved as %artist% - %title%.lrc or %title%.lrc)

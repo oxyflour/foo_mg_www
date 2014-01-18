@@ -31,13 +31,16 @@ function get_file(fname, hash)
 		hash = hash
 	}
 end
-function get_cover(browse_dir, track_file)
+function get_cover(browse_dir, track_file, track_album)
 	local cover = get_file(browse_dir..'cover.jpg', browse_dir:md5())
 	if cover.attr then return cover end
 
 	local track_dir = track_file:match('(.*\\).*')
 	local hash = track_dir:md5()
-	local cover = get_file(track_dir..'cover.jpg', hash)
+	cover = get_file(track_dir..'cover.jpg', hash)
+	if cover.attr then return cover end
+
+	cover = get_file(CONF.albumart_folder..'\\'..track_album..'.jpg', hash)
 	if cover.attr then return cover end
 
 	cover = get_file(CONF.albumart_cache..'\\'..hash, hash)
@@ -98,6 +101,7 @@ local sql = id > 0 and
 string.format([[SELECT
 	artist,
 	title,
+	album,
 	codec,
 	filename_ext,
 	subsong,
@@ -110,6 +114,7 @@ WHERE tt.id=%d ORDER BY add_date DESC LIMIT 0,1]], fb_env.db_path_table, fb_env.
 string.format([[SELECT
 	artist,
 	title,
+	album,
 	codec,
 	filename_ext,
 	subsong,
@@ -125,7 +130,7 @@ LEFT JOIN %s
 	ON pid=i
 LIMIT 0,1]],
 	fb_env.db_path_table, spath:utf8_len(), spath:gsub("'", "''"), fb_env.db_track_table)
-for artist, title, codec, file, subsong, dir, root in db:urows(sql) do
+for artist, title, album, codec, file, subsong, dir, root in db:urows(sql) do
 	browse_dir = root..spath
 	-- browse_dir should be a sub directory
 	if dir:sub(1, browse_dir:len()) ~= browse_dir then
@@ -133,6 +138,7 @@ for artist, title, codec, file, subsong, dir, root in db:urows(sql) do
 	end
 	track_artist = artist
 	track_title = title
+	track_album = album
 	track_codec = codec:lower()
 	track_file = dir..file
 	track_sub = subsong
@@ -186,7 +192,7 @@ elseif res == 'albumart' and track_file and track_file ~= '' then
 	else -- only use cache for folders
 		local fs, sz = {}, get_size(get_var('w'), get_var('s'))
 		if CONF.albumart_cache and
-				table.set(fs, 'cover', get_cover(browse_dir, track_file)).attr and
+				table.set(fs, 'cover', get_cover(browse_dir, track_file, track_album)).attr and
 				table.set(fs, 'thumb', get_thumb(fs.cover, sz)).attr then
 			send = fb_stream.stream_file(fs.thumb.fname)
 		elseif fs.cover and fs.cover.attr then
