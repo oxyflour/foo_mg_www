@@ -262,7 +262,7 @@
 		<p class="gray" ng-hide="audio.lyric"><br />No lyric for this track</p>
 		<img class="absolute absolute-left anim-all anim-in-1s" ng-show="lyric.info.bkimg"
 			ng-src="{{lyric.info.bkimg&&conf.res_url(lyric.info.bkimg, undefined, audio.info.path)}}" />
-		<div class="text absolute anim-all anim-in-1s full-width">
+		<div class="text absolute anim-all anim-in-1s full-width" style="margin-top:-90000px">
 			<div class="line anim-all" lrc-id="{{$index}}" ng-class="$index==lyric.current.index&&'active'"
 				ng-repeat="i in lyric.content" ng-if="i.d.substr">{{i.d}}</div>
 		</div>
