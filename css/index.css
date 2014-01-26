@@ -337,6 +337,11 @@
 	width: 25%;
 	max-width: 80px;
 }
+@media only screen and (max-width: 621px) {
+.tool .title {
+	font-size: 98%;
+}
+}
 @media only screen and (min-width: 621px) {
 .tool .content {
 	margin: 20px;

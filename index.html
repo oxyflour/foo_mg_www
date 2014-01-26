@@ -86,6 +86,8 @@
 	<button class="float-right" ng-click="select.finish()"><img height="36px" src="img/ic_action_cancel.png" /></button>
 </div>
 <div class="tool show-list-mode anim-all">
+	<button class="hide-too-wide float-right" style="padding:5px;"
+		ng-click="tool.show=''">X</button>
 	<h3 class="title no-wrap no-overflow">
 		<button ng-class="(!tool.show||tool.show=='nav')||'gray'"
 			ng-click="tool.toggle('nav')">Search</button>
