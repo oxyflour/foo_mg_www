@@ -621,11 +621,13 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 				});
 			}
 			function disptxt(e, i, n) {
-				var pos = txt.find('.line[lrc-id='+n+']').position(),
+				var line = txt.find('.line[lrc-id='+n+']'),
+					pos = line.position(),
+					height = line.height(),
 					baseY = e.height() / 2,
 					marginY = parseInt(txt.css('margin-top')) || 0,
 					offsetY = pos ? pos.top : 0,
-					trans = 'translate3d(0, '+Math.floor(baseY-marginY-offsetY)+'px, 0)';
+					trans = 'translate3d(0, '+Math.floor(baseY-marginY-offsetY-height/2)+'px, 0)';
 				txt.css({
 					'-webkit-transform': trans,
 					'-moz-transform': trans,
