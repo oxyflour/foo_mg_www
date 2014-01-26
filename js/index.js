@@ -760,7 +760,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.listUrl = l.search.url;
 		else if (l.path == 'img' && l.search.url)
 			$scope.imgUrl = l.search.url;
-		else
+		else if (!l.path)
 			$scope.listUrl = '/'
 	})
 
