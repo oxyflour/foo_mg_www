@@ -23,8 +23,7 @@
 				<option value="tool.show='play'">Playlists</option>
 				<option value="tool.show='res'">Resource</option>
 				<option value="tool.show='conf'">Settings</option>
-				<option value="browser.reload()">Reload List</option>
-				<option value="location.reload()">Reload Page</option>
+				<option value="location.reload()">Reload</option>
 				<option value="">Cancel</option>
 			</select>
 			<button class="no-margin">
@@ -32,8 +31,11 @@
 			</button>
 		</span>
 	</div>
-	<div class="hide-too-wide no-overflow bold big cursor-hand text-ellipsis"
-		ng-click="browser.browse(listParentPath)">{{listName}}</div>
+	<div class="hide-too-wide bold big cursor-hand">
+		<span class="absolute" style="padding-right:30px;"
+			ng-show="list.parent" ng-click="browser.browse(listParentPath)">&lt;</span>
+		<div class="no-overflow text-ellipsis" ng-click="tool.toggle('res')">{{listName}}</div>
+	</div>
 	<div class="hide-too-narrow no-overflow bg-white">
 		<span ng-repeat="(p, n) in listPathSplit">
 			<button class="no-overflow no-wrap no-margin bold big text-ellipsis"
@@ -51,7 +53,7 @@
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
 		<a ng-show="setting.img_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
 		<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
-		<div class="bg" ng-click="i.path ? browser.browse(i.path) : tool.toggle('res')">
+		<div class="bg" ng-click="i.path ? browser.browse(i.path) : select.toggle(0, i.group)">
 			<big class="stress">{{i.album}}</big> ({{i.album_artist}})
 		</div>
 	</div>
@@ -61,7 +63,7 @@
 		{{i.shortName}}
 		<div class="info">{{i.bracS}} {{i.bracR}}</div>
 	</li>
-	<li class="track {{i.id==audio.id&&audio.state}}" pl-id="{{i.id}}" ng-repeat-end
+	<li class="track {{i.id==audio.id&&audio.state}}" pl-id="{{i.id}}" bw-group="{{i.group}}" ng-repeat-end
 		ng-if="i.typ=='track'" ng-click="onEdit ? select.toggle(i.id) : browser.playCurrent(i.id)">
 		<span class="num">{{i.num}}</span>
 		<span class="duration" ng-click="select.toggle(i.id);$event.stopPropagation()">
@@ -153,6 +155,11 @@
 		</form>
 	</div>
 	<div class="content" ng-show="tool.show=='res'">
+		<p>
+			<button ng-click="browser.browse(listParentPath)">[ Parent ]</button>
+			<button ng-click="browser.reload()">[ Refresh ]</button>
+			<button ng-click="location.reload()">[ Reload ]</button>
+		</p>
 		<div class="gray" ng-hide="list.resList.length">No Resource Here</div>
 		<ul>
 			<li ng-repeat="i in list.resList" ng-switch on="i.typ">

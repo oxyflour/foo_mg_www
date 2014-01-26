@@ -685,9 +685,15 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		all: function() {
 			$('body').children('.list').not('.ng-hide').children('li').addClass('selected');
 		},
-		toggle: function(id) {
+		toggle: function(id, group) {
 			var bwList = $('body').children('.list').not('.ng-hide');
-			bwList.children(id ? 'li[pl-id='+id+']' : 'li').toggleClass('selected');
+			bwList.children('li').each(function(i, e) {
+				var elem = $(e);
+				if ((!id && !group) ||
+					(id && elem.attr('pl-id') == id) ||
+					(group && elem.attr('bw-group') == group))
+					elem.toggleClass('selected');
+			});
 			bwList.children('.selected').length ? $select.start() : $select.finish();
 		},
 		finish: function() {
