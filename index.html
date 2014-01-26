@@ -23,6 +23,8 @@
 				<option value="tool.show='play'">Playlists</option>
 				<option value="tool.show='res'">Resource</option>
 				<option value="tool.show='conf'">Settings</option>
+				<option value="browser.reload()">Reload List</option>
+				<option value="location.reload()">Reload Page</option>
 				<option value="">Cancel</option>
 			</select>
 			<button class="no-margin">
@@ -132,27 +134,21 @@
 			<div class="search">
 				<input type="text" name="word" ng-model="search.word" /><input type="submit" value="Search" /><br />
 			</div>
-			<input  id="sf_fo" type="checkbox" ng-model="search.fields.folder" />
-			<label for="sf_fo">Folder</label>
-			<input  id="sf_al" type="checkbox" ng-model="search.fields.album" />
-			<label for="sf_al">Album</label>
-			<input  id="sf_ar" type="checkbox" ng-model="search.fields.artist" />
-			<label for="sf_ar">Artist</label>
-			<input  id="sf_ti" type="checkbox" ng-model="search.fields.title" />
-			<label for="sf_ti">Title</label>
-			<br />
-			<input  id="sf_op" type="checkbox" ng-model="search.onpath" />
-			<label for="sf_op">Search under current folder</label>
+			<p>
+				<input  id="sf_fo" type="checkbox" ng-model="search.fields.folder" />
+				<label for="sf_fo">Folder</label>
+				<input  id="sf_al" type="checkbox" ng-model="search.fields.album" />
+				<label for="sf_al">Album</label>
+				<input  id="sf_ar" type="checkbox" ng-model="search.fields.artist" />
+				<label for="sf_ar">Artist</label>
+				<input  id="sf_ti" type="checkbox" ng-model="search.fields.title" />
+				<label for="sf_ti">Title</label>
+			</p>
+			<p>
+				<input  id="sf_op" type="checkbox" ng-model="search.onpath" />
+				<label for="sf_op">Search under current folder</label>
+			</p>
 		</form>
-		<h4>Go to</h4>
-		<p>
-			<button ng-click="browser.browse(listParentPath)">[ parent ]</button>
-			<button ng-click="browser.open(playUrl)">[ playing ]</button>
-		</p>
-		<p>
-			<button ng-click="browser.reload()">[ reload list ]</button>
-			<button onclick="location.reload()">[ reload page ]</button>
-		</p>
 	</div>
 	<div class="content" ng-show="tool.show=='res'">
 		<div class="gray" ng-hide="list.resList.length">No Resource Here</div>

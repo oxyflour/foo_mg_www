@@ -753,8 +753,9 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		return $location.absUrl()
 	}, function(url) {
 		var l = $scope.location = {
-			path :$location.path().substr(1),
-			search :$location.search()
+			path: $location.path().substr(1),
+			search: $location.search(),
+			reload: function() { location.reload(); }
 		}
 		if (l.path == 'list' && l.search.url)
 			$scope.listUrl = l.search.url;
