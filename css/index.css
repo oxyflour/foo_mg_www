@@ -398,6 +398,30 @@
 }
 }
 
+.img .mask {
+	background: rgba(0, 0, 0, 0.6);
+}
+.mask .playinfo {
+	color: #888;
+	background-color: #eee;
+	padding: 1em 0;
+}
+.mask .playinfo .info {
+	margin-top: 0.2em;
+}
+.img .buttonbar button {
+	color: #bbb;
+	font-size: 105%;
+	font-weight: bold;
+	text-shadow: #555 1px 1px 2px;
+	padding: 0.5em;
+}
+.img .loader {
+	color: #888;
+	background-color: #eee;
+	padding: 1.5em 0;
+}
+
 body>.show-list-mode,
 body>.show-img-mode,
 body.list-mode>.hide-list-mode,

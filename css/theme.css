@@ -30,6 +30,9 @@ a:hover {
 .hidden {
 	display: none;
 }
+.block {
+	display: block;
+}
 .absolute {
 	position: absolute;
 }
@@ -38,6 +41,9 @@ a:hover {
 }
 .full-width {
 	width: 100%;
+}
+.full-height {
+	height: 100%;
 }
 .inline-block {
 	display: inline-block;
@@ -57,17 +63,38 @@ a:hover {
 .half-opacity {
 	opacity: 0.5;
 }
+.full-opacity {
+	opacity: 1;
+}
 .float-left {
 	float: left;
 }
 .float-right {
 	float: right;
 }
-.absolute-left {
+.abs-left {
 	left: 0;
 }
-.absolute-right {
+.abs-right {
 	right: 0;
+}
+.abs-top {
+	top: 0;
+}
+.abs-bottom {
+	bottom: 0;
+}
+.left-top {
+	left: 0;
+	top: 0;
+}
+.right-top {
+	right: 0;
+	top: 0;
+}
+.left-bottom {
+	left: 0;
+	bottom: 0;
 }
 .text-center {
 	text-align: center;
@@ -87,8 +114,14 @@ a:hover {
 .gray {
 	color: #aaa;
 }
+.white {
+	color: white;
+}
 .bg-white {
 	background-color: white;
+}
+.bg-black {
+	background-color: black;
 }
 .bg-gray {
 	background-color: #eee;
@@ -99,6 +132,12 @@ a:hover {
 	-moz-transition: all .4s ease;
 	-ms-transition: all .4s ease;
 	transition: all .4s ease;
+}
+.anim-opacity {
+	-webkit-transition: opacity .4s ease;
+	-moz-transition:  opacity .4s ease;
+	-ms-transition:  opacity .4s ease;
+	transition: opacity .4s ease;
 }
 .anim-in-1s {
 	-webkit-transition-duration: 1s;

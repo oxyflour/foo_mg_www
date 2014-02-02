@@ -9,9 +9,9 @@
 </head>
 <body ng-class="[ tool.show&&'show-tool', list.onEdit&&'show-foot',
 		setting.folder_view_class||'aa-block-view', location.path+'-mode']"
-	bw-main bw-main-cache="{{setting.lists_in_cache||4}}"
-	pl-ctrl pl-ctrl-next="{{setting.play_single_track?'':1}}"  pl-ctrl-loop="{{setting.play_no_loop?'':1}}">
-<div class="overlay show-list-mode"></div>
+	bw-main="browser.url" bw-main-cache="{{setting.lists_in_cache||4}}"
+	pl-ctrl="audio[pl-audio]" pl-ctrl-next="{{!setting.play_single_track}}"  pl-ctrl-loop="{{!setting.play_no_loop}}">
+<div class="overlay show-list-mode" any-move="tool.show=false"></div>
 <div class="head show-list-mode no-wrap no-overflow anim-all">
 	<div class="float-right">
 		<button class="no-margin" ng-click="tool.toggle('nav')">
@@ -33,26 +33,25 @@
 	</div>
 	<div class="hide-too-wide bold big cursor-hand">
 		<span class="absolute" style="padding-right:40px;"
-			ng-show="list.parent" ng-click="browser.browse(listParentPath)">&lt;</span>
-		<div class="no-overflow text-ellipsis" ng-click="tool.toggle('res')">{{listName}}</div>
+			ng-show="list.parent" ng-click="browser.browse(browser.parentPath)">&lt;</span>
+		<div class="no-overflow text-ellipsis" ng-click="tool.toggle('res')">{{browser.name}}</div>
 	</div>
 	<div class="hide-too-narrow no-overflow bg-white">
-		<span ng-repeat="(p, n) in listPathSplit">
+		<span ng-repeat="(p, n) in browser.pathSplit">
 			<button class="no-overflow no-wrap no-margin bold big text-ellipsis"
-				ng-click="browser.browse(p)" ng-class="p!=listPath&&'gray'">{{n}}</button>
+				ng-click="browser.browse(p)" ng-class="p!=browser.path&&'gray'">{{n}}</button>
 			<span class="gray">&gt;</span>
 		</span>
 	</div>
 </div>
 <ul class="main list show-list-mode anim-all ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']"
-	bw-list ng-non-bindable ng-show="url==listUrl">
+	bw-list ng-non-bindable ng-show="url==browser.url">
 	<div ng-if="word" ng-click="browser.browse(path)">
 		<div class="tip cursor-hand fixed full-width">Searching '{{word}}'</div>
 		<div class="tip">Searching '{{word}}'</div>
 	</div>
 	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
-		<a ng-show="setting.img_open_self" ng-href="#/img?url={{i.aaUrl|urlEncode}}"><small class="link">&raquo;</small></a>
-		<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.aaUrl}}"><small class="link">&raquo;</small></a>
+		<small class="link cursor-hand" ng-click="image.open(i.aaUrl, true)">&raquo;</small>
 		<div class="bg" ng-click="i.path ? browser.browse(i.path) : select.toggle(0, i.group)">
 			<big class="stress">{{i.album}}</big> ({{i.album_artist}})
 		</div>
@@ -124,11 +123,11 @@
 		</p>
 		<ul ng-init="playlists=conf.local_store_dict('playlists@')">
 			<!-- Note: neither ng-class nor ng-show works with ng-repeat -->
-			<li ng-repeat="(u, n) in playlists" class="playlist {{u==listUrl&&'bold'}} {{u==playUrl&&'play'}}">
+			<li ng-repeat="(u, n) in playlists" class="playlist {{u==browser.url&&'bold'}} {{u==player.url&&'play'}}">
 				<form ng-show="n.length||f" action="javascript:void(null)" onsubmit="$('button').focus()">
 					<input auto-select local-store="playlists@{{u}}" local-store-init="n"
 						pl-url="{{u}}" ng-focus='f=1' ng-blur='f=0' ng-model="playlists[u]" />
-					<a ng-href="#list?url={{u|urlEncode}}">{{n}}</a>
+					<a href="javascript:void(null)" ng-click="browser.open(u)">{{n}}</a>
 				</form>
 			</li>
 		</ul>
@@ -156,15 +155,14 @@
 	</div>
 	<div class="content" ng-show="tool.show=='res'">
 		<p>
-			<button ng-click="browser.browse(listParentPath)">[ Parent ]</button>
+			<button ng-click="browser.browse(browser.parentPath)">[ Parent ]</button>
 			<button ng-click="browser.reload()">[ Refresh ]</button>
-			<button ng-click="location.reload()">[ Reload ]</button>
 		</p>
 		<div class="gray" ng-hide="list.resList.length">No Resource Here</div>
 		<ul>
 			<li ng-repeat="i in list.resList" ng-switch on="i.typ">
 				<div ng-switch-when="img">
-					<a ng-show="setting.img_open_self" ng-href="#/img?url={{i.url|urlEncode}}">{{i.name}}</a>
+					<a ng-show="setting.img_open_self" href="javascript:void(null)" ng-click="image.open(i.url)">{{i.name}}</a>
 					<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 				</div>
 				<div ng-switch-when="txt">
@@ -182,7 +180,7 @@
 	<div class="content" ng-show="tool.show=='conf'">
 		<h4>Folder Setting</h4>
 		<div class="field" ng-init="setting.list_sort=conf.local_store_dict('setting.sort@')">sort current folder:
-			<select local-store="setting.sort@{{listUrl}}" ng-model="setting.list_sort[listUrl]" ng-change="browser.reload()">
+			<select local-store="setting.sort@{{browser.url}}" ng-model="setting.list_sort[browser.url]" ng-change="browser.reload()">
 				<option value="">with none</option>
 				<option value="folder">by name</option>
 				<option value="folder_desc">by name reverse</option>
@@ -241,32 +239,37 @@
 </div>
 <div class="player show-list-mode anim-all">
 	<div class="ctrl" ng-hide="player.show">
-		<div class="albumart cursor-hand" ng-click="player.show='lrc'">
-			<div ng-attr-style="background-image:{{audio.aaCssUrl}}">
-				<button class="float-right gray" ng-show="audio.lyric">lrc</button>
-			</div>
+		<div class="albumart cursor-hand">
+			<div ng-attr-style="background-image:{{audio.aaCssUrl}}"
+				ng-click="image.open(audio.aaUrl, true)"></div>
 		</div>
 		<div class="buttonbar">
 			<button ng-click="player.playnext(-1, true)">[ &laquo; ]</button>
-			<button ng-click="player.play()" ng-dblclick="player.playnext(0)" ng-hide="audio.state=='play'">[ &gt; ]</button>
-			<button ng-click="player.pause()" ng-dblclick="player.playnext(0)" ng-show="audio.state=='play'">[ || ]</button>
+			<button ng-click="player.playpause()" ng-dblclick="player.playnext(0)">
+				<span ng-show="audio.state=='play'">[ | | ]</span>
+				<span ng-hide="audio.state=='play'">[ &gt; ]</span>
+			</button>
 			<button ng-click="player.playnext(1, true)">[ &raquo; ]</button>
 		</div>
-		<div class="cursor-hand" ng-show="audio.info" ng-click="browser.open(playUrl)">
+		<div class="cursor-hand" ng-show="audio.info" ng-click="browser.open(player.url)">
 			<big>{{audio.info.artist}} - {{audio.info.name}}</big>
 			<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
 			<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
-			<div class="info"><small>{{audio.info.album}} [{{audio.info.num}}]</small></div>
+			<div class="info">
+				<small>{{audio.info.album}} [{{audio.info.num}}]</small>
+				<small ng-show="audio.lyric"
+					ng-click="player.show=true;$event.stopPropagation()">[ lrc ]</small>
+			</div>
 		</div>
 		<big ng-hide="audio.id">Ready to play</big>
 	</div>
-	<!-- set offset for animation -->
-	<div class="lyric cursor-hand" ng-show="player.show=='lrc'" ng-click="player.show=''"
+	<div class="lyric cursor-hand" ng-show="player.show" ng-click="player.show=false"
 		pl-lyric="audio[pl-audio]" pl-lyric-bind="audio.lyric" pl-lyric-offset="0.8"
 		pl-lyric-load="lyric.load(info, content)" pl-lyric-update="lyric.update(info, i, content[i])">
 		<p class="gray" ng-hide="audio.lyric"><br />No lyric for this track</p>
-		<img class="absolute absolute-left anim-all anim-in-1s" ng-show="lyric.info.bkimg"
+		<img class="absolute abs-left anim-all anim-in-1s" ng-show="lyric.info.bkimg"
 			ng-src="{{lyric.info.bkimg&&conf.res_url(lyric.info.bkimg, undefined, audio.info.path)}}" />
+		<!-- Note: set a negative margin-top to avoid transform problem on android webview -->
 		<div class="text absolute anim-all anim-in-1s full-width" style="margin-top:-90000px">
 			<div class="line anim-all" lrc-id="{{$index}}" ng-class="$index==lyric.current.index&&'active'"
 				ng-repeat="i in lyric.content" ng-if="i.d.substr">{{i.d}}</div>
@@ -274,7 +277,7 @@
 	</div>
 	<audio pl-audio></audio>
 	<input type="hidden" local-store ng-model="audio.id" />
-	<input type="hidden" local-store ng-model="playUrl" />
+	<input type="hidden" local-store ng-model="player.url" />
 	<input type="hidden" local-store ng-model="player.playlist" />
 	<!--canvas class="analyser" width="120" height="30" pl-analyser="audio[pl-audio]"></canvas-->
 	<a class="processbar cursor-hand anim-all" ng-show="audio.id" ng-mousemove="player.getHoverPosition($event)"
@@ -284,8 +287,42 @@
 	</a>
 </div>
 <div class="img show-img-mode">
-	<a class="absolute gray" ng-href="mklrc.html#/img?url={{imgUrl|urlEncode}}">mklrc</a>
-	<img ng-src="{{imgUrl}}" />
+	<!--a class="absolute gray" ng-href="mklrc.html#/img?url={{image.url|urlEncode}}">mklrc</a-->
+	<div class="mask absolute left-top anim-opacity"
+		ng-style="{opacity:image.show?1:0}">
+		<div class="fixed left-top full-width full-height" any-move="image.show=false"> </div>
+		<div class="playinfo fixed left-bottom text-center full-width cursor-hand anim-opacity"
+			ng-click="browser.open(player.url)">
+			{{audio.info.artist}} - {{audio.info.name}}
+			<small>
+				<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
+				<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
+			</small>
+			<br />
+			<small class="info">{{audio.info.album}} [{{audio.info.num}}]</small>
+		</div>
+		<div class="fixed left-top bold gray text-center full-width"
+			style="top:40%">
+			<button class="float-left gray bold" style="padding:0.5em;font-size:180%"
+				ng-click="player.playnext(-1, true)">&lt;</button>
+			<button class="gray" style="margin-top:-0.2em;padding:0.5em;font-size:250%"
+				ng-click="player.playpause()" ng-dblclick="player.playnext(0)">
+				<span ng-show="audio.state=='play'">| |</span>
+				<span ng-hide="audio.state=='play'">&gt;|</span>
+			</button>
+			<button class="float-right gray bold" style="padding:0.5em;font-size:180%"
+				ng-click="player.playnext(1, true)">&gt;</button>
+		</div>
+		<div class="fixed left-top full-width full-height" ng-hide="image.show"> </div>
+	</div>
+	<div class="buttonbar fixed right-top">
+		<button ng-click="image.show=!image.show">...</button>
+		<button ng-click="image.show=false;image.resize()">+</button>
+		<button ng-click="browser.open(browser.url)">&laquo;</button>
+	</div>
+	<span class="loader fixed left-top text-center full-width">Loading...</span>
+	<img class="block" img-src="image.url" img-load="image.load()"
+		img-loading="image.loading()" img-loaded="image.loaded()" />
 </div>
 <script src="js/jquery-1.8.0.min.js"></script>
 <script src="js/jq.util.js"></script>

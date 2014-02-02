@@ -51,6 +51,9 @@ app.directive('bwMain', function($compile) {
 		}
 	}
 	return function (scope, elem, attrs, ctrl) {
+		scope.$watch(attrs.bwMain, function(url, url0) {
+			if (url) open(elem, scope, url);
+		});
 		scope.open = function(url, reopen) {
 			if (!url) return;
 			open(elem, scope, url, reopen);
@@ -78,7 +81,7 @@ app.directive('bwList', function($http) {
 				if (scope.ls.length != data.begin)
 					return;
 				$.keach(data.ls, function(i, v, d) {
-					// have to check because lua cjson sends null to fill array
+					// have to check twice because lua cjson sends null to fill array
 					if (!v) return;
 					if ((v.group = $.format('{{1//album}}', v)) &&
 							d.currentGroup != v.group) {
@@ -131,7 +134,7 @@ app.directive('bwList', function($http) {
 })
 app.directive('plCtrl', function($http) {
 	return function (scope, elem, attrs, ctrl) {
-		var a = angular.element('[pl-audio]');
+		var a = $(attrs.plCtrl);
 		var player = scope.player = (scope.player || {});
 		player.load = function(id) {
 			var ad = scope.audio;
@@ -397,6 +400,36 @@ app.directive('autoSelect', function() {
 		});
 	}
 })
+app.directive('imgSrc', function() {
+	return function (scope, elem, attrs, ctrl) {
+		function check() {
+			if (elem[0].complete) {
+				if (attrs.imgLoaded)
+					scope.$eval(attrs.imgLoaded);
+			}
+			else {
+				setTimeout(check, 500);
+				if (attrs.imgLoading)
+					scope.$eval(attrs.imgLoading);
+			}
+		}
+		scope.$watch(attrs.imgSrc, function(v, v0) {
+			if (!v) return;
+			if (attrs.imgLoad)
+				scope.$eval(attrs.imgLoad);
+			elem.attr('src', v);
+			check();
+		});
+	}
+})
+app.directive('anyMove', function() {
+	return function (scope, elem, attrs, ctrl) {
+		elem.bind("scroll touchstart mousedown", function(e) {
+			scope.$eval(attrs.anyMove, { $event: e });
+			scope.$apply();
+		})
+	}
+})
 
 app.controller('main', function($scope, $location, $http, $timeout) {
 	function get_full_url(url) {
@@ -450,10 +483,10 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}
 	}
 
-	// the bw-list elem may not load all items from listUrl at once, i.e. $scope.list.ls might be not complete
+	// the bw-list elem may not load all items from browse.url at once, i.e. $scope.list.ls might be not complete
 	// this function will make sure the callback can fetch every items under listurl all
 	function get_full_list(f) {
-		var list = $scope.list, url = $scope.listUrl;
+		var list = $scope.list, url = $browser.url;
 		if (list.total == list.ls.length)
 			f(list.ls);
 		else {
@@ -464,7 +497,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}
 	}
 	// the first parameter passed to the callback is a complete list of user selection,
-	// while the second one may not contain every one under listUrl.
+	// while the second one may not contain every one under browser.url.
 	// the second list should only be used for comparing with the first one
 	function get_selected_list(f) {
 		var bwList = $('.list:not(.ng-hide)'), children = bwList.children('.track'),
@@ -502,11 +535,13 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	}
 
 	var $browser = $scope.browser = {
+		url: '',
 		open: function(url) {
-			$scope.listUrl = url;
+			$location.path('list').search('url', url || '/');
+			$tool.autoHide();
 		},
 		browse: function(path) {
-			$scope.listUrl = (path || '/').replace(/\\/g, '/');
+			$browser.open((path || '/').replace(/\\/g, '/'));
 		},
 		search: function() {
 			var s = $scope.search;
@@ -518,18 +553,18 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 				fields: fields || undefined,
 				word: s.word || undefined
 			});
-			$scope.listUrl = path + (query ? '?'+query : '');
+			$browser.open(path + (query ? '?'+query : ''));
 		},
 		reload: function() {
-			if (!$scope.listUrl) return;
-			$scope.open($scope.listUrl, true);
+			if (!$browser.url) return;
+			$scope.open($browser.url, true);
 		},
 		// save (all items or current selection) as playlist
 		save: function(cb) {
 			get_selected_list(function(selected, total) {
 				var url = selected.join(',') == total.join(',') ?
-						$scope.listUrl : url_from_items($scope.listPath, selected);
-				var name = $scope.playlists[url] || $scope.playlists[$scope.listUrl] || $scope.list.name || 'new';
+						$browser.url : url_from_items($browser.url, selected);
+				var name = $scope.playlists[url] || $scope.playlists[$browser.url] || $scope.list.name || 'new';
 				save_list(url, name);
 				if (cb && cb.apply) cb();
 			});
@@ -555,7 +590,7 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 					selected = dataList.concat(selected);
 					if (selected.length) {
 						var newName = $scope.playlists[u] || data.name || 'new',
-							newUrl = url_from_items($scope.listPath, selected);
+							newUrl = url_from_items($browser.url, selected);
 						$scope.playlists[u] = '';
 						save_list(newUrl, newName);
 					}
@@ -565,24 +600,31 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$scope.addToUrl = '';
 			$select.finish();
 		},
-		// play (every items) under current listUrl
+		// play (every items) under current browser.url
 		playCurrent: function(id) {
 			$scope.player.playpause(id);
-			$scope.playUrl = $scope.listUrl;
+			$scope.player.url = $browser.url;
 			get_full_list(function(list) {
 				var dataList = get_tracks_from_data(list);
 				$scope.player.playlist = dataList.join(',');
 			});
 		}
+		// other methods will be added by bw-main
+	}
+
+	var $audio = $scope.audio = {
+		// other methods will be added by pl-audio
 	}
 
 	var $player = $scope.player = {
+		url: '',
 		show: false,
 		getHoverPosition: function(e) {
 			var t = $(e.currentTarget), p = t.offset(), w = t.width(), x = e.pageX;
-			$player.hoverSec = $scope.audio ? $scope.audio.length * (x - p.left) / w : 0;
-			$player.hoverMmss = $scope.audio ? sec2Mmss($player.hoverSec) : '';
+			$player.hoverSec = $audio ? $audio.length * (x - p.left) / w : 0;
+			$player.hoverMmss = $audio ? sec2Mmss($player.hoverSec) : '';
 		}
+		// other methods will be added by pl-ctrl
 	}
 
 	var $lyric = $scope.lyric = {
@@ -592,9 +634,6 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$lyric.current = {};
 		},
 		update: function(i, n, v) {
-			$lyric.current.index = n;
-			var elem = $('[pl-lyric]'), img = elem.find('img'), txt = elem.find('.text');
-			if (!elem.is(":visible")) return;
 			function dispbk(e, i, p) {
 				var alignx = p.alignx || i.bkalignx, aligny = p.aligny || i.bkaligny,
 					width = p.width || i.bklinewidth, height = p.height || i.bklineheight;
@@ -621,13 +660,10 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 				});
 			}
 			function disptxt(e, i, n) {
-				var line = txt.find('.line[lrc-id='+n+']'),
-					pos = line.position(),
-					height = line.height(),
-					baseY = e.height() / 2,
-					marginY = parseInt(txt.css('margin-top')) || 0,
-					offsetY = pos ? pos.top : 0,
-					trans = 'translate3d(0, '+Math.floor(baseY-marginY-offsetY-height/2)+'px, 0)';
+				var line = txt.find('.line[lrc-id='+n+']'), pos = line.position(),
+					baseY = e.height() / 2 - (parseInt(txt.css('margin-top')) || 0),
+					offsetY = line.height() / 2 + (pos ? pos.top : 0),
+					trans = 'translate3d(0, '+Math.floor(baseY-offsetY)+'px, 0)';
 				txt.css({
 					'-webkit-transform': trans,
 					'-moz-transform': trans,
@@ -635,10 +671,13 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 					'transform': trans,
 				});
 			}
-			if (typeof(v.d) == typeof({}))
-				dispbk(elem, i, v.d);
-			else
-				disptxt(elem, i, n);
+			$lyric.current.index = n;
+			var elem = $('[pl-lyric]'), img = elem.find('img'), txt = elem.find('.text');
+			elem.filter(':visible').each(function(i, e) {
+				typeof(v.d) == typeof({}) ?
+					dispbk($(e), i, v.d) :
+					disptxt($(e), i, n);
+			})
 		}
 	}
 
@@ -672,21 +711,24 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 	}
 
 	var $select = $scope.select = {
+		getList: function() {
+			return $('body').children('.list').not('.ng-hide');
+		},
 		start: function() {
 			$scope.list.onEdit = true;
 			$scope.tool.select = false;
 		},
 		length: function() {
-			return $('body').children('.list').not('.ng-hide').children('li.selected').length;
+			return $select.getList().children('li.selected').length;
 		},
 		clear: function() {
-			$('body').children('.list').not('.ng-hide').children('li').removeClass('selected');
+			$select.getList().children('li').removeClass('selected');
 		},
 		all: function() {
-			$('body').children('.list').not('.ng-hide').children('li').addClass('selected');
+			$select.getList().children('li').addClass('selected');
 		},
 		toggle: function(id, group) {
-			var bwList = $('body').children('.list').not('.ng-hide');
+			var bwList = $select.getList();
 			bwList.children('li').each(function(i, e) {
 				var elem = $(e);
 				if ((!id && !group) ||
@@ -702,82 +744,95 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 		}
 	}
 
+	var $image = $scope.image = {
+		url: '',
+		open: function(url, show) {
+			var s = { url: url };
+			if (show) s.show = 1;
+			$location.path('img').search(s);
+			$image.show = false;
+		},
+		show: false,
+		img: $('.img').find('img'),
+		span: $('.img').find('.loader'),
+		mask: $('.img').find('.mask'),
+		count: 0,
+		load: function() {
+			$image.img.hide();
+			$image.span.hide();
+		},
+		loading: function() {
+			var p = "/''\\..";
+			$image.img.hide();
+			$image.span.html('Loading '+(p+p).substr(Math.floor($image.count++)%p.length, p.length));
+			$image.span.show();
+		},
+		loaded: function() {
+			$image.span.hide();
+			$image.img.css({ width: 'auto', height: 'auto' });
+			$image.img.show();
+			$image.resize($location.search().show);
+		},
+		resize: function(show) {
+			var i = $image.img, s = i[0].style, m = $image.mask,
+				iw = i[0].naturalWidth, ih = i[0].naturalHeight,
+				ww = window.innerWidth, wh = window.innerHeight;
+			if (iw / ih > ww / wh)
+				s.height = parseInt(s.height) == wh ? 'auto' : wh+'px';
+			else
+				s.width = parseInt(s.width) == ww ? 'auto' : ww+'px';
+			$timeout(function() {
+				m.width(i.width()).height(i.height());
+				$image.show = !!show;
+			}, 50);
+		}
+	}
+
+	$scope.location = {
+		path: '',
+		search: {},
+		reload: function() { location.reload(); }
+	}
+
 	$scope.$watch('list.url+list.total', function(v) {
 		var ls = $scope.list, pl = $scope.playlists
 		if (!v || !ls || ls.total === undefined) return;
 		$tool.autoHide();
 
-		// use these list* varables rather than list.* to avoid flash
-		$scope.listName = (ls.parent ? '< ' : '') + ls.name;
-		$scope.listParentPath = ls.parent && ls.parent.path;
+		// use these browser.* varables rather than list.* to avoid flash
+		$browser.name = (ls.parent ? '< ' : '') + ls.name;
+		$browser.parentPath = ls.parent && ls.parent.path;
 
-		var path = $scope.listPath = ls.path;
-		var lpath = $scope.listLongestPath || '';
+		var path = $browser.path = ls.path;
+		var lpath = $browser.longestPath || '';
 		if (!lpath || (path && lpath.indexOf(path)) != 0) {
 			var p = [], d = {'':'root'};
-			$scope.listPathSplit = $.ieach(path.split('\\'), function(i, v, d) {
+			$browser.pathSplit = $.ieach(path.split('\\'), function(i, v, d) {
 				if (v) {
 					p.push(v);
 					d[p.join('\\')+'\\'] = v;
 				}
 			}, d);
-			$scope.listLongestPath = path;
+			$browser.longestPath = path;
 		}
-	})
-	$scope.$watch('listUrl', function(url, url0) {
-		if (url === url0) return;
-		$location.path('/list').search({url: url});
-		// call bwMain method to open
-		$scope.open && $scope.open(url);
-	})
-	$scope.$watch('imgUrl', function(url, url0) {
-		if (url === url0) return;
-		$location.path('/img').search({url: url});
-		// display image
-		var tmpl = '<span class="loader" style="position:fixed;left:0;top:0;width:100%;color:#888;background-color:#eee;text-align:center;padding:1.5em 0;">Loading...</span>';
-		var i = $('.img').find('img').hide(), l = $($('.img').find('.loader')[0] || $(tmpl).insertAfter(i).hide()[0]);
-		var c = 0, p = "/''\\..";
-		setTimeout(function check_loaded() {
-			if (i[0].complete) {
-				if (i[0].naturalWidth / i[0].naturalHeight > window.innerWidth / window.innerHeight)
-					i.css({display:'block', width: 'auto', 'min-height': '100%'})
-				else
-					i.css({display:'block', 'min-width': '100%', height: 'auto'})
-				l.hide();
-				i.show();
-			}
-			else {
-				i.hide();
-				l.html('Loading '+(p+p).substr(Math.floor(c++)%p.length, p.length));
-				l.show();
-				setTimeout(check_loaded, 300);
-			}
-		}, 200);
 	})
 
 	// hash router
 	$scope.$watch(function() {
 		return $location.absUrl()
 	}, function(url) {
-		var l = $scope.location = {
-			path: $location.path().substr(1),
-			search: $location.search(),
-			reload: function() { location.reload(); }
-		}
-		if (l.path == 'list' && l.search.url)
-			$scope.listUrl = l.search.url;
-		else if (l.path == 'img' && l.search.url)
-			$scope.imgUrl = l.search.url;
-		else if (!l.path)
-			$scope.listUrl = '/'
+		var p = $scope.location.path = $location.path().substr(1),
+			s = $scope.location.search = $location.search();
+		if (p == 'list' && s.url)
+			$browser.url = s.url;
+		else if (p == 'img' && s.url)
+			$image.url = s.url;
+		else if (!p)
+			$browser.open('/');
 	})
 
-	$('body').children('.overlay').bind("scroll touchstart mousedown", function(e) {
-		$tool.show = false;
-		$scope.$apply();
-	})
 	$(window).bind('beforeunload', function(e) {
-		if ($scope.audio.state == 'play')
-			return 'Are you leaving?'
+		if ($audio.state == 'play')
+			return 'Track will stop if you leave.'
 	})
 })
