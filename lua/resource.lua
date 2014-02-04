@@ -150,8 +150,10 @@ if not res and id > 0 and track_file and track_file ~= '' and track_sub >= 0 the
 		d[i:lower()] = v
 	end, {})["user-agent"]
 	local support = get_var("support") or (function(ua)
-		if ua:find("MSIE") then
+		if ua:find("MSIE") or ua:find('Trident') then
 			return "mp3"
+		elseif ua:find("Firefox") then
+			return "wav,pcm"
 		else
 			return "mp3,wav,pcm"
 		end
