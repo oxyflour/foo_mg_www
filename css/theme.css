@@ -18,6 +18,7 @@ button {
 	border: none;
 	cursor: pointer;
 	font-size: 100%;
+	background-image: none;
 }
 a {
 	color: #333;
@@ -132,12 +133,26 @@ a:hover {
 	-moz-transition: all .4s ease;
 	-ms-transition: all .4s ease;
 	transition: all .4s ease;
+	-webkit-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	-ms-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	backface-visibility: hidden;
 }
 .anim-opacity {
 	-webkit-transition: opacity .4s ease;
 	-moz-transition:  opacity .4s ease;
 	-ms-transition:  opacity .4s ease;
 	transition: opacity .4s ease;
+}
+.anim-transform {
+	-webkit-transition: -webkit-transform .4s ease;
+	-ms-transition: -ms-transform .4s ease;
+	-moz-transition: -moz-transform .4s ease;
+	transition: transform .4s ease;
 }
 .anim-in-1s {
 	-webkit-transition-duration: 1s;
@@ -189,7 +204,6 @@ a:hover {
 	left: 0;
 	right: 0;
 	top: 0;
-	height: 0; /*-- initial hidden --*/
 }
 .player {
 	position: absolute;
@@ -198,26 +212,68 @@ a:hover {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	height: 0; /*-- initial hidden --*/
 }
 
+/* narrow view */
 @media only screen and (max-width: 620px) {
-.show-tool .head {
-	top: 320px;
-	border-top: 1px solid #ccc;
-}
-.show-tool .tool {
-	overflow: auto;
-	height: 320px;
-}
-.show-tool .player {
-	height: 90px;
-}
 .hide-too-narrow {
 	display: none;
 }
+
+.tool {
+	margin-top: -321px;
+	height: 320px;
 }
+.player {
+	position: fixed;
+	height: 90px;
+	-webkit-transform: translateY(90px);
+	-ms-transform: translateY(90px);
+	-moz-transform: translateY(90px);
+	transform: translateY(90px);
+}
+.overlay {
+	width: 100%;
+	position: absolute;
+	background-color: black;
+	z-index: 2;
+	height: 1px;
+	opacity: 0;
+	-webkit-animation: fade-out 0.4s;
+	-ms-animation: fade-out 0.4s;
+	-moz-animation: fade-out 0.4s;
+	animation: fade-out 0.4s;
+}
+.show-tool .tool, .show-tool .head {
+	-webkit-transform: translateY(320px);
+	-ms-transform: translateY(320px);
+	-moz-transform: translateY(320px);
+	transform: translateY(320px);
+}
+.show-tool .tool {
+	overflow: auto;
+}
+.show-tool .player {
+	-webkit-transform: translateY(0);
+	-ms-transform: translateY(0);
+	-moz-transform: translateY(0);
+	transform: translateY(0);
+}
+.show-tool .overlay {
+	height: 100%;
+	opacity: 0.6;
+	-webkit-animation: fade-in 0.4s;
+	-ms-animation: fade-in 0.4s;
+	-moz-animation: fade-in 0.4s;
+	animation: fade-in 0.4s;
+}
+}
+/* wide view */
 @media only screen and (min-width: 621px) {
+.hide-too-wide {
+	display: none;
+}
+
 .main, .foot {
 	width: 50%;
 	right: auto;
@@ -237,9 +293,6 @@ a:hover {
 .player {
 	height: 160px;
 }
-.hide-too-wide {
-	display: none;
-}
 }
 
 .show-foot .main {
@@ -256,40 +309,26 @@ body {
 	color: #333;
 	background-color: #ccc;
 }
-.head, .player, .foot, .main, .tool {
+body>*{
 	background-color: #fff;
 }
 
-@media only screen and (max-width: 620px) {
-.show-tool .overlay {
-	width: 100%;
-	height: 100%;
-	opacity: 0.6;
-	-webkit-animation: fade-in 0.4s;
-	-ms-animation: fade-in 0.4s;
-	animation: fade-in 0.4s;
-}
-.overlay {
-	width: 100%;
-	position: absolute;
-	background-color: #333;
-	z-index: 2;
-	height: 0;
-	opacity: 0;
-	-webkit-animation: fade-out 0.4s;
-	-ms-animation: fade-out 0.4s;
-	animation: fade-out 0.4s;
-}
-}
+/*
+ * animation
+ */
 @-webkit-keyframes
 fade-in { 0% { opacity: 0; } 1% { opacity: 0; } }
 @-ms-keyframes
 fade-in { 0% { opacity: 0; } 1% { opacity: 0; } }
+@-moz-keyframes
+fade-in { 0% { opacity: 0; } 1% { opacity: 0; } }
 @keyframes
 fade-in { 0% { opacity: 0; } 1% { opacity: 0; } }
 @-webkit-keyframes
-fade-out { 0% { height: 100%; opacity: 0.6; } 90% { height: 100%; } }
+fade-out { 0% { height: 100%; opacity: 0.6; } 99% { height: 100%; } }
 @-ms-keyframes
-fade-out { 0% { height: 100%; opacity: 0.6; } 90% { height: 100%; } }
+fade-out { 0% { height: 100%; opacity: 0.6; } 99% { height: 100%; } }
+@-moz-keyframes
+fade-out { 0% { height: 100%; opacity: 0.6; } 99% { height: 100%; } }
 @keyframes
-fade-out { 0% { height: 100%; opacity: 0.6; } 90% { height: 100%; } }
+fade-out { 0% { height: 100%; opacity: 0.6; } 99% { height: 100%; } }

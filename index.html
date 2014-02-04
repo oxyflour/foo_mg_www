@@ -2,6 +2,7 @@
 <html ng-app="app" ng-controller="main">
 <head>
 <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1" />
+<meta name="mobile-web-app-capable" content="yes" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title>{{audio.info.name||'ready'}} - {{audio.info.artist||'foo_mg_www'}}</title>
 <link type="text/css" href="css/theme.css" rel="stylesheet" />
@@ -12,7 +13,7 @@
 	bw-main="browser.url" bw-main-cache="{{setting.lists_in_cache||4}}"
 	pl-ctrl="audio[pl-audio]" pl-ctrl-next="{{!setting.play_single_track}}"  pl-ctrl-loop="{{!setting.play_no_loop}}">
 <div class="overlay show-list-mode" any-move="tool.show=false"></div>
-<div class="head show-list-mode no-wrap no-overflow anim-all">
+<div class="head show-list-mode no-wrap no-overflow anim-transform">
 	<div class="float-right">
 		<button class="no-margin" ng-click="tool.toggle('nav')">
 			<img height="38px" src="img/ic_action_search.png" />
@@ -86,20 +87,20 @@
 	<button ng-click="select.clear()"><img height="36px" src="img/ic_action_view_as_grid.png" /></button>
 	<button class="float-right" ng-click="select.finish()"><img height="36px" src="img/ic_action_cancel.png" /></button>
 </div>
-<div class="tool show-list-mode anim-all">
+<div class="tool show-list-mode anim-transform">
 	<button class="hide-too-wide float-right" style="padding:5px;"
 		ng-click="tool.show=''">X</button>
 	<h3 class="title no-wrap no-overflow">
-		<button ng-class="(!tool.show||tool.show=='nav')||'gray'"
+		<button ng-class="(!tool.showing||tool.showing=='nav')||'gray'"
 			ng-click="tool.toggle('nav')">Search</button>
-		<button ng-class="tool.show=='play'||'gray'"
+		<button ng-class="tool.showing=='play'||'gray'"
 			ng-click="tool.toggle('play')">Playlists</button>
-		<button ng-class="tool.show=='res'||'gray'"
+		<button ng-class="tool.showing=='res'||'gray'"
 			ng-click="tool.toggle('res')">Resource</button>
-		<button ng-class="tool.show=='conf'||'gray'"
+		<button ng-class="tool.showing=='conf'||'gray'"
 			ng-click="tool.toggle('conf')">Settings</button>
 	</h3>
-	<div class="content" ng-show="tool.show=='play'">
+	<div class="content" ng-show="tool.showing=='play'">
 		<p>
 			<button ng-hide="list.onEdit" ng-click="select.start();tool.autoHide()">[ Select ]</button>
 			<button ng-show="list.onEdit" ng-click="select.finish();tool.autoHide()">[ Cancel ]</button>
@@ -132,7 +133,7 @@
 			</li>
 		</ul>
 	</div>
-	<div class="content" ng-show="!tool.show||tool.show=='nav'">
+	<div class="content" ng-show="!tool.showing||tool.showing=='nav'">
 		<form action="javascript:void(null)" ng-submit="browser.search()">
 			<div class="search">
 				<input type="text" name="word" ng-model="search.word" /><input type="submit" value="Search" /><br />
@@ -153,7 +154,7 @@
 			</p>
 		</form>
 	</div>
-	<div class="content" ng-show="tool.show=='res'">
+	<div class="content" ng-show="tool.showing=='res'">
 		<p>
 			<button ng-click="browser.browse(browser.parentPath)">[ Parent ]</button>
 			<button ng-click="browser.reload()">[ Refresh ]</button>
@@ -173,11 +174,11 @@
 			</li>
 		</ul>
 	</div>
-	<div class="content" ng-show="tool.show=='txt'">
+	<div class="content" ng-show="tool.showing=='txt'">
 		<h4>{{tool.showTxt.title}}</h4>
 		<pre>{{tool.showTxt.text}}</pre>
 	</div>
-	<div class="content" ng-show="tool.show=='conf'">
+	<div class="content" ng-show="tool.showing=='conf'">
 		<h4>Folder Setting</h4>
 		<div class="field" ng-init="setting.list_sort=conf.local_store_dict('setting.sort@')">sort current folder:
 			<select local-store="setting.sort@{{browser.url}}" ng-model="setting.list_sort[browser.url]" ng-change="browser.reload()">
@@ -237,7 +238,7 @@
 		</div>
 	</div>
 </div>
-<div class="player show-list-mode anim-all">
+<div class="player show-list-mode anim-transform">
 	<div class="ctrl" ng-hide="player.show">
 		<div class="albumart cursor-hand">
 			<div ng-attr-style="background-image:{{audio.aaCssUrl}}"

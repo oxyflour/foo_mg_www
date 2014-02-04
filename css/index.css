@@ -422,13 +422,12 @@
 	padding: 1.5em 0;
 }
 
-body>.show-list-mode,
-body>.show-img-mode,
-body.list-mode>.hide-list-mode,
-body.img-mode>.hide-img-mode {
+.list-mode .hide-list-mode, .show-list-mode,
+.img-mode .hide-img-mode, .show-img-mode {
 	display: none;
 }
-body.list-mode>.show-list-mode,
-body.img-mode>.show-img-mode {
-	display: block;
+
+.list-mode .show-list-mode,
+.img-mode .show-img-mode {
+	display: initial;
 }
