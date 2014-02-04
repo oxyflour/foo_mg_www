@@ -429,5 +429,5 @@
 
 .list-mode .show-list-mode,
 .img-mode .show-img-mode {
-	display: initial;
+	display: block;
 }

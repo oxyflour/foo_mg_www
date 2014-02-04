@@ -40,6 +40,9 @@ a:hover {
 .fixed {
 	position: fixed;
 }
+.relative {
+	position: relative;
+}
 .full-width {
 	width: 100%;
 }
