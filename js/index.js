@@ -753,9 +753,9 @@ app.controller('main', function($scope, $location, $http, $timeout) {
 			$image.show = false;
 		},
 		show: false,
-		img: $('.img').find('img'),
-		span: $('.img').find('.loader'),
-		mask: $('.img').find('.mask'),
+		img: $('.img>img'),
+		span: $('.img>.loader'),
+		mask: $('.img>.mask'),
 		count: 0,
 		load: function() {
 			$image.img.hide();

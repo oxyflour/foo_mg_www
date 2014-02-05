@@ -325,16 +325,20 @@
 			<small class="info">{{audio.info.album}} [{{audio.info.num}}]</small>
 		</div>
 		<div class="fixed left-top bold gray text-center full-width"
-			style="top:40%">
-			<button class="float-left gray bold" style="padding:0.5em;font-size:180%"
-				ng-click="player.playnext(-1, true)">&lt;</button>
-			<button class="gray" style="margin-top:-0.2em;padding:0.5em;font-size:250%"
-				ng-click="player.playpause()" ng-dblclick="player.playnext(0)">
-				<span ng-show="audio.state=='play'">| |</span>
-				<span ng-hide="audio.state=='play'">&gt;|</span>
+			style="top:40%;opacity:0.7">
+			<button class="float-left" style="padding:0.5em"
+				ng-click="player.playnext(-1, true)">
+				<img src="img/ic_action_previous.png" width="42px" />
 			</button>
-			<button class="float-right gray bold" style="padding:0.5em;font-size:180%"
-				ng-click="player.playnext(1, true)">&gt;</button>
+			<button class="gray" style="padding:0.5em"
+				ng-click="player.playpause()" ng-dblclick="player.playnext(0)">
+				<img src="img/ic_action_pause.png" width="64px" ng-show="audio.state=='play'" />
+				<img src="img/ic_action_play.png" width="64px" ng-hide="audio.state=='play'" />
+			</button>
+			<button class="float-right" style="padding:0.5em"
+				ng-click="player.playnext(1, true)">
+				<img src="img/ic_action_next.png" width="42px" />
+			</button>
 		</div>
 		<div class="fixed left-top full-width full-height" ng-hide="image.show"> </div>
 	</div>
