@@ -321,8 +321,9 @@
 				<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
 				<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
 			</small>
-			<br />
-			<small class="info">{{audio.info.album}} [{{audio.info.num}}]</small>
+			<div class="info">
+				<small>{{audio.info.album}} [{{audio.info.num}}]</small>
+			</div>
 		</div>
 		<div class="fixed left-top bold gray text-center full-width"
 			style="top:40%;opacity:0.7">

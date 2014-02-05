@@ -402,9 +402,9 @@
 	background: rgba(0, 0, 0, 0.6);
 }
 .mask .playinfo {
-	color: #888;
+	color: #666;
 	background-color: #eee;
-	padding: 1em 0;
+	padding: 0.8em 0;
 }
 .mask .playinfo .info {
 	margin-top: 0.2em;
