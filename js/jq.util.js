@@ -53,6 +53,7 @@ $.url_concat = function(dict) {
 	}, []).join('&');
 }
 
+/*
 $.fn.editlist = function(s) {
 	s = $.extend({
 		elem: 'li',
@@ -94,4 +95,5 @@ $.fn.editlist = function(s) {
 	this.unbind('mousedown', ms_down).mousedown(ms_down);
 	return this;
 }
+*/
 })(jQuery)

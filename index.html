@@ -4,14 +4,15 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<title>{{audio.info.name||'ready'}} - {{audio.info.artist||'foo_mg_www'}}</title>
+<title ng:bind-template="{{audio.info.name||'ready'}} - {{audio.info.artist||'foo_mg_www'}}">FooMG</title>
 <link type="text/css" href="css/theme.css" rel="stylesheet" />
 <link type="text/css" href="css/index.css" rel="stylesheet" />
 </head>
 <body ng-class="[ tool.show&&'show-tool', list.onEdit&&'show-foot',
 		setting.folder_view_class||'aa-block-view', location.path+'-mode']"
 	bw-main="browser.url" bw-main-cache="{{setting.lists_in_cache||4}}"
-	pl-ctrl="audio[pl-audio]" pl-ctrl-next="{{!setting.play_single_track}}"  pl-ctrl-loop="{{!setting.play_no_loop}}">
+	pl-ctrl="audio[pl-audio]"
+	pl-ctrl-next="{{!setting.play_single_track}}" pl-ctrl-loop="{{!setting.play_no_loop}}">
 <div class="overlay show-list-mode" any-move="tool.show=false"></div>
 <div class="head show-list-mode no-wrap no-overflow anim-transform">
 	<div class="float-right">
@@ -45,26 +46,30 @@
 		</span>
 	</div>
 </div>
-<ul class="main list show-list-mode anim-all ng-hide" ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']"
+<ul class="main list show-list-mode anim-all ng-hide"
+	ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']"
 	bw-list ng-non-bindable ng-show="url==browser.url">
 	<div ng-if="word" ng-click="browser.browse(path)">
 		<div class="tip cursor-hand fixed full-width">Searching '{{word}}'</div>
 		<div class="tip">Searching '{{word}}'</div>
 	</div>
-	<div class="sep" ng-attr-style="background-image:{{i.aaCssUrl}}" ng-repeat-start="i in ls" ng-if="i.newGroup">
+	<div ng-if="i.newGroup" class="sep" ng-repeat-start="i in ls"
+		ng-attr-style="background-image:{{i.aaCssUrl}}">
 		<small class="link cursor-hand" ng-click="image.open(i.aaUrl, true)">&raquo;</small>
 		<div class="bg" ng-click="i.path ? browser.browse(i.path) : select.toggle(0, i.group)">
 			<big class="stress">{{i.album}}</big> ({{i.album_artist}})
 		</div>
 	</div>
-	<li class="folder" bw-id="{{i.id}}" ng-attr-title="{{i.name}}" ng-if="i.typ=='folder'" ng-click="browser.browse(i.path)">
+	<li ng-if="i.typ=='folder'" class="folder" bw-id="{{i.id}}"
+		ng-attr-title="{{i.name}}" ng-click="browser.browse(i.path)">
 		<div class="albumart" ng-attr-style="background-image:{{i.aaCssUrl}}"></div>
 		<span class="float-right">&gt;</span>
 		{{i.shortName}}
 		<div class="info">{{i.bracS}} {{i.bracR}}</div>
 	</li>
-	<li class="track {{i.id==audio.id&&audio.state}}" pl-id="{{i.id}}" bw-group="{{i.group}}" ng-repeat-end
-		ng-if="i.typ=='track'" ng-click="onEdit ? select.toggle(i.id) : browser.playCurrent(i.id)">
+	<li ng-if="i.typ=='track'" class="track {{i.id==audio.id&&audio.state}}" ng-repeat-end
+		pl-id="{{i.id}}" bw-group="{{i.group}}"
+		ng-click="onEdit ? select.toggle(i.id) : browser.playCurrent(i.id)">
 		<span class="num">{{i.num}}</span>
 		<span class="duration" ng-click="select.toggle(i.id);$event.stopPropagation()">
 			<span class="current">{{audio.current.mmss}}/</span>{{i.length}}<br />
@@ -82,10 +87,18 @@
 	<button ng-click="tool.show=='play'?browser.save():tool.toggle('play')">
 		<img height="36px" src="img/ic_action_accept.png" />
 	</button>
-	<button ng-click="select.all()"><img height="36px" src="img/ic_action_select_all.png" /></button>
-	<button ng-click="select.toggle()"><img height="36px" src="img/ic_action_refresh.png" /></button>
-	<button ng-click="select.clear()"><img height="36px" src="img/ic_action_view_as_grid.png" /></button>
-	<button class="float-right" ng-click="select.finish()"><img height="36px" src="img/ic_action_cancel.png" /></button>
+	<button ng-click="select.all()">
+		<img height="36px" src="img/ic_action_select_all.png" />
+	</button>
+	<button ng-click="select.toggle()">
+		<img height="36px" src="img/ic_action_refresh.png" />
+	</button>
+	<button ng-click="select.clear()">
+		<img height="36px" src="img/ic_action_view_as_grid.png" />
+	</button>
+	<button class="float-right" ng-click="select.finish()">
+		<img height="36px" src="img/ic_action_cancel.png" />
+	</button>
 </div>
 <div class="tool show-list-mode anim-transform">
 	<button class="hide-too-wide float-right" style="padding:5px;"
@@ -102,19 +115,23 @@
 	</h3>
 	<div class="content" ng-show="tool.showing=='play'">
 		<p>
-			<button ng-hide="list.onEdit" ng-click="select.start();tool.autoHide()">[ Select ]</button>
-			<button ng-show="list.onEdit" ng-click="select.finish();tool.autoHide()">[ Cancel ]</button>
+			<button ng-hide="list.onEdit"
+				ng-click="select.start();tool.autoHide()">[ Select ]</button>
+			<button ng-show="list.onEdit"
+				ng-click="select.finish();tool.autoHide()">[ Cancel ]</button>
 			<span ng-hide="list.onEdit&&!select.length()">
 				<button ng-click="browser.save()">[ Save ]</button>
 				<span class="no-overflow no-wrap">
-					<select class="absolute no-opacity" style="max-width:90px;" ng-model="replaceUrl" ng-change="browser.replace()">
+					<select class="absolute no-opacity" style="max-width:90px;"
+						ng-model="replaceUrl" ng-change="browser.replace()">
 						<option></option>
 						<option ng-repeat="(u, n) in playlists" ng-value="u" ng-if="n">{{n}}</option>
 					</select>
 					<button>[ Replace ]</button>
 				</span>
 				<span class="no-overflow no-wrap">
-					<select class="absolute no-opacity" style="max-width:90px;" ng-model="addToUrl" ng-change="browser.addTo()">
+					<select class="absolute no-opacity" style="max-width:90px;"
+						ng-model="addToUrl" ng-change="browser.addTo()">
 						<option></option>
 						<option ng-repeat="(u, n) in playlists" ng-value="u" ng-if="n">{{n}}</option>
 					</select>
@@ -124,7 +141,8 @@
 		</p>
 		<ul ng-init="playlists=conf.local_store_dict('playlists@')">
 			<!-- Note: neither ng-class nor ng-show works with ng-repeat -->
-			<li ng-repeat="(u, n) in playlists" class="playlist {{u==browser.url&&'bold'}} {{u==player.url&&'play'}}">
+			<li ng-repeat="(u, n) in playlists"
+				class="playlist {{u==browser.url&&'bold'}} {{u==player.url&&'play'}}">
 				<form ng-show="n.length||f" action="javascript:void(null)" onsubmit="$('button').focus()">
 					<input auto-select local-store="playlists@{{u}}" local-store-init="n"
 						pl-url="{{u}}" ng-focus='f=1' ng-blur='f=0' ng-model="playlists[u]" />
@@ -136,7 +154,9 @@
 	<div class="content" ng-show="!tool.showing||tool.showing=='nav'">
 		<form action="javascript:void(null)" ng-submit="browser.search()">
 			<div class="search">
-				<input type="text" name="word" ng-model="search.word" /><input type="submit" value="Search" /><br />
+				<input type="text" name="word" ng-model="search.word" />
+				<input type="submit" value="Search" />
+				<br />
 			</div>
 			<p>
 				<input  id="sf_fo" type="checkbox" ng-model="search.fields.folder" />
@@ -163,11 +183,13 @@
 		<ul>
 			<li ng-repeat="i in list.resList" ng-switch on="i.typ">
 				<div ng-switch-when="img">
-					<a ng-show="setting.img_open_self" href="javascript:void(null)" ng-click="image.open(i.url)">{{i.name}}</a>
+					<a ng-show="setting.img_open_self" href="javascript:void(null)"
+						ng-click="image.open(i.url)">{{i.name}}</a>
 					<a ng-hide="setting.img_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 				</div>
 				<div ng-switch-when="txt">
-					<a ng-show="setting.txt_open_self" href="javascript:void(null)" ng-click="tool.showTxt(i.name, i.url)">{{i.name}}</a>
+					<a ng-show="setting.txt_open_self" href="javascript:void(null)"
+						ng-click="tool.showTxt(i.name, i.url)">{{i.name}}</a>
 					<a ng-hide="setting.txt_open_self" target="blank" ng-href="{{i.url}}">{{i.name}}</a>
 				</div>
 				<a ng-switch-default target="blank" ng-href="{{i.url}}">{{i.name}}</a>
@@ -181,7 +203,8 @@
 	<div class="content" ng-show="tool.showing=='conf'">
 		<h4>Folder Setting</h4>
 		<div class="field" ng-init="setting.list_sort=conf.local_store_dict('setting.sort@')">sort current folder:
-			<select local-store="setting.sort@{{browser.url}}" ng-model="setting.list_sort[browser.url]" ng-change="browser.reload()">
+			<select local-store="setting.sort@{{browser.url}}"
+				ng-model="setting.list_sort[browser.url]" ng-change="browser.reload()">
 				<option value="">with none</option>
 				<option value="folder">by name</option>
 				<option value="folder_desc">by name reverse</option>
@@ -253,7 +276,7 @@
 			<button ng-click="player.playnext(1, true)">[ &raquo; ]</button>
 		</div>
 		<div class="cursor-hand" ng-show="audio.info" ng-click="browser.open(player.url)">
-			<big>{{audio.info.artist}} - {{audio.info.name}}</big>
+			<span class="big">{{audio.info.artist}} - {{audio.info.name}}</span>
 			<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
 			<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
 			<div class="info">
@@ -288,13 +311,12 @@
 	</a>
 </div>
 <div class="img show-img-mode">
-	<!--a class="absolute gray" ng-href="mklrc.html#/img?url={{image.url|urlEncode}}">mklrc</a-->
 	<div class="mask absolute left-top anim-opacity"
 		ng-style="{opacity:image.show?1:0}">
 		<div class="fixed left-top full-width full-height" any-move="image.show=false"> </div>
 		<div class="playinfo fixed left-bottom text-center full-width cursor-hand anim-opacity"
 			ng-click="browser.open(player.url)">
-			{{audio.info.artist}} - {{audio.info.name}}
+			<span class="bold">{{audio.info.artist}} - {{audio.info.name}}</span>
 			<small>
 				<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
 				<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
