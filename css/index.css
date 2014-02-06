@@ -81,9 +81,9 @@
 	border: 2px solid transparent;
 }
 @media only screen and (min-width: 1080px) {
-.sep .bg {
-	height: 120px;
-}
+	.sep .bg {
+		height: 120px;
+	}
 }
 
 .folder .albumart {
@@ -124,13 +124,13 @@
 	height: 150px;
 }
 @media only screen and (min-width: 1080px) {
-.main, .foot {
-	right: auto;
-	width: 540px;
-} 
-.tool, .player {
-	left: 540px;
-} 
+	.main, .foot {
+		right: auto;
+		width: 540px;
+	} 
+	.tool, .player {
+		left: 540px;
+	} 
 }
 
 .track.play, .track.pause, .track.ended {
@@ -147,9 +147,9 @@
 	border-left: 12px #fff solid;
 }
 @media only screen and (max-width: 620px) {
-.track.play .current {
-	display: inline;
-}
+	.track.play .current {
+		display: inline;
+	}
 }
 .on-edit .track .check {
 	border-color: #aaa;
@@ -246,70 +246,70 @@
 	transition-duration: 0.4s;
 }
 @media only screen and (max-width: 620px) {
-.player {
-	font-size: 85%;
-	white-space: nowrap;
-}
-.player .albumart {
-	height: 80px;
-	width: 80px;
-	margin: 5px;
-}
-.player .buttonbar {
-	margin-left: 90px;
-}
-.player .lyric {
-	height: 90px;
-}
-.player .analyser {
-	bottom: 3px;
-}
-.player .processbar {
-	position: fixed;
-	bottom: 0;
-	height: 3px;
-}
-.player .processbar .bar {
-	bottom: 0;
-}
+	.player {
+		font-size: 85%;
+		white-space: nowrap;
+	}
+	.player .albumart {
+		height: 80px;
+		width: 80px;
+		margin: 5px;
+	}
+	.player .buttonbar {
+		margin-left: 90px;
+	}
+	.player .lyric {
+		height: 90px;
+	}
+	.player .analyser {
+		bottom: 3px;
+	}
+	.player .processbar {
+		position: fixed;
+		bottom: 0;
+		height: 3px;
+	}
+	.player .processbar .bar {
+		bottom: 0;
+	}
 }
 @media only screen and (min-width: 621px) {
-.player .buttonbar {
-	padding: 20px 0;
-}
-.player .albumart {
-	height: 130px;
-	width: 130px;
-	margin: 15px;
-}
-.player .buttonbar {
-	margin-left: 150px;
-}
-.player .lyric {
-	height: 150px;
-}
-.player .processbar {
-	position: absolute;
-	bottom: 0;
-}
+	.player .buttonbar {
+		padding: 20px 0;
+	}
+	.player .albumart {
+		height: 130px;
+		width: 130px;
+		margin: 15px;
+	}
+	.player .buttonbar {
+		margin-left: 150px;
+	}
+	.player .lyric {
+		height: 150px;
+	}
+	.player .processbar {
+		position: absolute;
+		bottom: 0;
+	}
 }
 @media only screen and (min-width: 1080px) {
-.tool {
-	bottom: 200px;
-}
-.player {
-	height: 200px;
-}
-.player .albumart {
-	height: 170px;
-	width: 170px;
-}
-.player .buttonbar {
-	margin-left: 200px;
-}
-.player .lyric {
-	height: 200px;
-}
+	.tool {
+		bottom: 200px;
+	}
+	.player {
+		height: 200px;
+	}
+	.player .albumart {
+		height: 170px;
+		width: 170px;
+	}
+	.player .buttonbar {
+		margin-left: 200px;
+	}
+	.player .lyric {
+		height: 200px;
+	}
 }
 
 .tool h3 {
@@ -338,17 +338,17 @@
 	max-width: 80px;
 }
 @media only screen and (max-width: 621px) {
-.tool .title {
-	font-size: 98%;
-}
+	.tool .title {
+		font-size: 98%;
+	}
 }
 @media only screen and (min-width: 621px) {
-.tool .content {
-	margin: 20px;
-}
-.tool .title {
-	margin-left: 10px;
-}
+	.tool .content {
+		margin: 20px;
+	}
+	.tool .title {
+		margin-left: 10px;
+	}
 }
 
 .content .playlist {
@@ -377,25 +377,25 @@
 }
 
 @media only screen and (min-width: 1281px) {
-.main, .foot {
-	right: auto;
-	width: 600px;
-} 
-.tool, .player {
-	left: 600px;
-} 
-.aa-block-view .folder {
-	margin-left: 20px;
-	margin-top: 12px;
-	max-width: 160px;
-}
-.aa-block-view .folder .albumart {
-	width: 160px;
-	height: 160px;
-}
-.sep .bg {
-	height: 140px;
-}
+	.main, .foot {
+		right: auto;
+		width: 600px;
+	} 
+	.tool, .player {
+		left: 600px;
+	} 
+	.aa-block-view .folder {
+		margin-left: 20px;
+		margin-top: 12px;
+		max-width: 160px;
+	}
+	.aa-block-view .folder .albumart {
+		width: 160px;
+		height: 160px;
+	}
+	.sep .bg {
+		height: 140px;
+	}
 }
 
 .img .mask {

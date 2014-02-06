@@ -22,9 +22,10 @@
 		<span class="no-overflow no-wrap">
 			<select class="absolute no-opacity" style="-webkit-appearance:none;width:45px;height:45px"
 				ng-model="headActions" ng-change="$eval(headActions);headActions=''">
-				<option value="tool.show='play'">Playlists</option>
-				<option value="tool.show='res'">Resource</option>
-				<option value="tool.show='conf'">Settings</option>
+				<optgroup label="View...">
+					<option value="tool.show='play'">Playlists</option>
+					<option value="tool.show='conf'">Settings</option>
+				</optgroup>
 				<option value="location.reload()">Reload</option>
 				<option value="">Cancel</option>
 			</select>
@@ -100,11 +101,11 @@
 		<img height="36px" src="img/ic_action_cancel.png" />
 	</button>
 </div>
-<div class="tool show-list-mode anim-transform">
+<div class="tool show-list-mode anim-transform" ng-init="tool.showing='nav'">
 	<button class="hide-too-wide float-right" style="padding:5px;"
 		ng-click="tool.show=''">X</button>
 	<h3 class="title no-wrap no-overflow">
-		<button ng-class="(!tool.showing||tool.showing=='nav')||'gray'"
+		<button ng-class="tool.showing=='nav'||'gray'"
 			ng-click="tool.toggle('nav')">Search</button>
 		<button ng-class="tool.showing=='play'||'gray'"
 			ng-click="tool.toggle('play')">Playlists</button>
@@ -151,7 +152,7 @@
 			</li>
 		</ul>
 	</div>
-	<div class="content" ng-show="!tool.showing||tool.showing=='nav'">
+	<div class="content" ng-show="tool.showing=='nav'">
 		<form action="javascript:void(null)" ng-submit="browser.search()">
 			<div class="search">
 				<input type="text" name="word" ng-model="search.word" />
@@ -317,7 +318,7 @@
 		<div class="playinfo fixed left-bottom text-center full-width cursor-hand anim-opacity"
 			ng-click="browser.open(player.url)">
 			<span class="bold">{{audio.info.artist}} - {{audio.info.name}}</span>
-			<small>
+			<small class="no-wrap">
 				<span ng-show="audio.state=='play'">[{{audio.current.mmss}}/{{audio.info.length}}]</span>
 				<span ng-hide="audio.state=='play'">[{{audio.state}}]</span>
 			</small>
