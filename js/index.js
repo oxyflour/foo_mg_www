@@ -74,8 +74,9 @@ app.directive('bwList', function($http) {
 		scope: true,
 		link: function (scope, elem, attrs, ctrl) {
 		var load = function() {
-			if (scope.ls.length >= scope.total)
+			if (scope.ls.length >= scope.total || scope.loading)
 				return;
+			scope.loading = true;
 			var url = scope.conf.list_url(scope.url, scope.ls.length, 30);
 			$http.get(url).success(function(data) {
 				if (scope.ls.length != data.begin)
@@ -114,6 +115,9 @@ app.directive('bwList', function($http) {
 						typ: {jpg:'img',png:'img',bmp:'img',txt:'txt',log:'txt'}[v.split('.').pop().toLowerCase()]
 					});
 				}, []);
+				scope.loading = false;
+			}).error(function() {
+				scope.loading = false;
 			});
 		}
 		elem.bind('scroll', function(e) {
