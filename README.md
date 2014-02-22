@@ -36,6 +36,7 @@ browse.lua 可以以json的格式输出数据，以此为基础开发了一个�
 
 ##如何安装
 首先你需要在foobar2000中安装 [foo\_mg](https://github.com/oxyflour/foo_mg)，然后将本项目中的所有文件放置到设定的目录里（默认是foobar2000目录下的foo\_mg\_www文件夹）。如果没有改过默认端口（8080），那在浏览器中打开 http://127.0.0.1:8080/ 即可
+
 如果你想生成封面的缩略图以提高访问速度，请在foo\_mg\_www下新建tmp\cache文件夹，并下载[ImageMagic](http://www.imagemagick.org/script/download.php)软件包中的convert.exe程序放在tmp\ImageMagic文件夹下
 
 
