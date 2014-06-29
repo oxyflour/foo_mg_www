@@ -165,7 +165,9 @@ a:hover {
 }
 
 @-ms-viewport {
+/*
 	width: device-width;
+*/
 }
 
 /*
