@@ -104,9 +104,8 @@
 .aa-block-view .folder {
 	clear: none;
 	float: left;
-	width: 42%;
 	max-width: 150px;
-	margin-left: 16px;
+	margin-left: 6px;
 	margin-right: 0;
 	white-space: nowrap;
 	overflow: hidden;
