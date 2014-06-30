@@ -381,9 +381,6 @@
 		position: absolute;
 		bottom: 0;
 	}
-	.tool .title {
-		font-size: 98%;
-	}
 	.tool .content {
 		margin: 20px;
 	}
