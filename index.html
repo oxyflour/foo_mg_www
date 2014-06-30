@@ -71,12 +71,12 @@
 	<li ng-if="i.typ=='track'" class="track {{i.id==audio.id&&audio.state}}" ng-repeat-end
 		pl-id="{{i.id}}" bw-group="{{i.group}}"
 		ng-click="onEdit ? select.toggle(i.id) : browser.playCurrent(i.id)">
-		<span class="num">{{i.num}}</span>
+		<span class="num" ng-click="select.toggle(i.id);$event.stopPropagation()">{{i.num}}</span>
 		<span class="duration" ng-click="select.toggle(i.id);$event.stopPropagation()">
 			<span class="current">{{audio.current.mmss}}/</span>{{i.length}}<br />
 			<div class="check"></div>
 		</span>
-		{{i.name}}
+		<div>{{i.name}}</div>
 		<div class="info">&lt;{{i.artist}}&gt;</div>
 	</li>
 	<div class="loading anim-all anim-in-1s" show-delay="500" ng-hide="ls.length==total">
