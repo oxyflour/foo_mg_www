@@ -145,7 +145,8 @@
 			<li ng-repeat="(u, n) in playlists"
 				class="playlist {{u==browser.url&&'bold'}} {{u==player.url&&'play'}}">
 				<form ng-show="n.length||f" action="javascript:void(null)" onsubmit="$('button').focus()">
-					<input auto-select local-store="playlists@{{u}}" local-store-init="n"
+					<button onclick="$(this).next().setfocus()" title="Edit Playlist Name">&sect;</button>
+					<input local-store="playlists@{{u}}" local-store-init="n"
 						pl-url="{{u}}" ng-focus='f=1' ng-blur='f=0' ng-model="playlists[u]" />
 					<a href="javascript:void(null)" ng-click="browser.open(u)">{{n}}</a>
 				</form>

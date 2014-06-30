@@ -52,6 +52,13 @@ $.url_concat = function(dict) {
 			d.push(k+'='+encodeURIComponent(v));
 	}, []).join('&');
 }
+$.fn.setfocus = function() {
+	var e = this[0];
+	if (e) setTimeout(function() {
+		e.focus();
+		e.select();
+	}, 20)
+}
 
 /*
 $.fn.editlist = function(s) {

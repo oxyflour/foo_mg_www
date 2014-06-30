@@ -395,15 +395,6 @@ app.directive('showDelay', function() {
 		}, parseInt(attrs.showDelay) || 400)
 	}
 })
-app.directive('autoSelect', function() {
-	return function (scope, elem, attrs, ctrl) {
-		elem.mousedown(function(e) {
-			if (!elem.is(':focus')) setTimeout(function() {
-				elem.select();
-			}, parseInt(attrs.autoSelect) || 100)
-		});
-	}
-})
 app.directive('imgSrc', function() {
 	return function (scope, elem, attrs, ctrl) {
 		function check() {
