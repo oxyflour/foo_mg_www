@@ -180,9 +180,9 @@
 }
 .player .lyric img, .player .lyric .text {
 	-webkit-transform-origin: left top;
-	-moz-transform-origin: left top;
-	-ms-transform-origin: left top;
-	transform-origin: left top;
+	   -moz-transform-origin: left top;
+	    -ms-transform-origin: left top;
+	        transform-origin: left top;
 }
 .player .line {
 	margin: 0.15em;
@@ -206,9 +206,13 @@
 	height: 8px;
 	background-color: #ddd;
 	-webkit-transition-duration: 1.2s;
-	-moz-transition-duration: 1.2s;
-	-ms-transition-duration: 1.2s;
-	transition-duration: 1.2s;
+	   -moz-transition-duration: 1.2s;
+	    -ms-transition-duration: 1.2s;
+	        transition-duration: 1.2s;
+	-webkit-transition-delay: 0.5s;
+	   -moz-transition-delay: 0.5s;
+	    -ms-transition-delay: 0.5s;
+	        transition-delay: 0.5s;
 }
 .player .processbar .text {
 	float: right;
@@ -222,9 +226,13 @@
 .player .processbar:hover {
 	height: 1.2em;
 	-webkit-transition-duration: 0.4s;
-	-moz-transition-duration: 0.4s;
-	-ms-transition-duration: 0.4s;
-	transition-duration: 0.4s;
+	   -moz-transition-duration: 0.4s;
+	    -ms-transition-duration: 0.4s;
+	        transition-duration: 0.4s;
+	-webkit-transition-delay: 0;
+	   -moz-transition-delay: 0;
+	    -ms-transition-delay: 0;
+	        transition-delay: 0;
 }
 
 .tool h3 {
@@ -390,13 +398,6 @@
 	.sep .bg {
 		height: 120px;
 	}
-	.main, .foot {
-		right: auto;
-		width: 540px;
-	} 
-	.tool, .player {
-		left: 540px;
-	} 
 	.tool {
 		bottom: 200px;
 	}
