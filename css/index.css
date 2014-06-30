@@ -260,6 +260,10 @@
 	width: 25%;
 	max-width: 80px;
 }
+.content .search label {
+	display: inline-block;
+	margin: 5px;
+}
 
 .content .playlist {
 	margin: 0;
