@@ -47,7 +47,7 @@
 		</span>
 	</div>
 </div>
-<ul class="main list show-list-mode anim-all ng-hide"
+<ul class="main list show-list-mode ng-hide"
 	ng-class="[groupCount>3&&'small-sep',onEdit&&'on-edit']"
 	bw-list ng-non-bindable ng-show="url==browser.url">
 	<div ng-if="word" ng-click="browser.browse(path)">
@@ -84,7 +84,7 @@
 	</div>
 	<div class="empty" ng-hide="total!=0">No thing here</div>
 </ul>
-<div class="foot show-list-mode anim-all no-wrap no-overflow">
+<div class="foot show-list-mode no-wrap no-overflow">
 	<button ng-click="tool.show=='play'?browser.save():tool.toggle('play')">
 		<img height="36px" src="img/ic_action_accept.png" />
 	</button>
