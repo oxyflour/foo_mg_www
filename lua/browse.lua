@@ -228,7 +228,7 @@ db:close()
 
 -- output as json
 if get_var("tojson") then
-	cjson.encode_sparse_array(true)
+	cjson.encode_sparse_array(true, 0)
 	print("HTTP/1.0 200 OK\r\n",
 		"Content-Type: text/json;charset=utf-8\r\n",
 		"\r\n",
