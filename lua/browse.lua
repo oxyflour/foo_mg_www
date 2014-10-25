@@ -1,6 +1,7 @@
 dofile(fb_env.script_path:match("(.*\\).*")..'common.lua')
 function get_path(path)
 	if not path or path == '' then path = '\\' end
+	path = path:gsub('/', '\\')
 	if path:sub(1, 1) ~= '\\' then path = '\\'..path end
 	if path:sub(-1) ~= '\\' then path = path..'\\' end
 	local s, n = path:gsub('\\', '')
@@ -8,7 +9,7 @@ function get_path(path)
 end
 function parse_sort(fields, avail_fields)
 	local s = nil
-	for f in fields:gmatch("[^,]+") do
+	for f in (fields or ''):gmatch("[^,]+") do
 		local k = avail_fields[f]
 		if k then
 			s = s and s..", "..k or k
@@ -71,7 +72,7 @@ end
 local path, n = get_path(get_var("path"))
 local begin = tonumber(get_var("begin") or '0')
 local count = tonumber(get_var("count") or '1e9')
-local sort = get_var("sort") or ''
+local sort = get_var("sort")
 inf = {
 	name = get_var('name') or path:match('.*\\([^\\]+)\\') or 'root',
 	ls = {},	-- the item index is the key (starting from 1)
@@ -103,7 +104,7 @@ local track_sort_fields = {
 	tlist = inf.tlist and string.format("instr(',%s,', ','||t.id||',')", num_escape(inf.tlist)),
 	path = 'pid',
 	album = 'album',
-	num = 'tracknum'
+	num = 'tracknumber'
 }
 
 local db = sqlite3.open(fb_env.db_file_name)
@@ -144,7 +145,7 @@ if inf.flist or inf.tlist or inf.word then -- search
 			FROM %s as t
 			LEFT JOIN %s as p ON p.id=t.pid
 			WHERE %s %s]], fb_env.db_track_table, fb_env.db_path_table, cond,
-			parse_sort(sort or 'pid,album,tracknumber', track_sort_fields))
+			parse_sort(sort or 'path,album,num', track_sort_fields))
 		for id, pid, title, num, artist, album, album_artist, length, seconds, path in db:urows(sql) do
 			table.insert(ls, id)
 			inf.total = table.inspart(inf.ls, {
