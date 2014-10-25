@@ -4,6 +4,7 @@ function opt_find(opts, item, sep)
 end
 function get_path(path)
 	if not path or path == '' then path = '\\' end
+	path = path:gsub('/', '\\')
 	if path:sub(1, 1) ~= '\\' then path = '\\'..path end
 	if path:sub(-1) ~= '\\' then path = path..'\\' end
 	local s, n = path:gsub('\\', '')
@@ -191,6 +192,8 @@ elseif res == 'albumart' and track_file and track_file ~= '' then
 	local send = -1
 	if id > 0 then -- do not use cache for tracks
 		send = fb_stream.stream_albumart(track_file)
+	elseif id < 0 then
+		send = fb_stream.stream_file(CONF.def_albumart)
 	else -- only use cache for folders
 		local fs, sz = {}, get_size(get_var('w'), get_var('s'))
 		if CONF.albumart_cache and
