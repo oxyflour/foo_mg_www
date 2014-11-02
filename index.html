@@ -191,15 +191,16 @@
 			</span>
 		</div>
 	</div>
-	<div class="ctrl row" ng-show="player.conf" on-focus-out="player.conf = false">
+	<div class="ctrl opt row" ng-show="player.conf" on-focus-out="player.conf = false">
 		<div class="col-xs-12">
 			<span class="button small glyphicon glyphicon-cog pull-right"
 				ng-click="player.conf = !player.conf"></span>
 		</div>
 		<div class="col-xs-12 play-opt">
-			<span class="volume-text cursor-pointer"
+			Volume:
+			<span class="cursor-pointer"
 				ng-click="player.volume(player.volume() ? 0 : 100)">{{ player.volume() }}%</span>
-			<div class="volume" style="margin-right:50px;">
+			<div class="volume">
 				<input class="cursor-pointer" type="range" min="0" max="100"
 					title="volume"
 					focus-me="player.conf"

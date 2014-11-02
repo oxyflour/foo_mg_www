@@ -393,12 +393,6 @@ fade-out { 0% { width: 100%; opacity: 1; } 69% { width: 100%; } }
 	position: relative;
 }
 /* volume control */
-.player .volume-text {
-	position: absolute;
-	top: 3px;
-	right: 20px;
-	font-size: 100%;
-}
 .player .volume {
 	position: relative;
 	margin-top: 5px;
@@ -432,6 +426,9 @@ fade-out { 0% { width: 100%; opacity: 1; } 69% { width: 100%; } }
 	white-space: nowrap;
 	height: 175px;
 }
+.player .opt {
+	background: rgba(255, 255, 255, 0.8);
+}
 .player .ctrl .button-col {
 	text-align: center;
 	margin-top: 50px;
@@ -454,7 +451,8 @@ fade-out { 0% { width: 100%; opacity: 1; } 69% { width: 100%; } }
 	opacity: 1;
 }
 .player .ctrl .play-opt {
-	margin-left: 5px;
+	margin-left: 3%;
+	width: 94%;
 	margin-top: 10px;
 }
 .player .ctrl .play-opt label {
