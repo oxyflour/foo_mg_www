@@ -375,7 +375,8 @@
 			<select class="form-control search-opt" ng-model="search.fields"
 				ng-change="search.word=search.word||undefined;browse(search)"
 				ng-options="field as name for (name, field) in
-					{ Both:undefined, Folders:'folder', Tracks:'album,artist,title' }"></select>
+					{ Any:undefined, Folders:'folder', Tracks:'album,artist,title',
+						Album:'album', Artist:'artist', Title:'title' }"></select>
 			<button type="submit" class="btn btn-primary">Search</button>
 		</div>
 		<p></p>
