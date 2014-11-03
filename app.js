@@ -159,9 +159,10 @@ app.factory('player', function ($interval, $rootScope, fooMG, config) {
 	player.time = function (time) {
 		return time === undefined ? audio.currentTime : (audio.currentTime = time)
 	}
-	player.volume = function (volume) {
-		return Math.floor((volume === undefined ? audio.volume : (audio.volume = volume / 100)) * 100)
-	}
+	Object.defineProperty(player, 'volume', {
+		get: function () { return Math.floor(audio.volume * 100) },
+		set: function (v) { audio.volume = v / 100 }
+	})
 
 	return player
 })
@@ -173,6 +174,15 @@ app.directive('localStorage', function () {
 			key: '@localStorage',
 		},
 		link: function (scope, elem, attrs, ctrl) {
+			// set initial value if the storage is unset yet
+			var k = scope.key || attrs.ngModel,
+				m = k+'.localStorageInited'
+			if (attrs.localStorageInitialValue && !localStorage.getItem(m)) {
+				localStorage.setItem(k, scope.model = scope.$eval(attrs.localStorageInitialValue))
+				localStorage.setItem(m, true)
+			}
+			// getter / setter
+			// note that if the storage will be removed if the value is empty (!value)
 			scope.$watch('model', function(v, v0) {
 				var k = scope.key || attrs.ngModel
 				if (v === v0 && attrs.localSaveOnly === undefined)

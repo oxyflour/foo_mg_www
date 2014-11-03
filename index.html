@@ -203,15 +203,15 @@
 		<div class="col-xs-12 play-opt">
 			Volume:
 			<span class="cursor-pointer"
-				ng-click="player.volume(player.volume() ? 0 : 100)">{{ player.volume() }}%</span>
+				ng-click="player.volume = player.volume ? 0 : 100">{{ player.volume }}%</span>
 			<div class="volume">
 				<input class="cursor-pointer" type="range" min="0" max="100"
 					title="volume"
 					focus-me="player.conf"
-					ng-model-options="{ getterSetter:true }"
+					local-storage local-storage-initial-value="100"
 					ng-model="player.volume" />
 				<div class="vbar">
-					<div class="bar" ng-style="{ 'padding-left':player.volume()+'%' }">
+					<div class="bar" ng-style="{ 'padding-left':player.volume+'%' }">
 						<div class="core"></div>
 					</div>
 				</div>
@@ -228,10 +228,10 @@
 			</label>
 		</div>
 	</div>
-	<div class="info" ng-show="player.playing.id">
+	<div class="info">
 		<h5 class="primary">
 			<a href ng-click="browse(player.params);route.tool=false">{{ player.playing.name }}</a>
-			<small>&lt;{{ player.playing.artist }}&gt;</small>
+			<small>&lt; {{ player.playing.artist || 'Ready to Play' }} &gt;</small>
 		</h5>
 		<small class="time">
 			[ {{ player.hover.mmss || (player.status == 'play' ?
@@ -395,7 +395,7 @@
 			<div class="title">
 				<h4 class="primary">{{:: item.album }}</h4>
 				<p class="sub">
-					&lt;{{:: item.album_artist }}&gt;
+					&lt; {{:: item.album_artist }} &gt;
 					{{ item.count }} {{ item.count > 1 ? 'tracks' : 'track' }}
 					<a href ng-if="item.path" ng-click="browse({ path:item.path })">View</a>
 				</p>
