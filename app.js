@@ -449,7 +449,7 @@ app.controller('main', function ($scope, $location, $timeout, fooMG, player, con
 			var k = localStorage.key(i);
 			if (k.search(prefix) == 0) {
 				var u = k.substr(prefix.length);
-				ls[u] = localStorage.getItem(k);
+				ls[u] = JSON.parse(localStorage.getItem(k))
 			}
 		}
 		return ls;
