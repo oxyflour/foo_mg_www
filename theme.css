@@ -288,13 +288,13 @@ body {
 	}
 	.track .title {
 		display: inline-block;
-		width: 55%;
+		min-width: 55%;
 	}
 	.nosep .track .title {
-		width: 40%;
+		min-width: 40%;
 	}
 	.track .artist {
-		display: inline;
+		display: inline-block;
 	}
 	.track .select-check {
 		display: inline;
