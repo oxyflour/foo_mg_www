@@ -178,17 +178,18 @@ app.directive('localStorage', function () {
 			var k = scope.key || attrs.ngModel,
 				m = k+'.localStorageInited'
 			if (attrs.localStorageInitialValue && !localStorage.getItem(m)) {
-				localStorage.setItem(k, JSON.stringify(scope.model = scope.$eval(attrs.localStorageInitialValue)))
+				scope.model = scope.$eval(attrs.localStorageInitialValue)
+				localStorage.setItem(k, JSON.stringify(scope.model))
 				localStorage.setItem(m, true)
 			}
 			// getter / setter
 			// note that if the storage will be removed if the value is empty (!value)
 			scope.$watch('model', function(v, v0) {
 				var k = scope.key || attrs.ngModel
-				if (v === v0 && attrs.localSaveOnly === undefined)
+				if (v === v0 && attrs.localStorageSaveOnly === undefined)
 					scope.model = JSON.parse(localStorage.getItem(k)) || ''
-				else
-					scope.model ? localStorage.setItem(k, JSON.stringify(scope.model)) : localStorage.removeItem(k)
+				else scope.model ?
+					localStorage.setItem(k, JSON.stringify(scope.model)) : localStorage.removeItem(k)
 			});
 		},
 	};
