@@ -189,10 +189,19 @@ app.directive('localStorage', function () {
 			// note that if the storage will be removed if the value is empty (!value)
 			scope.$watch('model', function(v, v0) {
 				var k = scope.key || attrs.ngModel
-				if (v === v0 && attrs.localStorageSaveOnly === undefined)
-					scope.model = JSON.parse(localStorage.getItem(k)) || ''
-				else scope.model ?
-					localStorage.setItem(k, JSON.stringify(scope.model)) : localStorage.removeItem(k)
+				if (v === v0 && attrs.localStorageSaveOnly === undefined) {
+					try {
+						scope.model = JSON.parse(localStorage.getItem(k)) || ''
+					}
+					catch (e) {
+					}
+				}
+				else {
+					if (scope.model)
+						localStorage.setItem(k, JSON.stringify(scope.model))
+					else
+						localStorage.removeItem(k)
+				}
 			});
 		},
 	};
@@ -452,7 +461,12 @@ app.controller('main', function ($scope, $location, $timeout, fooMG, player, con
 			var k = localStorage.key(i);
 			if (k.search(prefix) == 0) {
 				var u = k.substr(prefix.length);
-				ls[u] = JSON.parse(localStorage.getItem(k))
+				try {
+					ls[u] = JSON.parse(localStorage.getItem(k))
+				}
+				catch (e) {
+					ls[u] = ''
+				}
 			}
 		}
 		return ls;
