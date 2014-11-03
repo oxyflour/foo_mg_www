@@ -20,8 +20,20 @@
 <body cache-scroll-position>
 <nav class="navbar navbar-default navbar-fixed-top">
 	<div class="container">
+		<!-- header -->
+		<div class="navbar-header title visible-xs-block" ng-hide="route.search">
+			<a href class="navbar-brand pull-right" ng-click="route.search = true" ng-hide="route.tool">
+				<span class="glyphicon glyphicon-search" style="font-size:120%"></span>
+			</a>
+			<a href class="navbar-brand text" ng-click="route.tool = !route.tool">
+				<span class="icon glyphicon glyphicon-align-justify anim anim-transform"
+					ng-class="route.tool && 'active'"></span>
+				{{ route.title || list.title || 'FooMG' }}
+			</a>
+		</div>
+		<!-- search -->
 		<div class="navbar-header search visible-xs-block ng-hide" ng-show="route.search" ng-cloak>
-			<a href class="navbar-brand" ng-click="route.search = false">
+			<a href class="navbar-brand back" ng-click="route.search = false">
 				<span class="glyphicon glyphicon-chevron-left"></span>
 			</a>
 			<form class="navbar-form"
@@ -32,16 +44,6 @@
 						ng-model="search.text" placeholder="Find Folders or Tracks" />
 				</div>
 			</form>
-		</div>
-		<div class="navbar-header title visible-xs-block" ng-hide="route.search">
-			<a href class="navbar-brand pull-right" ng-click="route.search = true" ng-hide="route.tool">
-				<span class="glyphicon glyphicon-search" style="font-size:120%"></span>
-			</a>
-			<a href class="navbar-brand text" ng-click="route.tool = !route.tool" ng-cloak>
-				<span class="icon glyphicon glyphicon-align-justify anim anim-transform"
-					ng-class="route.tool && 'active'"></span>
-				{{ route.title || list.title || 'FooMG' }}
-			</a>
 		</div>
 		<!-- navbars for large view -->
 		<div class="navbar-header hidden-xs">
@@ -193,35 +195,41 @@
 			</span>
 		</div>
 	</div>
-	<div class="ctrl opt" ng-show="player.conf" on-focus-out="player.conf = false">
-		<span tabindex="-1" class="cursor-pointer" ng-click="player.volume = player.volume ? 0 : 100">
-			Volume: {{ player.volume }}%
-		</span>
-		<div class="volume">
-			<input class="cursor-pointer" type="range" min="0" max="100"
-				title="volume"
-				focus-me="player.conf"
-				local-storage local-storage-initial-value="100"
-				ng-model="player.volume" />
-			<div class="vbar">
-				<div class="bar" ng-style="{ 'padding-left':player.volume+'%' }">
-					<div class="core"></div>
+	<div class="ctrl conf row" ng-show="player.conf" on-focus-out="player.conf = false">
+		<div class="col-xs-12">
+			<span class="button small glyphicon glyphicon-remove pull-right"
+				ng-click="player.conf = !player.conf"></span>
+		</div>
+		<div class="col-xs-12 config">
+			<span tabindex="-1" class="cursor-pointer" ng-click="player.volume = player.volume ? 0 : 100">
+				Volume: {{ player.volume }}%
+			</span>
+			<div class="volume">
+				<input class="cursor-pointer" type="range" min="0" max="100"
+					title="volume"
+					focus-me="player.conf"
+					local-storage local-storage-initial-value="100"
+					ng-model="player.volume" />
+				<div class="vbar">
+					<div class="bar" ng-style="{ 'padding-left':player.volume+'%' }">
+						<div class="core"></div>
+					</div>
 				</div>
 			</div>
+			<p></p>
+			<p>
+				<input type="checkbox" ng-model="config.playNext"
+					local-storage local-storage-initial-value="true" />
+				<span tabindex="-1" class="cursor-pointer"
+					ng-click="config.playNext = !config.playNext">Playing Through</span>
+			</p>
+			<p>
+				<input type="checkbox" ng-model="config.playLoop"
+					local-storage local-storage-initial-value="true" />
+				<span tabindex="-1" class="cursor-pointer"
+					ng-click="config.playLoop = !config.playLoop">Playing Loop</span>
+			</p>
 		</div>
-		<p></p>
-		<p>
-			<input type="checkbox" ng-model="config.playNext"
-				local-storage local-storage-initial-value="true" />
-			<span tabindex="-1" class="cursor-pointer"
-				ng-click="config.playNext = !config.playNext">Playing Through</span>
-		</p>
-		<p>
-			<input type="checkbox" ng-model="config.playLoop"
-				local-storage local-storage-initial-value="true" />
-			<span tabindex="-1" class="cursor-pointer"
-				ng-click="config.playLoop = !config.playLoop">Playing Loop</span>
-		</p>
 	</div>
 	<div class="info">
 		<h5 class="primary">
