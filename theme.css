@@ -428,6 +428,7 @@ fade-out { 0% { width: 100%; opacity: 1; } 69% { width: 100%; } }
 }
 .player .opt {
 	background: rgba(255, 255, 255, 0.8);
+	padding: 15px 10px;
 }
 .player .ctrl .button-col {
 	text-align: center;
@@ -449,15 +450,6 @@ fade-out { 0% { width: 100%; opacity: 1; } 69% { width: 100%; } }
 }
 .player .ctrl .button:hover {
 	opacity: 1;
-}
-.player .ctrl .play-opt {
-	margin-left: 3%;
-	width: 94%;
-	margin-top: 10px;
-}
-.player .ctrl .play-opt label {
-	color: #333;
-	font-weight: normal;
 }
 /* side player info */
 .player .info {

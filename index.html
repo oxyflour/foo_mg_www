@@ -145,7 +145,7 @@
 				<div class="part player" include-template="tmplSidePlayer"
 					ng-attr-style="background-image:{{
 						getResUrl({ id:player.playing.id||-1, res:'albumart' }) | toBgImgCss }}"></div>
-				<div class="part folderinfo" include-template="tmplSideFolder"></div>
+				<div class="part folderinfo" ng-if="list" include-template="tmplSideFolder"></div>
 				<div class="part resource" ng-if="list.res.length"
 					include-template="tmplSideResource"></div>
 				<div class="part links visible-xs-block">
@@ -193,40 +193,35 @@
 			</span>
 		</div>
 	</div>
-	<div class="ctrl opt row" ng-show="player.conf" on-focus-out="player.conf = false">
-		<div class="col-xs-12">
-			<span class="button small glyphicon glyphicon-cog pull-right"
-				ng-click="player.conf = !player.conf"></span>
-		</div>
-		<div class="col-xs-12 play-opt">
-			Volume:
-			<span class="cursor-pointer"
-				ng-click="player.volume = player.volume ? 0 : 100">{{ player.volume }}%</span>
-			<div class="volume">
-				<input class="cursor-pointer" type="range" min="0" max="100"
-					title="volume"
-					focus-me="player.conf"
-					local-storage local-storage-initial-value="100"
-					ng-model="player.volume" />
-				<div class="vbar">
-					<div class="bar" ng-style="{ 'padding-left':player.volume+'%' }">
-						<div class="core"></div>
-					</div>
+	<div class="ctrl opt" ng-show="player.conf" on-focus-out="player.conf = false">
+		<span tabindex="-1" class="cursor-pointer" ng-click="player.volume = player.volume ? 0 : 100">
+			Volume: {{ player.volume }}%
+		</span>
+		<div class="volume">
+			<input class="cursor-pointer" type="range" min="0" max="100"
+				title="volume"
+				focus-me="player.conf"
+				local-storage local-storage-initial-value="100"
+				ng-model="player.volume" />
+			<div class="vbar">
+				<div class="bar" ng-style="{ 'padding-left':player.volume+'%' }">
+					<div class="core"></div>
 				</div>
 			</div>
 		</div>
-		<div class="col-xs-12 play-opt">
-			<label class="cursor-pointer">
-				<input type="checkbox" ng-model="config.playNext" ng-true-value="'1'"
-					local-storage local-storage-initial-value="'1'" /> Playing Through
-			</label>
-		</div>
-		<div class="col-xs-12 play-opt">
-			<label class="cursor-pointer">
-				<input type="checkbox" ng-model="config.playLoop" ng-true-value="'1'"
-					local-storage local-storage-initial-value="'1'" /> Playing Loop
-			</label>
-		</div>
+		<p></p>
+		<p>
+			<input type="checkbox" ng-model="config.playNext"
+				local-storage local-storage-initial-value="true" />
+			<span tabindex="-1" class="cursor-pointer"
+				ng-click="config.playNext = !config.playNext">Playing Through</span>
+		</p>
+		<p>
+			<input type="checkbox" ng-model="config.playLoop"
+				local-storage local-storage-initial-value="true" />
+			<span tabindex="-1" class="cursor-pointer"
+				ng-click="config.playLoop = !config.playLoop">Playing Loop</span>
+		</p>
 	</div>
 	<div class="info">
 		<h5 class="primary">

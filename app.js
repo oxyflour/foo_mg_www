@@ -178,7 +178,7 @@ app.directive('localStorage', function () {
 			var k = scope.key || attrs.ngModel,
 				m = k+'.localStorageInited'
 			if (attrs.localStorageInitialValue && !localStorage.getItem(m)) {
-				localStorage.setItem(k, scope.model = scope.$eval(attrs.localStorageInitialValue))
+				localStorage.setItem(k, JSON.stringify(scope.model = scope.$eval(attrs.localStorageInitialValue)))
 				localStorage.setItem(m, true)
 			}
 			// getter / setter
@@ -186,9 +186,9 @@ app.directive('localStorage', function () {
 			scope.$watch('model', function(v, v0) {
 				var k = scope.key || attrs.ngModel
 				if (v === v0 && attrs.localSaveOnly === undefined)
-					scope.model = localStorage.getItem(k) || ''
+					scope.model = JSON.parse(localStorage.getItem(k)) || ''
 				else
-					scope.model ? localStorage.setItem(k, scope.model) : localStorage.removeItem(k)
+					scope.model ? localStorage.setItem(k, JSON.stringify(scope.model)) : localStorage.removeItem(k)
 			});
 		},
 	};
@@ -278,7 +278,7 @@ app.directive('onFocusOut', function ($timeout) {
 			$timeout(function () {
 				if (!elem.find(':focus').length)
 					scope.$eval(attrs.onFocusOut)
-			}, parseInt(attrs.onFocusOutDelay || 300))
+			}, parseInt(attrs.onFocusOutDelay || 100))
 		})
 	}
 })
