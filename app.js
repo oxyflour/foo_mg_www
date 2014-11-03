@@ -31,8 +31,8 @@ angular.paramsSplit = function (str) {
 var app = angular.module('app', ['ngRoute'/*, 'ngAnimate'*/])
 app.value('config', {
 	luaPath: '/lua/',
-	playNoNext: true,
-	playNoLoop: true,
+	playNext: true,
+	playLoop: true,
 })
 app.filter('toBgImgCss', function () {
 	return function (url) {
@@ -96,12 +96,12 @@ app.factory('player', function ($interval, $rootScope, fooMG, config) {
 		player.status = 'ended'
 
 		// continue playing
-		if (!config.playNoNext) {
-			var id = player.getTrackId(0, 1, config.playNoLoop)
+		if (config.playNext) {
+			var id = player.getTrackId(0, 1, !config.playLoop)
 			if (id) player.play(id)
 		}
 		// loop itself
-		else if (!config.playNoLoop)
+		else if (config.playLoop)
 			audio.play()
 	})
 

@@ -79,12 +79,12 @@
 							<span class="glyphicon glyphicon-fast-backward"></span> Play Prev</a></li>
 						<li class="divider"></li>
 						<li>
-							<a href ng-click="config.playNoNext = !config.playNoNext">
-								<span ng-hide="config.playNoNext">
+							<a href ng-click="config.playNext = !config.playNext">
+								<span ng-show="config.playNext">
 									<span class="glyphicon glyphicon-sort-by-attributes-alt"></span>
 									Playing Through List
 								</span>
-								<span ng-show="config.playNoNext">
+								<span ng-hide="config.playNext">
 									<span class="glyphicon glyphicon-sort-by-attributes-alt" style="opacity:0.2">
 									</span>
 									Playing Single Track
@@ -92,12 +92,12 @@
 							</a>
 						</li>
 						<li>
-							<a href ng-click="config.playNoLoop = !config.playNoLoop">
-								<span ng-hide="config.playNoLoop">
+							<a href ng-click="config.playLoop = !config.playLoop">
+								<span ng-show="config.playLoop">
 									<span class="glyphicon glyphicon-repeat"></span>
 									Playing Loop
 								</span>
-								<span ng-show="config.playNoLoop">
+								<span ng-hide="config.playLoop">
 									<span class="glyphicon glyphicon-repeat" style="opacity:0.2"></span>
 									Playing No Loop
 								</span>
@@ -142,8 +142,6 @@
 		<div class="col-sm-3 tool" ng-class="{ show:route.tool }">
 			<div class="mask" on-touch-start="route.tool=false" ng-click="route.tool=false"></div>
 			<div class="affix side anim anim-transform" fit-parent-width>
-				<input type="hidden" ng-model="config.playNoNext" local-storage />
-				<input type="hidden" ng-model="config.playNoLoop" local-storage />
 				<div class="part player" include-template="tmplSidePlayer"
 					ng-attr-style="background-image:{{
 						getResUrl({ id:player.playing.id||-1, res:'albumart' }) | toBgImgCss }}"></div>
@@ -219,12 +217,14 @@
 		</div>
 		<div class="col-xs-12 play-opt">
 			<label class="cursor-pointer">
-				<input type="checkbox" ng-model="config.playNoNext" /> Playing Single Track
+				<input type="checkbox" ng-model="config.playNext" ng-true-value="'1'"
+					local-storage local-storage-initial-value="'1'" /> Playing Through
 			</label>
 		</div>
 		<div class="col-xs-12 play-opt">
 			<label class="cursor-pointer">
-				<input type="checkbox" ng-model="config.playNoLoop" /> Playing No Loop
+				<input type="checkbox" ng-model="config.playLoop" ng-true-value="'1'"
+					local-storage local-storage-initial-value="'1'" /> Playing Loop
 			</label>
 		</div>
 	</div>
