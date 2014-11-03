@@ -27,6 +27,21 @@ angular.paramsSplit = function (str) {
 		d[k] = decodeURIComponent(v)
 	}, { })
 }
+angular.resetZoom = function () {
+	// Tested ok with Build-in browser & Chrome 39 on Android
+	// But does not work For IE because scale in viewport is not supported
+	//   see http://msdn.microsoft.com/en-us/library/windows/apps/ff462082(v=vs.105).aspx
+	var meta = $('meta[name="viewport"]'),
+		body = $('body'),
+		content = meta.attr('content')
+	meta.attr('content',
+		'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1')
+	body.hide()
+	setTimeout(function () {
+		meta.attr('content', content)
+		body.show()
+	}, 500)
+}
 
 var app = angular.module('app', ['ngRoute'/*, 'ngAnimate'*/])
 app.value('config', {
