@@ -152,14 +152,11 @@ app.factory('player', function ($interval, $rootScope, fooMG, config) {
 		return st[i]
 	}
 	player.play = function (id, offset) {
-		if (!id && player.pid) {
-			if (!audio.src)
-				audio.src = fooMG.getResUrl({ id:player.pid })
-			audio.play()
-		}
-		else if (id = player.getTrackId(id, offset) || id) {
+		if (id = player.getTrackId(id, offset) || id) {
+			var url = fooMG.getResUrl({ id:id })
+			if (audio.url != url)
+				audio.src = audio.url = url
 			player.pid = id
-			audio.src = fooMG.getResUrl({ id:id })
 			audio.play()
 		}
 	}
