@@ -123,8 +123,13 @@ body {
 	padding-left: 0;
 }
 .form-search .search-opt {
-	max-width: 105px;
-	display: inline-block;
+	width: 100px;
+}
+@media (max-width: 767px) {
+	.form-search .search-opt {
+		width: 32%;
+		display: inline-block;
+	}
 }
 
 /*

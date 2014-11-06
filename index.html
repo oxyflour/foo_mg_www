@@ -379,13 +379,13 @@
 			<label class="sr-only">Search Dir</label>
 			<select class="form-control search-opt" ng-model="search.path"
 				ng-change="search.word=search.word||undefined;browse(search)"
-				ng-options="dir.path as dir.name for dir in dirs"></select>
+				ng-options="dir.path as dir.shortName for dir in dirs"></select>
 			<select class="form-control search-opt" ng-model="search.fields"
 				ng-change="search.word=search.word||undefined;browse(search)"
 				ng-options="field as name for (name, field) in
 					{ Any:undefined, Folders:'folder', Tracks:'album,artist,title',
 						Album:'album', Artist:'artist', Title:'title' }"></select>
-			<button type="submit" class="btn btn-primary">Search</button>
+			<button class="btn btn-primary search-opt" type="submit">Search</button>
 		</div>
 		<p></p>
 	</form>
