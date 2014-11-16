@@ -456,7 +456,7 @@ fade-out { 0% { width: 100%; opacity: 1; } 69% { width: 100%; } }
 	background: rgba(255, 255, 255, 0.8);
 }
 .player .conf .config {
-	padding: 0 24px;
+	padding: 12px;
 }
 /* side player info */
 .player .info {

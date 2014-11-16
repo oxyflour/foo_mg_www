@@ -48,6 +48,7 @@ app.value('config', {
 	luaPath: /^10\./.test(location.host) ? '/lua/' : 'http://121.40.73.193/lua/',
 	playNext: true,
 	playLoop: true,
+	transcoding: /^10\./.test(location.host) ? 'mp3' : '',
 })
 app.filter('toBgImgCss', function () {
 	return function (url) {
@@ -70,6 +71,7 @@ app.factory('fooMG', function ($http, config) {
 			})
 		},
 		getResUrl: function (data) {
+			if (!data.res && config.transcoding) data.support = config.transcoding
 			var params = angular.paramsJoin(data)
 			return config.luaPath + 'resource.lua' + (params ? '?'+params : '')
 		},
