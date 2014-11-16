@@ -45,7 +45,7 @@ angular.resetZoom = function () {
 
 var app = angular.module('app', ['ngRoute'/*, 'ngAnimate'*/])
 app.value('config', {
-	luaPath: '/lua/',
+	luaPath: /^10\./.test(location.host) ? '/lua/' : 'http://121.40.73.193/lua/',
 	playNext: true,
 	playLoop: true,
 })
