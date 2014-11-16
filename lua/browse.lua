@@ -232,6 +232,7 @@ if get_var("tojson") then
 	cjson.encode_sparse_array(true, 0)
 	print("HTTP/1.0 200 OK\r\n",
 		"Content-Type: text/json;charset=utf-8\r\n",
+		"Access-Control-Allow-Origin: *\r\n",
 		"\r\n",
 		cjson.encode(inf))
 -- display
