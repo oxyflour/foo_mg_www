@@ -48,7 +48,7 @@ app.value('config', {
 	luaPath: /^10\./.test(location.host) ? '/lua/' : 'http://121.40.73.193/lua/',
 	playNext: true,
 	playLoop: true,
-	transcoding: /^10\./.test(location.host) ? 'mp3' : '',
+	transcoding: /^10\./.test(location.host) ? '' : 'mp3',
 })
 app.filter('toBgImgCss', function () {
 	return function (url) {
