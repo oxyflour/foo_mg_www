@@ -45,10 +45,10 @@ angular.resetZoom = function () {
 
 var app = angular.module('app', ['ngRoute'/*, 'ngAnimate'*/])
 app.value('config', {
-	luaPath: /^10\./.test(location.host) ? '/lua/' : 'http://121.40.73.193/lua/',
+	luaPath: '/lua/',
 	playNext: true,
 	playLoop: true,
-	transcoding: /^10\./.test(location.host) ? '' : 'mp3',
+	transcoding: '',
 })
 app.filter('toBgImgCss', function () {
 	return function (url) {
