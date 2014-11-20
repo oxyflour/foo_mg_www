@@ -171,7 +171,7 @@
 	<input type="hidden" local-storage ng-model="player.params" />
 	<div class="ctrl row" ng-hide="player.conf">
 		<div class="col-xs-12">
-			<span class="button small glyphicon glyphicon-cog pull-right"
+			<span tabindex="-1" class="button small glyphicon glyphicon-cog pull-right"
 				ng-click="player.conf = !player.conf"></span>
 		</div>
 		<div class="col-xs-4 button-col">
@@ -197,7 +197,7 @@
 	</div>
 	<div class="ctrl conf row" ng-show="player.conf" on-focus-out="player.conf = false">
 		<div class="col-xs-12">
-			<span class="button small glyphicon glyphicon-remove pull-right"
+			<span tabindex="-1" class="button small glyphicon glyphicon-remove pull-right"
 				ng-click="player.conf = !player.conf"></span>
 			<div class="config">
 				<span tabindex="-1" class="cursor-pointer" style="margin-top:-2em"
