@@ -10,7 +10,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="icon" sizes="96x96" href="img/launcher-icon-2x.png">
 <link rel="apple-touch-startup-image" href="img/launcher-icon-2x.png">
-<title ng-bind="route.title || list.title || 'FooMG'">FooMG</title>
+<title ng-bind="(player.playing.name && player.playing.name+' - '+player.playing.artist) ||
+	route.title || list.title || 'FooMG'">FooMG</title>
 <script src="lib/jquery/jquery-2.1.1.min.js"></script>
 <script src="lib/angular/angular.min.js"></script>
 <script src="lib/angular/angular-route.js"></script>
