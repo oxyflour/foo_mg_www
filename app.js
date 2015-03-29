@@ -60,7 +60,7 @@ app.factory('fooMG', function ($http, config) {
 		list: function (params, begin, count) {
 			var data = angular.paramsSplit(params)
 			return $http({
-				url: config.luaPath + 'browse.lua',
+				url: config.luaPath + 'browse.lua/',
 				method: 'GET',
 				params: angular.extend(data, {
 					tojson: 1,
@@ -73,7 +73,7 @@ app.factory('fooMG', function ($http, config) {
 		getResUrl: function (data) {
 			if (!data.res && config.transcoding) data.support = config.transcoding
 			var params = angular.paramsJoin(data)
-			return config.luaPath + 'resource.lua' + (params ? '?'+params : '')
+			return config.luaPath + 'resource.lua/' + (params ? '?'+params : '')
 		},
 		shared: { }
 	}
