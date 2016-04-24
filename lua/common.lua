@@ -1,20 +1,14 @@
-CONF = {
+config = {
 	-- default albumart file
-	def_albumart = fb_env.doc_root.."\\img\\nocover.jpg",
-	-- albumart folder (saved as %album%.jpg)
-	albumart_folder = fb_env.doc_root.."\\tmp\\albumart",
+	def_albumart = fb_env.doc_root..'\\img\\nocover.jpg',
 	-- albumart cache folder
-	albumart_cache = fb_env.doc_root.."\\tmp\\cache",
-	-- lyric search dir (saved as %artist% - %title%.lrc or %title%.lrc)
-	lyric_dir = fb_env.doc_root.."\\tmp\\lyric",
+	albumart_cache = fb_env.doc_root..'\\tmp\\cache',
 	-- image magic convert.exe path
 	image_magic_exe = fb_env.doc_root.."\\tmp\\ImageMagic\\convert.exe",
-	-- extra lua script name
-	ext_fname = "mg.lua",
-	-- resource types
-	res_fmt = {"jpg", "bmp", "png", "txt", "log"},
+	-- allowed resource types
+	allowed_resource = { jpg=1, bmp=1, png=1, txt=1, log=1 },
 	-- also scan resource in these sub directorys
-	res_sub = {"scans", "bk"}
+	scan_sub_directory = { scans=1, bk=1 },
 }
 
 string.md5 = fb_util.md5
@@ -28,29 +22,17 @@ end
 string.ansi_to_utf8 = function(s)
 	return fb_util.codepage_to_utf8(s, 0)
 end
+string.sql_escape = function(s)
+	return s and s:gsub('\'', '\'\'')
+end
+string.like_escape = function(s, c)
+	return s and s:gsub('\'', '\'\''):gsub('[%%_%[%]'..c..']', c..'%1')
+end
 
-table.set = function(ls, key, val)
-	ls[key] = val
-	return val
-end
-table.each = function(ls, func, obj)
-	for i, v in pairs(ls) do
-		local r = func(i, v, obj)
-		if r then
-			return r
-		end
+request_info.get_virtual_path = function()
+	local script_name = fb_env.script_path:match('.*\\(.*)$')
+	local path_begin, path_end = request_info.uri:find('/'..script_name..'/')
+	if path_end and path_end > 0 then
+		return request_info.uri:sub(path_end)
 	end
-	return obj
-end
-table.index = function(ls, item)
-	return table.each(ls, function(i, v)
-		return v == item and i
-	end)
-end
-table.inspart = function(ls, item, current, begin, count)
-	current = current + 1
-	if current > begin and current <= begin + count then
-		ls[current] = item
-	end
-	return current
 end

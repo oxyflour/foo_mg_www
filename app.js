@@ -58,20 +58,44 @@ app.filter('toBgImgCss', function () {
 app.factory('fooMG', function ($http, config) {
 	return {
 		list: function (params, begin, count) {
-			var data = angular.paramsSplit(params)
+			begin = begin || 0
+			count = count || 1
+			var data = angular.paramsSplit(params),
+				path = data.path || '',
+				sort = data.sort || (config.sort && config.sort[params]) ||
+					(data.tlist && 'tlist') || 'default'
+			delete data.path
+			delete data.sort
 			return $http({
-				url: config.luaPath + 'browse.lua/',
+				url: config.luaPath + 'list.lua/' + encodeURI(path) +
+					sort + '-' + begin + '-' + (begin + count - 1) + '.json',
 				method: 'GET',
-				params: angular.extend(data, {
-					tojson: 1,
-					begin: begin,
-					count: count,
-					sort: data.sort || (config.sort && config.sort[params]) || (data.tlist && 'tlist') || undefined
-				})
+				params: data
 			})
 		},
 		getResUrl: function (data) {
-			if (!data.res && config.transcoding) data.support = config.transcoding
+			if (!data.res && config.transcoding) {
+				data.support = config.transcoding
+			}
+			if (data.id > 0) {
+				if (data.res === 'albumart') {
+					return config.luaPath + 'track.lua/' + data.id + '.jpg'
+				}
+				else {
+					return config.luaPath + 'track.lua/' + data.id +
+						(config.transcoding ? '.' + config.transcoding : '')
+				}
+			}
+			else {
+				if (data.res === 'albumart') {
+					return config.luaPath + 'res.lua/' + encodeURI(data.path || '') +
+						'~/cover.thumb.jpg'
+				}
+				else if (data.res) {
+					return config.luaPath + 'res.lua/' + encodeURI(data.path || '') +
+						'~/' + encodeURI(data.res.replace(/\\/g, '/'))
+				}
+			}
 			var params = angular.paramsJoin(data)
 			return config.luaPath + 'resource.lua/' + (params ? '?'+params : '')
 		},
