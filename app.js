@@ -56,6 +56,9 @@ app.filter('toBgImgCss', function () {
 	}
 })
 app.factory('fooMG', function ($http, config) {
+	function encodePath(path) {
+		return path.split('/').map(encodeURIComponent).join('/')
+	}
 	return {
 		list: function (params, begin, count) {
 			begin = begin || 0
@@ -67,7 +70,7 @@ app.factory('fooMG', function ($http, config) {
 			delete data.path
 			delete data.sort
 			return $http({
-				url: config.luaPath + 'list.lua/' + encodeURI(path) +
+				url: config.luaPath + 'list.lua/' + encodePath(path) +
 					sort + '-' + begin + '-' + (begin + count - 1) + '.json',
 				method: 'GET',
 				params: data
@@ -88,11 +91,11 @@ app.factory('fooMG', function ($http, config) {
 			}
 			else {
 				if (data.res === 'albumart') {
-					return config.luaPath + 'res.lua/' + encodeURI(data.path || '') +
+					return config.luaPath + 'res.lua/' + encodePath(data.path || '') +
 						'~/cover.thumb.jpg'
 				}
 				else if (data.res) {
-					return config.luaPath + 'res.lua/' + encodeURI(data.path || '') +
+					return config.luaPath + 'res.lua/' + encodePath(data.path || '') +
 						'~/' + encodeURI(data.res.replace(/\\/g, '/'))
 				}
 			}
