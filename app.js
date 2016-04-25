@@ -151,7 +151,7 @@ app.factory('player', function ($interval, $rootScope, fooMG, config) {
 
 	// player.params
 	player.$watch('params', function (params) {
-		if (params) fooMG.list(params).success(function (data) {
+		if (params) fooMG.list(params, 0, 256).success(function (data) {
 			player.playlist = angular.ieach(data.ls, function (v, i, d) {
 				if (v.id) d.push(v.id)
 			}, [ ]).join(',')
@@ -159,7 +159,7 @@ app.factory('player', function ($interval, $rootScope, fooMG, config) {
 	})
 	// player.pid
 	player.$watch('pid', function (pid) {
-		if (pid) fooMG.list('tlist='+pid).success(function (data) {
+		if (pid) fooMG.list('tlist='+pid, 0, 1).success(function (data) {
 			player.playing = data.ls[0]
 		})
 	})
