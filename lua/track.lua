@@ -81,6 +81,10 @@ else
 	sent = fb_stream.stream_mp3(track_info.file, track_info.sub, 0, 2)	-- vbr mp3, quality 2, [320kbps]
 end
 
+if supported_codecs.jpg and sent < 0 then
+	sent = fb_stream.stream_file(config.def_albumart)
+end
+
 if sent < 0 then
 	print('HTTP/1.0 403 OK\r\n\r\n')
 end

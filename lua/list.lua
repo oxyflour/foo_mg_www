@@ -257,7 +257,7 @@ local items
 if get_var('word') or get_var('flist') or get_var('tlist') then
 	items = search_path_items({
 		search_word = get_var('word'),
-		search_fields = get_var('field'),
+		search_fields = get_var('fields'),
 		folder_ids = get_var('flist'),
 		track_ids = get_var('tlist'),
 	}, path, begin, last, sort)

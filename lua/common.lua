@@ -2,7 +2,7 @@ config = {
 	-- default albumart file
 	def_albumart = fb_env.doc_root..'\\img\\nocover.jpg',
 	-- albumart cache folder
-	albumart_cache = fb_env.doc_root..'\\tmp\\cache',
+	albumart_cache = fb_env.doc_root..'\\tmp',
 	-- image magic convert.exe path
 	image_magic_exe = fb_env.doc_root.."\\tmp\\ImageMagic\\convert.exe",
 	-- allowed resource types
