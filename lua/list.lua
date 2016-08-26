@@ -249,7 +249,7 @@ local virtual_path = request_info.get_virtual_path()
 local path_mat, file_mat = virtual_path:match('/(.*/)([^/]+)$')
 local path = path_mat or ''
 local file = file_mat or virtual_path:sub(2)
-local sort, begin_index, last_index = file:match('(.*)-(%d+)-(%d+)%.json')
+local sort, begin_index, last_index, ext_type = file:match('(.*)-(%d+)-(%d+)%.(%w+)')
 local begin = tonumber(begin_index or '0')
 local last = tonumber(last_index or '1e9')
 
@@ -283,9 +283,27 @@ local result = {
 	res = items.res,
 }
 
-cjson.encode_sparse_array(true, 0)
-print("HTTP/1.0 200 OK\r\n",
-	"Content-Type: application/json\r\n",
-	"Access-Control-Allow-Origin: *\r\n",
-	"\r\n",
-	cjson.encode(result))
+if ext_type:lower() == 'json' then
+	cjson.encode_sparse_array(true, 0)
+	print("HTTP/1.0 200 OK\r\n",
+		"Content-Type: application/json\r\n",
+		"Access-Control-Allow-Origin: *\r\n",
+		"\r\n",
+		cjson.encode(result))
+elseif ext_type:lower() == 'zip' then
+	local entries = { }
+	local hasEntry = false
+	for i, item in ipairs(items.list) do
+		local name = string.format([[%s. %s - %s.*]],
+			item.num, item.artist, item.name)
+		if item.typ == 'track' then
+			entries[name] = string.format([[/lua/track.lua/%s]], item.id)
+			hasEntry = true
+		end
+	end
+	if hasEntry then
+		fb_stream.zip_urls(file, entries)
+	end
+else
+	print('HTTP/1.0 403 OK\r\n\r\n')
+end
