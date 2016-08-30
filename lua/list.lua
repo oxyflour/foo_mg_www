@@ -45,6 +45,7 @@ function query_path_items(path, begin, last, sort)
 	local sql = string.format([[SELECT
 		i,
 		d,
+		b,
 		SUBSTR(b, 1, e-r) AS p
 	FROM (SELECT *,
 			id AS i,
@@ -63,7 +64,7 @@ function query_path_items(path, begin, last, sort)
 	local folders, list, total = { }, { }, 0
 
 	local db = sqlite3.open(fb_env.db_file_name)
-	for id, dir, sub in db:urows(sql) do
+	for id, dir, pth, sub in db:urows(sql) do
 		if sub == path then
 			folders[id] = dir
 		else
@@ -73,6 +74,7 @@ function query_path_items(path, begin, last, sort)
 					typ = "folder",
 					name = ('\\'..sub):match('([^\\]+)\\$'),
 					path = sub,
+					latest_path = pth,
 				}
 			end
 		end
@@ -154,7 +156,8 @@ function search_path_items(params, path, begin, last, sort)
 					typ = "folder",
 					name = dir,
 					path = dir,
-					id = id
+					id = id,
+					latest_path = dir,
 				}
 			end
 			folder_ids = folder_ids and folder_ids..','..id or id

@@ -419,7 +419,7 @@
 		<li class="folder" ng-if="item.typ=='folder'">
 			<a href class="albumart" ng-click="browse({ path:item.path })"
 				ng-attr-style="background-image:{{::
-					getResUrl({ path:item.path, res:'albumart', s:'small' }) | toBgImgCss }}"></a>
+					getResUrl({ path:item.latest_path, res:'albumart', s:'small' }) | toBgImgCss }}"></a>
 			<div class="title">
 				<h4 class="primary">
 					<a href ng-click="browse({ path:item.path })">{{:: item.shortName }}</a>

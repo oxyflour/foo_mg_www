@@ -46,6 +46,9 @@ angular.resetZoom = function () {
 var app = angular.module('app', ['ngRoute'/*, 'ngAnimate'*/])
 app.value('config', {
 	luaPath: 'lua/',
+	cdnDomain: {
+		'aly.ofr.me': 'https://ocq8s0sc1.qnssl.com/lua/',
+	},
 	playNext: true,
 	playLoop: true,
 	transcoding: '',
@@ -57,7 +60,7 @@ app.filter('toBgImgCss', function () {
 })
 app.factory('fooMG', function ($http, config) {
 	function encodePath(path) {
-		return path.split('/').map(encodeURIComponent).join('/')
+		return path.replace(/\\/g, '/').split('/').map(encodeURIComponent).join('/')
 	}
 	return {
 		list: function (params, begin, count) {
@@ -91,7 +94,8 @@ app.factory('fooMG', function ($http, config) {
 			}
 			else {
 				if (data.res === 'albumart') {
-					return config.luaPath + 'res.lua/' + encodePath(data.path || '') +
+					var luaPath = config.cdnDomain[document.domain] || config.luaPath
+					return luaPath + 'res.lua/' + encodePath(data.path || '') +
 						'~/cover.thumb.jpg'
 				}
 				else if (data.res) {
